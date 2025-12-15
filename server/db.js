@@ -1,14 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var pg_1 = require("pg");
-var pool = new pg_1.Pool({
-    host: "localhost",
-    port: 5432,
-    database: "dtales_db",
-    user: "dtales_admin",
-    password: "StrongPassword123",
+import pkg from "pg";
+const { Pool } = pkg;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
-pool.on("connect", function () {
-    console.log("🐘 PostgreSQL connected");
+
+pool.on("connect", () => {
+  console.log("🐘 PostgreSQL connected");
 });
-exports.default = pool;
+
+export default pool;
+

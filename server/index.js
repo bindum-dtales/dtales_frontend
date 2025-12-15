@@ -1,17 +1,22 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var express = require("express");
-var cors = require("cors");
-var blogs_1 = require("./routes/blogs");
-var case_studies_1 = require("./routes/case-studies");
-var app = express();
+import express from "express";
+import cors from "cors";
+import blogsRouter from "./routes/blogs.js";
+import caseStudiesRouter from "./routes/case-studies.js";
+
+const app = express();
+
 app.use(cors());
 app.use(express.json());
-app.use("/api/blogs", blogs_1.default);
-app.use("/api/case-studies", case_studies_1.default);
-app.get("/health", function (_req, res) {
-    res.json({ status: "ok" });
+
+app.get("/health", (_, res) => {
+  res.json({ status: "ok" });
 });
-app.listen(4000, function () {
-    console.log("🚀 Backend running on http://localhost:4000");
+
+app.use("/api/blogs", blogsRouter);
+app.use("/api/case-studies", caseStudiesRouter);
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
 });
+
