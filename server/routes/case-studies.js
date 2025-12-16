@@ -63,7 +63,7 @@ router.get("/:id", function (req, res) { return __awaiter(void 0, void 0, void 0
             case 1:
                 rows = (_a.sent()).rows;
                 if (!rows.length) {
-                    return [2 /*return*/, res.status(404).json({ error: "Case study not found" })];
+                    return [2 /*return*/, res.status(404).json({ error: "Not found" })];
                 }
                 res.json(rows[0]);
                 return [2 /*return*/];
