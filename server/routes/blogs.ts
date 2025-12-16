@@ -8,10 +8,15 @@ const router = Router();
  * Get all blogs (admin)
  */
 router.get("/", async (_req, res) => {
-  const { rows } = await pool.query(
-    "SELECT * FROM blogs ORDER BY created_at DESC"
-  );
-  res.json(rows);
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM blogs ORDER BY created_at DESC"
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    res.status(500).json({ error: "Failed to fetch blogs" });
+  }
 });
 
 /**
@@ -19,10 +24,15 @@ router.get("/", async (_req, res) => {
  * Get published blogs (public)
  */
 router.get("/public", async (_req, res) => {
-  const { rows } = await pool.query(
-    "SELECT * FROM blogs WHERE published = true ORDER BY created_at DESC"
-  );
-  res.json(rows);
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM blogs WHERE published = true ORDER BY created_at DESC"
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching public blogs:", error);
+    res.status(500).json({ error: "Failed to fetch public blogs" });
+  }
 });
 
 /**
@@ -30,16 +40,18 @@ router.get("/public", async (_req, res) => {
  * Create blog
  */
 router.post("/", async (req, res) => {
-  const { title, slug, content, cover_image_url, published } = req.body;
-
-  const { rows } = await pool.query(
-    `INSERT INTO blogs (title, slug, content, cover_image_url, published)
-     VALUES ($1,$2,$3,$4,$5)
-     RETURNING *`,
-    [title, slug, content, cover_image_url ?? null, !!published]
-  );
-
-  res.status(201).json(rows[0]);
+  try {
+    const { title, slug, content, cover_image_url, published } = req.body;
+    const { rows } = await pool.query(
+      `INSERT INTO blogs (title, slug, content, cover_image_url, published)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [title, slug, content, cover_image_url ?? null, !!published]
+    );
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    console.error("Error creating blog:", error);
+    res.status(500).json({ error: "Failed to create blog" });
+  }
 });
 
 /**
@@ -47,18 +59,17 @@ router.post("/", async (req, res) => {
  * Get single blog by ID
  */
 router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-
-  const { rows } = await pool.query(
-    "SELECT * FROM blogs WHERE id = $1",
-    [id]
-  );
-
-  if (rows.length === 0) {
-    return res.status(404).json({ message: "Blog not found" });
+  try {
+    const { id } = req.params;
+    const { rows } = await pool.query("SELECT * FROM blogs WHERE id = $1", [id]);
+    if (!rows.length) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Error fetching blog:", error);
+    res.status(500).json({ error: "Failed to fetch blog" });
   }
-
-  res.json(rows[0]);
 });
 
 /**
@@ -66,23 +77,48 @@ router.get("/:id", async (req, res) => {
  * Update blog by ID
  */
 router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const { title, slug, content, cover_image_url, published } = req.body;
+  try {
+    const { id } = req.params;
+    const { title, slug, content, cover_image_url, published } = req.body;
+    const { rows } = await pool.query(
+      `UPDATE blogs SET
+       title = $1,
+       slug = $2,
+       content = $3,
+       cover_image_url = $4,
+       published = $5,
+       updated_at = NOW()
+       WHERE id = $6 RETURNING *`,
+      [title, slug, content, cover_image_url, published, id]
+    );
+    if (!rows.length) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Error updating blog:", error);
+    res.status(500).json({ error: "Failed to update blog" });
+  }
+});
 
-  const { rows } = await pool.query(
-    `UPDATE blogs
-     SET title = $1,
-         slug = $2,
-         content = $3,
-         cover_image_url = $4,
-         published = $5,
-         updated_at = now()
-     WHERE id = $6
-     RETURNING *`,
-    [title, slug, content, cover_image_url, published, id]
-  );
-
-  res.json(rows[0]);
+/**
+ * DELETE /api/blogs/:id
+ * Delete blog by ID
+ */
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rowCount } = await pool.query("DELETE FROM blogs WHERE id = $1", [
+      id,
+    ]);
+    if (!rowCount) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting blog:", error);
+    res.status(500).json({ error: "Failed to delete blog" });
+  }
 });
 
 export = router;
