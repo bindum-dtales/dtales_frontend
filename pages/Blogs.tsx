@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../src/lib/api";
 
 type Blog = {
 	id: string;
@@ -10,8 +11,6 @@ type Blog = {
 	published: boolean;
 	created_at: string;
 };
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const stripHtml = (html: string) => html.replace(/<[^>]*>?/gm, "");
 const getExcerpt = (html?: string) => {
@@ -25,19 +24,10 @@ const Blogs: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const loadBlogs = async () => {
-			try {
-				const res = await fetch(`${BASE_URL}/api/blogs/public`);
-				if (!res.ok) throw new Error("Failed to fetch blogs");
-				const data = await res.json();
-				setBlogs(data);
-			} catch (e: any) {
-				setError(e.message || "Failed to load blogs");
-			} finally {
-				setLoading(false);
-			}
-		};
-		loadBlogs();
+		apiFetch<Blog[]>("/api/blogs/public")
+			.then(setBlogs)
+			.catch((e) => setError(e.message || "Failed to load blogs"))
+			.finally(() => setLoading(false));
 	}, []);
 
 	return (

@@ -1,11 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Quote } from 'lucide-react';
-import { TESTIMONIALS } from '../constants';
+
+type Testimonial = {
+  id: number;
+  quote: string;
+  client: string;
+  company: string;
+};
 
 const Testimonials: React.FC = () => {
-  // Duplicate testimonials multiple times to ensure seamless looping on wide screens
-  const MARQUEE_ITEMS = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS];
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // TODO: Replace with API call when backend endpoint is ready
+    // apiFetch<Testimonial[]>("/api/testimonials").then(setTestimonials).finally(() => setLoading(false));
+    
+    // Temporary fallback
+    const fallbackData: Testimonial[] = [
+      { id: 1, quote: "DTales transformed our documentation from chaotic to crystal clear.", client: "Sarah M.", company: "TechCorp" },
+      { id: 2, quote: "Their content strategy increased our user engagement by 300%.", client: "James K.", company: "StartupHub" },
+      { id: 3, quote: "Professional, detail-oriented, and always ahead of deadlines.", client: "Emily R.", company: "CloudVentures" },
+    ];
+    setTestimonials(fallbackData);
+    setLoading(false);
+  }, []);
+
+  const MARQUEE_ITEMS = [...testimonials, ...testimonials, ...testimonials, ...testimonials];
+
+  if (loading) {
+    return (
+      <section className="py-32 bg-black text-white overflow-hidden relative">
+        <div className="text-center text-gray-400">Loading testimonials...</div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-32 bg-black text-white overflow-hidden relative">

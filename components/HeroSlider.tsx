@@ -4,6 +4,9 @@ import { ChevronRight, Pause, Play } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { HERO_SLIDES } from '../constants';
 
+// TODO: Replace HERO_SLIDES with API call when backend endpoint is ready
+// const slides = await apiFetch<HeroSlide[]>("/api/hero-slides");
+
 const HeroSlider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -26,48 +29,32 @@ const HeroSlider: React.FC = () => {
     setTimeout(() => setIsPlaying(true), 8000);
   };
 
-  // Helper function for HashRouter-safe smooth scrolling
-  const scrollToHash = (hash: string) => {
-    if (location.pathname !== "/") {
-      navigate(`/#/${hash}`);
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      const el = document.getElementById(hash);
-      el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  };
-
-  // Helper function to scroll to footer
-  const scrollToFooter = () => {
-    if (location.pathname !== "/") {
+  const scrollToSection = (sectionId: string) => {
+    const isHome = location.pathname === "/";
+    
+    if (!isHome) {
       navigate("/");
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
     }
-
-    setTimeout(() => {
-      const footer = document.getElementById("contact");
-      footer?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 200);
   };
 
   const handleCTAClick = () => {
     switch (currentIndex) {
       case 0:
-        // Slide 1 - Learn More → scroll to About section
-        scrollToHash("about");
+        scrollToSection("about");
         break;
       case 1:
-        // Slide 2 - Our Services → navigate to /services
         navigate('/services');
         break;
       case 2:
-        // Slide 3 - View Portfolio → navigate to /blogs
         navigate('/blogs');
         break;
       case 3:
-        // Slide 4 - Contact Us → scroll to footer
-        scrollToFooter();
+        scrollToSection("contact");
         break;
       default:
         break;
@@ -85,7 +72,6 @@ const HeroSlider: React.FC = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
         >
-          {/* Background Image with Advanced Overlay */}
           <div className="absolute inset-0">
              <motion.img
               src={HERO_SLIDES[currentIndex].image} 
@@ -99,7 +85,6 @@ const HeroSlider: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
           </div>
 
-          {/* Content */}
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -140,7 +125,6 @@ const HeroSlider: React.FC = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Progressive Controls */}
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-6 z-20 bg-black/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
         <button 
           onClick={() => setIsPlaying(!isPlaying)}

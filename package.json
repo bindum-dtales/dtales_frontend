@@ -1,7 +1,7 @@
 {
-  "name": "dtales-revamp",
+  "name": "dtales-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,19 +16,19 @@
     "@tiptap/starter-kit": "^3.13.0",
     "cors": "^2.8.5",
     "express": "^5.2.1",
-    "framer-motion": "^12.23.24",
-    "lucide-react": "^0.554.0",
+    "framer-motion": "^11.15.0",
+    "lucide-react": "^0.468.0",
     "pg": "^8.16.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.10.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^22.19.2",
-    "@vitejs/plugin-react": "^5.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "ts-node": "^10.9.2",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "typescript": "^5.8.2",
+    "vite": "^5.4.11"
   }
 }

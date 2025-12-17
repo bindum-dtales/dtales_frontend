@@ -63,6 +63,14 @@ const App: React.FC = () => {
               } 
             />
             <Route 
+              path="/admin/blogs/edit/:id" 
+              element={
+                <ProtectedRoute>
+                  <AdminBlogEditor />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/admin/blogs/manage" 
               element={
                 <ProtectedRoute>

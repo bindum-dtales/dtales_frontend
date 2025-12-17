@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { apiFetch } from "../src/lib/api";
 
 type Blog = {
   id: string;
@@ -9,8 +10,6 @@ type Blog = {
   created_at?: string;
 };
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
-
 const BlogDetails: React.FC = () => {
   const { id } = useParams();
   const [blog, setBlog] = useState<Blog | null>(null);
@@ -18,20 +17,11 @@ const BlogDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadBlog = async () => {
-      if (!id) return;
-      try {
-        const res = await fetch(`${BASE_URL}/api/blogs/${id}`);
-        if (!res.ok) throw new Error("Failed to fetch blog");
-        const data = await res.json();
-        setBlog(data);
-      } catch (e: any) {
-        setError(e.message || "Failed to load blog");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadBlog();
+    if (!id) return;
+    apiFetch<Blog>(`/api/blogs/${id}`)
+      .then(setBlog)
+      .catch((e) => setError(e.message || "Failed to load blog"))
+      .finally(() => setLoading(false));
   }, [id]);
 
   return (

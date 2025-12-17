@@ -20,6 +20,7 @@ import {
   Heading2,
   Heading3,
 } from "lucide-react";
+import { apiPost, apiPut } from "../src/lib/api";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -96,31 +97,25 @@ const AdminBlogEditor: React.FC = () => {
     if (!editor) return;
     setSaving(true);
     setError(null);
-
     try {
+      const editorHTML = editor.getHTML();
       const payload = {
         title,
         slug,
         cover_image_url: coverUrl,
-        content: { html: editor.getHTML() },
+        content: { html: editorHTML },
         published,
       };
-
-      const endpoint = isEdit
-        ? `${BASE_URL}/api/blogs/${id}`
-        : `${BASE_URL}/api/blogs`;
-
-      const res = await fetch(endpoint, {
-        method: isEdit ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error("Failed to save blog");
-
+      
+      if (isEdit && id) {
+        await apiPut(`/api/blogs/${id}`, payload);
+      } else {
+        await apiPost("/api/blogs", payload);
+      }
+      
       navigate("/admin/dashboard");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (e: any) {
+      setError(e.message || "An unexpected error occurred");
     } finally {
       setSaving(false);
     }
