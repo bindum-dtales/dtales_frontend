@@ -48,18 +48,22 @@ const upload = multer({
  * Upload a single image file
  * Returns { url: "/uploads/filename.ext" }
  */
-router.post("/image", upload.single("image"), (req, res) => {
-  try {
+router.post("/image", (req, res) => {
+  const uploadHandler = upload.single("image");
+  
+  uploadHandler(req, res, (err) => {
+    if (err) {
+      console.error("MULTER ERROR:", err);
+      return res.status(400).json({ error: err.message || "Failed to upload image" });
+    }
+
     if (!req.file) {
       return res.status(400).json({ error: "No image file provided" });
     }
 
     const imageUrl = `/uploads/${req.file.filename}`;
-    res.status(201).json({ url: imageUrl });
-  } catch (err) {
-    console.error("IMAGE UPLOAD ERROR:", err);
-    res.status(500).json({ error: "Failed to upload image" });
-  }
+    return res.status(201).json({ url: imageUrl });
+  });
 });
 
 module.exports = router;

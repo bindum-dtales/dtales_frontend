@@ -311,11 +311,19 @@ const AdminCaseStudyEditor: React.FC = () => {
             </button>
             <button
               aria-label="Add Image"
-              className="px-3 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20"
-              onClick={addImage}
+              className="px-3 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 disabled:opacity-60"
+              onClick={addEditorImage}
+              disabled={uploadingImage}
             >
               <ImageIcon size={16} />
             </button>
+            <input
+              ref={editorImageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleEditorImageUpload(e.target.files?.[0] || null)}
+              className="hidden"
+            />
 
             <button
               aria-label="Undo"
