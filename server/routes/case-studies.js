@@ -142,4 +142,27 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+/**
+ * DELETE case study by ID
+ * Mirrors blog deletion behavior with JSON response
+ */
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ error: "Invalid case study id" });
+    }
+
+    const result = await pool.query("DELETE FROM case_studies WHERE id = $1", [id]);
+    if (!result.rowCount) {
+      return res.status(404).json({ error: "Case study not found" });
+    }
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("DELETE CASE STUDY ERROR:", err);
+    return res.status(500).json({ error: "Failed to delete case study" });
+  }
+});
+
 module.exports = router;
