@@ -84,11 +84,11 @@ const BlogDetails: React.FC = () => {
 
             {/* Cover Image */}
             {blog.cover_image_url && (
-              <div className="mb-10 overflow-hidden rounded-3xl">
+              <div className="mb-10 rounded-3xl overflow-hidden bg-gray-100">
                 <img
                   src={blog.cover_image_url}
                   alt={blog.title}
-                  className="w-full h-auto object-cover"
+                  className="w-full h-auto object-contain"
                 />
               </div>
             )}
