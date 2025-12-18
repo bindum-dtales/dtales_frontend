@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowLeft, Calendar } from "lucide-react";
 import { apiFetch } from "../src/lib/api";
 
 type CaseStudy = {
@@ -25,39 +27,64 @@ const CaseStudyDetails: React.FC = () => {
   }, [id]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-950 pt-28 pb-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#F5F5F7] pt-28 pb-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
+        {/* Back Button */}
+        <Link 
+          to="/case-studies" 
+          className="inline-flex items-center gap-2 text-dtales-navy font-semibold hover:underline mb-8"
+        >
+          <ArrowLeft size={20} />
+          Back to Case Studies
+        </Link>
+
         {loading && (
-          <div className="text-center text-gray-300 bg-white/5 border border-white/10 rounded-xl py-4 px-5">
+          <div className="text-center text-gray-600 bg-white border border-gray-200 rounded-[2rem] py-6 px-5">
             Loading case study...
           </div>
         )}
 
         {error && (
-          <div className="text-center text-red-300 bg-red-500/10 border border-red-500/30 rounded-xl py-4 px-5">
+          <div className="text-center text-red-600 bg-red-50 border border-red-200 rounded-[2rem] py-6 px-5">
             {error}
           </div>
         )}
 
         {!loading && !error && !caseStudy && (
-          <div className="text-center text-gray-300">Case study not found.</div>
+          <div className="text-center text-gray-600 bg-white border border-gray-200 rounded-[2rem] py-6 px-5">
+            Case study not found.
+          </div>
         )}
 
         {!loading && !error && caseStudy && (
-          <div className="bg-white/5 border border-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
-            <div className="space-y-3">
-              <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
+          <motion.article 
+            className="bg-white rounded-[2.5rem] shadow-sm p-8 sm:p-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Header */}
+            <header className="mb-8">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black leading-tight mb-6 tracking-tight">
                 {caseStudy.title}
               </h1>
               {caseStudy.created_at && (
-                <p className="text-sm text-gray-400">
-                  {new Date(caseStudy.created_at).toLocaleDateString()}
-                </p>
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Calendar size={18} />
+                  <time className="text-base">
+                    {new Date(caseStudy.created_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </time>
+                </div>
               )}
-            </div>
+            </header>
 
+            {/* Cover Image */}
             {caseStudy.cover_image_url && (
-              <div className="overflow-hidden rounded-xl border border-white/10">
+              <div className="mb-10 overflow-hidden rounded-3xl">
                 <img
                   src={caseStudy.cover_image_url}
                   alt={caseStudy.title}
@@ -66,11 +93,22 @@ const CaseStudyDetails: React.FC = () => {
               </div>
             )}
 
+            {/* Content */}
             <div
-              className="prose prose-invert prose-lg max-w-none text-gray-100"
+              className="prose prose-lg max-w-none
+                prose-headings:font-bold prose-headings:text-black prose-headings:tracking-tight
+                prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
+                prose-p:text-gray-700 prose-p:leading-relaxed prose-p:text-lg
+                prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-black prose-strong:font-bold
+                prose-ul:text-gray-700 prose-ol:text-gray-700
+                prose-li:text-gray-700 prose-li:leading-relaxed
+                prose-img:rounded-2xl prose-img:shadow-md
+                prose-code:text-blue-700 prose-code:bg-blue-50 prose-code:px-2 prose-code:py-1 prose-code:rounded
+                prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-2xl"
               dangerouslySetInnerHTML={{ __html: caseStudy.content?.html || "" }}
             />
-          </div>
+          </motion.article>
         )}
       </div>
     </div>

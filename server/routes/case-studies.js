@@ -44,6 +44,21 @@ router.get("/", async (_req, res) => {
 });
 
 /**
+ * GET published case studies only
+ */
+router.get("/public", async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT * FROM case_studies WHERE published = true ORDER BY created_at DESC"
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("FETCH PUBLIC CASE STUDIES ERROR:", err);
+    res.status(500).json({ error: "Failed to fetch public case studies" });
+  }
+});
+
+/**
  * GET single case study by ID
  */
 router.get("/:id", async (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -19,28 +19,35 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  Upload,
+  X,
 } from "lucide-react";
 import { apiFetch, apiPost, apiPut } from "../src/lib/api";
+import { useImageUpload } from "../src/hooks/useImageUpload";
 
 const AdminCaseStudyEditor: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
+  const { uploadImage, uploading: uploadingImage, error: uploadError, setError: setUploadError } = useImageUpload();
+
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(isEdit);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const editorImageInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ 
+      StarterKit.configure({
         heading: { levels: [1, 2, 3] },
       }),
       Underline,
+      Link.configure({ openOnClick: false }),
       Image,
-      Link.configure({ autolink: true, openOnClick: false }),
     ],
     content: "",
     editorProps: {
@@ -80,10 +87,26 @@ const AdminCaseStudyEditor: React.FC = () => {
     editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
-  const addImage = () => {
-    const url = window.prompt("Enter image URL");
-    if (!url) return;
-    editor?.chain().focus().setImage({ src: url }).run();
+  const handleCoverImageUpload = async (file: File | null) => {
+    if (!file) return;
+    setUploadError(null);
+    const url = await uploadImage(file);
+    if (url) {
+      setCoverImageUrl(url);
+    }
+  };
+
+  const handleEditorImageUpload = async (file: File | null) => {
+    if (!file || !editor) return;
+    setUploadError(null);
+    const url = await uploadImage(file);
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  const addEditorImage = () => {
+    editorImageInputRef.current?.click();
   };
 
   const handleSaveDraft = async () => {
@@ -159,6 +182,15 @@ const AdminCaseStudyEditor: React.FC = () => {
           </div>
         )}
 
+        {uploadError && (
+          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 flex justify-between items-center">
+            <span>{uploadError}</span>
+            <button onClick={() => setUploadError(null)}>
+              <X size={18} />
+            </button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <input
             className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
@@ -172,12 +204,41 @@ const AdminCaseStudyEditor: React.FC = () => {
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
           />
-          <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
-            placeholder="Cover Image URL"
-            value={coverImageUrl}
-            onChange={(e) => setCoverImageUrl(e.target.value)}
-          />
+          
+          {/* Cover Image Upload */}
+          <div className="md:col-span-2">
+            <label className="block text-sm text-gray-300 mb-2">Cover Image</label>
+            <div className="flex gap-3 items-center">
+              <button
+                type="button"
+                onClick={() => coverInputRef.current?.click()}
+                disabled={uploadingImage}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white px-4 py-3 rounded-xl font-semibold transition"
+              >
+                <Upload size={18} />
+                {uploadingImage ? "Uploading..." : "Choose Image"}
+              </button>
+              {coverImageUrl && (
+                <div className="flex-1 flex items-center gap-3">
+                  <img src={coverImageUrl} alt="Cover preview" className="h-12 w-12 object-cover rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={() => setCoverImageUrl("")}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleCoverImageUpload(e.target.files?.[0] || null)}
+              className="hidden"
+            />
+          </div>
         </div>
 
         <div className="bg-white/10 border border-white/10 backdrop-blur-lg rounded-xl">
