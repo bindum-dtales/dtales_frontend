@@ -1,9 +1,36 @@
 const { Router } = require("express");
 const pool = require("../db");
+const slugify = require("slugify");
 
 const router = Router();
 
-// Get all case studies
+/**
+ * Always generate a valid slug (NEVER null)
+ */
+function generateSlug(title) {
+  return slugify(String(title || "case-study"), {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
+}
+
+/**
+ * Ensure slug is unique in DB
+ */
+async function ensureUniqueSlug(baseSlug) {
+  const { rows } = await pool.query(
+    "SELECT id FROM case_studies WHERE slug = $1",
+    [baseSlug]
+  );
+
+  if (rows.length === 0) return baseSlug;
+  return `${baseSlug}-${Date.now()}`;
+}
+
+/**
+ * GET all case studies
+ */
 router.get("/", async (_req, res) => {
   try {
     const { rows } = await pool.query(
@@ -11,90 +38,40 @@ router.get("/", async (_req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error(err);
+    console.error("FETCH CASE STUDIES ERROR:", err);
     res.status(500).json({ error: "Failed to fetch case studies" });
   }
 });
 
-// Get case study by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { rows } = await pool.query(
-      "SELECT * FROM case_studies WHERE id = $1",
-      [id]
-    );
-    if (!rows.length) {
-      return res.status(404).json({ error: "Case study not found" });
-    }
-    res.json(rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch case study" });
-  }
-});
-
-// Create case study
+/**
+ * POST create case study
+ * 🚨 Slug is FORCED here
+ */
 router.post("/", async (req, res) => {
   try {
-    const { title, client, content, cover_image_url, published } = req.body;
-    const { rows } = await pool.query(
-      `INSERT INTO case_studies
-       (title, client, content, cover_image_url, published)
-       VALUES ($1,$2,$3,$4,$5)
-       RETURNING *`,
-      [title, client ?? null, content, cover_image_url ?? null, !!published]
-    );
-    res.status(201).json(rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to create case study" });
-  }
-});
+    const { title, content } = req.body;
 
-// Update case study
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, client, content, cover_image_url, published } = req.body;
-    const { rows } = await pool.query(
-      `UPDATE case_studies SET
-       title = $1,
-       client = $2,
-       content = $3,
-       cover_image_url = $4,
-       published = $5,
-       updated_at = NOW()
-       WHERE id = $6 RETURNING *`,
-      [title, client, content, cover_image_url, published, id]
-    );
-    if (!rows.length) {
-      return res.status(404).json({ error: "Case study not found" });
+    if (!title || typeof title !== "string") {
+      return res.status(400).json({ error: "Title is required" });
     }
-    res.json(rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to update case study" });
-  }
-});
 
-// Delete case study
-router.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { rowCount } = await pool.query(
-      "DELETE FROM case_studies WHERE id = $1",
-      [id]
+    const baseSlug = generateSlug(title);
+    const slug = await ensureUniqueSlug(baseSlug);
+
+    const { rows } = await pool.query(
+      `
+      INSERT INTO case_studies (title, slug, content)
+      VALUES ($1, $2, $3)
+      RETURNING *
+      `,
+      [title.trim(), slug, content ?? ""]
     );
-    if (!rowCount) {
-      return res.status(404).json({ error: "Case study not found" });
-    }
-    res.status(204).send();
+
+    return res.status(201).json(rows[0]);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to delete case study" });
+    console.error("CREATE CASE STUDY ERROR:", err);
+    return res.status(500).json({ error: "Failed to create case study" });
   }
 });
 
 module.exports = router;
-// force git change
