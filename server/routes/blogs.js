@@ -158,7 +158,8 @@ router.put("/:id", async (req, res) => {
 
     const title = ((req.body.title ?? current.title) || "").toString().trim();
     const contentHtmlRaw = pickContentHtml(req.body.content);
-    const contentHtml = contentHtmlRaw || current.content || "";
+    // Only use new content if explicitly provided; otherwise keep existing
+    const contentHtml = contentHtmlRaw !== "" ? contentHtmlRaw : current.content || "";
     const coverImage = pickCoverImage(req.body);
     const published = toBooleanStrict(req.body.published);
 

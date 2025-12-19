@@ -12,10 +12,7 @@ const AdminCaseStudyEditor: React.FC = () => {
   const { uploadImage, uploading: uploadingImage, error: uploadError, setError: setUploadError } = useImageUpload();
 
   const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [summary, setSummary] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
-  const [client, setClient] = useState("");
   const [contentFile, setContentFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,17 +28,10 @@ const AdminCaseStudyEditor: React.FC = () => {
         const data = await apiFetch<{
           title: string;
           slug: string;
-          summary?: string | null;
-          cover_image?: string | null;
           cover_image_url?: string | null;
-          client?: string | null;
-          content?: { html?: string };
         }>(`/api/case-studies/${id}`);
         setTitle(data.title || "");
-        setSlug(data.slug || "");
-        setSummary(data.summary || "");
         setCoverImageUrl(data.cover_image_url || "");
-        setClient(data.client || "");
       } catch (e: any) {
         setError(e.message || "Failed to load case study");
       } finally {
@@ -100,42 +90,36 @@ const AdminCaseStudyEditor: React.FC = () => {
     setSaving(true);
     setError(null);
     try {
-      let htmlContent = "";
-      
-      // If editing and no new file, keep existing content
-      if (isEdit && !contentFile) {
-        htmlContent = ""; // Backend will preserve existing
-      } else if (contentFile) {
-        const content = await uploadDocxAndGetContent();
-        if (!content) {
-          setSaving(false);
-          return;
-        }
-        htmlContent = content;
+      if (!title.trim()) {
+        setError("Title is required");
+        setSaving(false);
+        return;
       }
 
       const payload: any = {
-        title,
-        slug,
-        summary,
-        cover_image: coverImageUrl,
+        title: title.trim(),
         cover_image_url: coverImageUrl,
-        client,
         published: false,
       };
 
-      if (htmlContent) {
-        payload.content = { html: htmlContent };
+      // Only include content if a new .docx file was uploaded
+      if (contentFile) {
+        const htmlContent = await uploadDocxAndGetContent();
+        if (!htmlContent) {
+          setSaving(false);
+          return;
+        }
+        payload.content = htmlContent; // Plain HTML string, NOT { html: ... }
+      } else if (!isEdit) {
+        // For new case studies, content is required
+        setError("Please upload a .docx file with your content");
+        setSaving(false);
+        return;
       }
 
       if (isEdit && id) {
         await apiPut(`/api/case-studies/${id}`, payload);
       } else {
-        if (!contentFile) {
-          setError("Please upload a .docx file with your content");
-          setSaving(false);
-          return;
-        }
         await apiPost("/api/case-studies", payload);
       }
     } catch (e: any) {
@@ -149,42 +133,36 @@ const AdminCaseStudyEditor: React.FC = () => {
     setSaving(true);
     setError(null);
     try {
-      let htmlContent = "";
-      
-      // If editing and no new file, keep existing content
-      if (isEdit && !contentFile) {
-        htmlContent = ""; // Backend will preserve existing
-      } else if (contentFile) {
-        const content = await uploadDocxAndGetContent();
-        if (!content) {
-          setSaving(false);
-          return;
-        }
-        htmlContent = content;
+      if (!title.trim()) {
+        setError("Title is required");
+        setSaving(false);
+        return;
       }
 
       const payload: any = {
-        title,
-        slug,
-        summary,
-        cover_image: coverImageUrl,
+        title: title.trim(),
         cover_image_url: coverImageUrl,
-        client,
         published: true,
       };
 
-      if (htmlContent) {
-        payload.content = { html: htmlContent };
+      // Only include content if a new .docx file was uploaded
+      if (contentFile) {
+        const htmlContent = await uploadDocxAndGetContent();
+        if (!htmlContent) {
+          setSaving(false);
+          return;
+        }
+        payload.content = htmlContent; // Plain HTML string, NOT { html: ... }
+      } else if (!isEdit) {
+        // For new case studies, content is required
+        setError("Please upload a .docx file with your content");
+        setSaving(false);
+        return;
       }
 
       if (isEdit && id) {
         await apiPut(`/api/case-studies/${id}`, payload);
       } else {
-        if (!contentFile) {
-          setError("Please upload a .docx file with your content");
-          setSaving(false);
-          return;
-        }
         await apiPost("/api/case-studies", payload);
       }
 
@@ -226,30 +204,10 @@ const AdminCaseStudyEditor: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
+            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white md:col-span-2"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-          />
-          <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
-            placeholder="Slug"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-          />
-
-          <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
-            placeholder="Summary"
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-          />
-
-          <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
-            placeholder="Client"
-            value={client}
-            onChange={(e) => setClient(e.target.value)}
           />
           
           {/* Cover Image Upload */}

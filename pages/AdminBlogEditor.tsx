@@ -12,7 +12,6 @@ const AdminBlogEditor: React.FC = () => {
   const { uploadImage, uploading: uploadingImage, error: uploadError, setError: setUploadError } = useImageUpload();
 
   const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [contentFile, setContentFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
@@ -26,30 +25,9 @@ const AdminBlogEditor: React.FC = () => {
 
     const loadBlog = async () => {
       try {
-        const data = await apiFetch<{ title: string; slug: string; cover_image_url?: string | null; content?: { html?: string } }>(`/api/blogs/${id}`);
+        const data = await apiFetch<{ title: string; slug: string; cover_image_url?: string | null }>(`/api/blogs/${id}`);
 
         setTitle(data.title || "");
-        setSlug(data.slug || "");
-        setCoverUrl(data.cover_image_url || "");
-      } catch (err: any) {
-        setError(err.message || "Failed to load blog");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadBlog();
-  }, [id, isEdit]);
-
-  useEffect(() => {
-    if (!isEdit) return;
-
-    const loadBlog = async () => {
-      try {
-        const data = await apiFetch<{ title: string; slug: string; cover_image_url?: string | null; content?: { html?: string } }>(`/api/blogs/${id}`);
-
-        setTitle(data.title || "");
-        setSlug(data.slug || "");
         setCoverUrl(data.cover_image_url || "");
       } catch (err: any) {
         setError(err.message || "Failed to load blog");
@@ -109,39 +87,36 @@ const AdminBlogEditor: React.FC = () => {
     setSaving(true);
     setError(null);
     try {
-      let htmlContent = "";
-      
-      // If editing and no new file, keep existing content
-      if (isEdit && !contentFile) {
-        htmlContent = ""; // Backend will preserve existing
-      } else if (contentFile) {
-        const content = await uploadDocxAndGetContent();
-        if (!content) {
-          setSaving(false);
-          return;
-        }
-        htmlContent = content;
+      if (!title.trim()) {
+        setError("Title is required");
+        setSaving(false);
+        return;
       }
 
       const payload: any = {
-        title,
-        slug,
+        title: title.trim(),
         cover_image_url: coverUrl,
         published: false,
       };
 
-      if (htmlContent) {
-        payload.content = { html: htmlContent };
-      }
-      
-      if (isEdit && id) {
-        await apiPut(`/api/blogs/${id}`, payload);
-      } else {
-        if (!contentFile) {
-          setError("Please upload a .docx file with your content");
+      // Only include content if a new .docx file was uploaded
+      if (contentFile) {
+        const htmlContent = await uploadDocxAndGetContent();
+        if (!htmlContent) {
           setSaving(false);
           return;
         }
+        payload.content = htmlContent; // Plain HTML string, NOT { html: ... }
+      } else if (!isEdit) {
+        // For new blogs, content is required
+        setError("Please upload a .docx file with your content");
+        setSaving(false);
+        return;
+      }
+
+      if (isEdit && id) {
+        await apiPut(`/api/blogs/${id}`, payload);
+      } else {
         await apiPost("/api/blogs", payload);
       }
     } catch (e: any) {
@@ -155,39 +130,36 @@ const AdminBlogEditor: React.FC = () => {
     setSaving(true);
     setError(null);
     try {
-      let htmlContent = "";
-      
-      // If editing and no new file, keep existing content
-      if (isEdit && !contentFile) {
-        htmlContent = ""; // Backend will preserve existing
-      } else if (contentFile) {
-        const content = await uploadDocxAndGetContent();
-        if (!content) {
-          setSaving(false);
-          return;
-        }
-        htmlContent = content;
+      if (!title.trim()) {
+        setError("Title is required");
+        setSaving(false);
+        return;
       }
 
       const payload: any = {
-        title,
-        slug,
+        title: title.trim(),
         cover_image_url: coverUrl,
         published: true,
       };
 
-      if (htmlContent) {
-        payload.content = { html: htmlContent };
-      }
-      
-      if (isEdit && id) {
-        await apiPut(`/api/blogs/${id}`, payload);
-      } else {
-        if (!contentFile) {
-          setError("Please upload a .docx file with your content");
+      // Only include content if a new .docx file was uploaded
+      if (contentFile) {
+        const htmlContent = await uploadDocxAndGetContent();
+        if (!htmlContent) {
           setSaving(false);
           return;
         }
+        payload.content = htmlContent; // Plain HTML string, NOT { html: ... }
+      } else if (!isEdit) {
+        // For new blogs, content is required
+        setError("Please upload a .docx file with your content");
+        setSaving(false);
+        return;
+      }
+
+      if (isEdit && id) {
+        await apiPut(`/api/blogs/${id}`, payload);
+      } else {
         await apiPost("/api/blogs", payload);
       }
       
@@ -229,16 +201,10 @@ const AdminBlogEditor: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
+            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white md:col-span-2"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-          />
-          <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white"
-            placeholder="Slug"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
           />
           
           {/* Cover Image Upload */}

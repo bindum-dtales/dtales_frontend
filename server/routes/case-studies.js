@@ -89,16 +89,12 @@ router.get("/:id", async (req, res) => {
 
 /**
  * POST create case study
- * 🚨 Slug is FORCED here
  */
 router.post("/", async (req, res) => {
   try {
     const {
       title,
-      summary,
-      cover_image,
       cover_image_url,
-      client,
       published,
     } = req.body;
 
@@ -126,24 +122,18 @@ router.post("/", async (req, res) => {
       INSERT INTO case_studies (
         title,
         slug,
-        summary,
         content,
-        cover_image,
         cover_image_url,
-        client,
         published
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
       `,
       [
         title.trim(),
         slug,
-        summary ?? null,
         contentHtml,
-        cover_image ?? cover_image_url ?? null,
-        cover_image_url ?? cover_image ?? null,
-        client ?? null,
+        cover_image_url ?? null,
         published === true,
       ]
     );
@@ -182,8 +172,6 @@ router.put("/:id", async (req, res) => {
     const baseSlug = generateSlug(title);
     const slug = await ensureUniqueSlugForUpdate(baseSlug, id);
 
-    const summary = req.body.summary ?? current.summary ?? null;
-    
     // Extract HTML from content (handles both string and { html: "..." })
     let content = current.content ?? null;
     if (req.body.content !== undefined) {
@@ -194,15 +182,10 @@ router.put("/:id", async (req, res) => {
       }
     }
     
-    const cover_image =
-      req.body.cover_image !== undefined
-        ? req.body.cover_image
-        : current.cover_image ?? null;
     const cover_image_url =
       req.body.cover_image_url !== undefined
         ? req.body.cover_image_url
-        : current.cover_image_url ?? cover_image ?? null;
-    const client = req.body.client ?? current.client ?? null;
+        : current.cover_image_url ?? null;
     const published =
       typeof req.body.published === "boolean"
         ? req.body.published
@@ -214,26 +197,13 @@ router.put("/:id", async (req, res) => {
       SET
         title = $1,
         slug = $2,
-        summary = $3,
-        content = $4,
-        cover_image = $5,
-        cover_image_url = $6,
-        client = $7,
-        published = $8
-      WHERE id = $9
+        content = $3,
+        cover_image_url = $4,
+        published = $5
+      WHERE id = $6
       RETURNING *
       `,
-      [
-        title,
-        slug,
-        summary,
-        content,
-        cover_image,
-        cover_image_url,
-        client,
-        published,
-        id,
-      ]
+      [title, slug, content, cover_image_url, published, id]
     );
 
     return res.json(rows[0]);
