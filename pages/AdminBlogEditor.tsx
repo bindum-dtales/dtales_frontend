@@ -83,7 +83,7 @@ const AdminBlogEditor: React.FC = () => {
       }
 
       const data = await response.json();
-      return data.content;
+      return data.html;
     } catch (err: any) {
       setError(err.message || "Failed to process .docx file");
       return null;

@@ -14,8 +14,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// Serve uploaded images as static files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// No local static uploads; all assets served from Cloudinary
 
 app.get("/health", (_, res) => {
   res.json({ status: "ok" });

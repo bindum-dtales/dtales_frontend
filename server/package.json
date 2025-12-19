@@ -7,10 +7,12 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "mammoth": "^1.11.0",
     "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "pg": "^8.16.3",
     "slugify": "^1.6.6"
   }

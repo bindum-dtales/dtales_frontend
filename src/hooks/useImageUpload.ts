@@ -28,8 +28,8 @@ export const useImageUpload = () => {
       }
 
       const data = await response.json();
-      // Return full URL with API base
-      return `${API_BASE_URL}${data.url}`;
+      // Backend returns a full Cloudinary URL
+      return data.url as string;
     } catch (err: any) {
       const errorMessage = err.message || "Failed to upload image";
       setError(errorMessage);
