@@ -6,7 +6,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://dtales-backend.onrender.com";
 
 /**
- * Upload an image to Cloudinary via the backend.
+ * Upload an image to Supabase Storage via the backend.
  *
  * @param file - Image file to upload
  * @returns URL of uploaded image, or null if upload fails
@@ -50,8 +50,8 @@ export async function uploadImage(file: File): Promise<string | null> {
  * Flow:
  *   1. Send DOCX file to backend
  *   2. Backend parses DOCX → HTML using Mammoth
- *   3. Backend uploads embedded images to Cloudinary
- *   4. Backend returns clean HTML with Cloudinary URLs
+ *   3. Backend uploads embedded images to Supabase Storage
+ *   4. Backend returns clean HTML with Supabase public URLs
  *
  * @param file - DOCX file to upload and parse
  * @returns HTML content from DOCX, or null if upload/parsing fails

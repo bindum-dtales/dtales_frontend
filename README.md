@@ -6,27 +6,25 @@
 
 A modern, production-ready Content Management System with blog and case study management.
 
-## 🎉 Upload System - NOW FIXED!
+## 🎉 Upload System - Supabase Storage
 
-All uploads now use **Cloudinary** for permanent, reliable storage.
+All uploads now use **Supabase Storage** for permanent, reliable storage.
 
 ### Quick Start for Deployment
 
-1. **Read:** [`DEPLOYMENT_CHECKLIST.md`](DEPLOYMENT_CHECKLIST.md) - Step-by-step deployment guide
-2. **Setup:** Get Cloudinary credentials from https://cloudinary.com
+1. **Read:** [`QUICK_DEPLOYMENT.md`](QUICK_DEPLOYMENT.md) - Step-by-step deployment guide
+2. **Setup:** Configure Supabase Storage bucket
 3. **Configure:** Set environment variables in Render
 4. **Deploy:** Push and deploy!
 
 ### Documentation
 
-- 📋 [`DEPLOYMENT_CHECKLIST.md`](DEPLOYMENT_CHECKLIST.md) - Complete deployment checklist
-- 📖 [`CLOUDINARY_DEPLOYMENT_GUIDE.md`](CLOUDINARY_DEPLOYMENT_GUIDE.md) - Comprehensive guide
-- ✅ [`UPLOADS_FIXED_SUMMARY.md`](UPLOADS_FIXED_SUMMARY.md) - What was fixed
-- 🔍 [`verify-cloudinary-setup.sh`](verify-cloudinary-setup.sh) - Automated verification
+- 📋 [`QUICK_DEPLOYMENT.md`](QUICK_DEPLOYMENT.md) - Complete deployment guide
+- 📖 [`ENVIRONMENT_CONFIGURATION.md`](ENVIRONMENT_CONFIGURATION.md) - Comprehensive environment setup
 
 ## Run Locally
 
-**Prerequisites:** Node.js, PostgreSQL
+**Prerequisites:** Node.js, PostgreSQL, Supabase account
 
 
 1. Install dependencies:

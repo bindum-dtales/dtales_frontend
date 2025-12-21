@@ -28,7 +28,7 @@ export const useImageUpload = () => {
       }
 
       const data = await response.json();
-      // Backend returns a full Cloudinary URL
+      // Backend returns a full Supabase Storage URL
       return data.url as string;
     } catch (err: any) {
       const errorMessage = err.message || "Failed to upload image";

@@ -1,46 +1,12 @@
 const { Router } = require("express");
 const multer = require("multer");
 const mammoth = require("mammoth");
-const supabase = require("../config/supabase");
+const { uploadImageToSupabase } = require("../utils/supabaseUpload");
 
 const router = Router();
 
 // Multer in-memory storage (no local disk)
 const memoryStorage = multer.memoryStorage();
-
-const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET;
-
-// Helper to upload a buffer to Supabase Storage and return its public URL
-const uploadToSupabase = async (filename, buffer, contentType) => {
-  if (!SUPABASE_BUCKET) {
-    throw new Error("Supabase bucket is not configured");
-  }
-
-  const path = `uploads/${Date.now()}-${Math.random().toString(16).slice(2)}-${filename}`;
-
-  const { error: uploadError } = await supabase
-    .storage
-    .from(SUPABASE_BUCKET)
-    .upload(path, buffer, {
-      contentType,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    throw new Error(`Supabase upload failed: ${uploadError.message}`);
-  }
-
-  const { data: publicData, error: publicError } = supabase
-    .storage
-    .from(SUPABASE_BUCKET)
-    .getPublicUrl(path);
-
-  if (publicError) {
-    throw new Error(`Supabase public URL failed: ${publicError.message}`);
-  }
-
-  return publicData.publicUrl;
-};
 
 // ============================================================================
 // FILE FILTERS
@@ -118,7 +84,11 @@ router.post("/image", (req, res) => {
     }
 
     try {
-      const url = await uploadToSupabase(imageFile.originalname, imageFile.buffer, imageFile.mimetype || "application/octet-stream");
+      const url = await uploadImageToSupabase(
+        imageFile.buffer,
+        imageFile.originalname,
+        imageFile.mimetype
+      );
       console.log("✅ Image uploaded to Supabase:", url);
       return res.status(201).json({ url });
     } catch (e) {
@@ -187,9 +157,9 @@ router.post("/docx", (req, res) => {
           convertImage: mammoth.images.imgElement(async (image) => {
             try {
               const buffer = await image.read();
-              const url = await uploadToSupabase(
-                `docx-embedded-${Date.now()}.png`,
+              const url = await uploadImageToSupabase(
                 buffer,
+                `docx-embedded-${Date.now()}.png`,
                 image.contentType || "image/png"
               );
               uploadedImages.push(url);
