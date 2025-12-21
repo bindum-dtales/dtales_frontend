@@ -24,37 +24,26 @@ async function uploadImageToSupabase(buffer, filename, mimeType) {
     throw new Error("Empty buffer provided - cannot upload empty file");
   }
 
-  // Generate unique file path
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 10);
-  const extension = filename.split(".").pop() || "png";
-  const sanitizedName = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
-  const path = `uploads/${timestamp}-${randomString}-${sanitizedName}`;
+  const filePath = `${Date.now()}-${filename}`;
 
-  // Upload to Supabase Storage
-  const { data: uploadData, error: uploadError } = await supabase.storage
+  const { error } = await supabase.storage
     .from(SUPABASE_BUCKET)
-    .upload(path, buffer, {
-      contentType: mimeType || "application/octet-stream",
-      upsert: true,
+    .upload(filePath, buffer, {
+      contentType: mimeType,
+      upsert: false
     });
 
-  if (uploadError) {
-    console.error("❌ Supabase upload error:", uploadError);
-    throw new Error(`Supabase upload failed: ${uploadError.message}`);
+  if (error) {
+    console.error("❌ Supabase upload error:", error);
+    throw new Error(`Supabase upload failed: ${error.message}`);
   }
 
-  // Get public URL
-  const { data: publicUrlData } = supabase.storage
+  const { data } = supabase.storage
     .from(SUPABASE_BUCKET)
-    .getPublicUrl(path);
+    .getPublicUrl(filePath);
 
-  if (!publicUrlData || !publicUrlData.publicUrl) {
-    throw new Error("Failed to generate public URL for uploaded file");
-  }
-
-  console.log("✅ Supabase upload successful:", publicUrlData.publicUrl);
-  return publicUrlData.publicUrl;
+  console.log("✅ Supabase upload successful:", data.publicUrl);
+  return data.publicUrl;
 }
 
 module.exports = { uploadImageToSupabase };

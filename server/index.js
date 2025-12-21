@@ -26,7 +26,23 @@ if (missingVars.length > 0) {
 console.log("✅ Environment variables validated");
 
 // Initialize Supabase once (will throw if misconfigured)
-require("./config/supabase");
+const supabase = require("./config/supabase");
+
+// Verify bucket exists
+(async () => {
+  try {
+    const { data: buckets, error } = await supabase.storage.listBuckets();
+    if (error) throw error;
+    const bucketExists = buckets.some(b => b.name === process.env.SUPABASE_BUCKET);
+    if (!bucketExists) {
+      throw new Error(`Bucket '${process.env.SUPABASE_BUCKET}' does not exist in Supabase Storage`);
+    }
+    console.log(`✅ Supabase bucket '${process.env.SUPABASE_BUCKET}' verified`);
+  } catch (err) {
+    console.error("❌ STARTUP FAILED - Supabase bucket verification:", err.message);
+    process.exit(1);
+  }
+})();
 
 const blogsRouter = require("./routes/blogs");
 const caseStudiesRouter = require("./routes/case-studies");
