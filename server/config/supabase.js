@@ -1,19 +1,25 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
+/**
+ * LAZY INITIALIZATION: Supabase client is created on-demand (request-time)
+ * This ensures the server starts even if Supabase is unreachable.
+ * @returns {Object} Supabase client instance
+ * @throws {Error} If required environment variables are missing
+ */
+function getSupabase() {
+  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error("Missing required Supabase environment variables (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)");
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error(
+      "Missing Supabase env vars: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"
+    );
+  }
+
+  return createClient(
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY,
+    { auth: { persistSession: false } }
+  );
 }
 
-const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-  {
-    auth: { persistSession: false }
-  }
-);
-
-console.log("✅ Supabase configured (lazy mode - no network calls at startup)");
-
-module.exports = supabase;
+module.exports = { getSupabase };

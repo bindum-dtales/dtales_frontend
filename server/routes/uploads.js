@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const multer = require("multer");
 const mammoth = require("mammoth");
+const { getSupabase } = require("../config/supabase");
 const { uploadImageToSupabase } = require("../utils/supabaseUpload");
 
 const router = Router();
@@ -61,8 +62,11 @@ const uploadFields = multer({
  * Response (201):
  *   { url: "https://<supabase-public-url>/..." }
  *
- * Error Response (400 or 500):
- *   { message: "error description", source: "image_upload" }
+ * Error Response (200 with warning):
+ *   { warning: "Image upload skipped", reason: "error message" }
+ *
+ * NOTE: Returns 200 on Supabase failures (graceful degradation)
+ * to ensure blog/case study creation is not blocked by upload issues.
  */
 router.post("/image", (req, res) => {
   uploadFields(req, res, async (err) => {
@@ -84,17 +88,47 @@ router.post("/image", (req, res) => {
     }
 
     try {
+      // Initialize Supabase at request-time (lazy initialization)
+      let supabase;
+      try {
+        supabase = getSupabase();
+      } catch (initErr) {
+        console.warn("⚠️ Supabase initialization failed:", initErr.message);
+        return res.status(200).json({
+          warning: "Image upload skipped",
+          reason: "Supabase configuration error"
+        });
+      }
+
       const url = await uploadImageToSupabase(
+        supabase,
         imageFile.buffer,
         imageFile.originalname,
         imageFile.mimetype
       );
       return res.status(201).json({ url });
-    } catch (e) {
-      console.error("❌ Supabase upload failed:", e.message);
-      return res.status(500).json({
-        message: e.message || "Failed to upload image",
-        source: "image_upload",
+    } catch (uploadErr) {
+      // Check if error is DNS/network related (ENOTFOUND, ECONNREFUSED, ETIMEDOUT)
+      const isDnsError = 
+        uploadErr.code === "ENOTFOUND" || 
+        uploadErr.code === "ECONNREFUSED" || 
+        uploadErr.code === "ETIMEDOUT" ||
+        uploadErr.message?.includes("ENOTFOUND") ||
+        uploadErr.message?.includes("getaddrinfo");
+
+      if (isDnsError) {
+        console.warn("⚠️ Supabase DNS/network error, gracefully degrading:", uploadErr.message);
+        return res.status(200).json({
+          warning: "Image upload skipped",
+          reason: "Supabase service unreachable"
+        });
+      }
+
+      console.error("❌ Image upload failed:", uploadErr.message);
+      // Still return 200 to allow blog/case study creation to succeed
+      return res.status(200).json({
+        warning: "Image upload skipped",
+        reason: uploadErr.message || "Upload failed"
       });
     }
   });
@@ -104,8 +138,6 @@ router.post("/image", (req, res) => {
 // DOCX UPLOAD HANDLER
 // ============================================================================
 
-// (Handled by unified uploadFields above)
-
 /**
  * POST /api/uploads/docx
  *
@@ -114,7 +146,7 @@ router.post("/image", (req, res) => {
  * Flow:
  *   1. Accept DOCX via multer memory storage
  *   2. Parse DOCX → HTML using Mammoth
- *   3. Upload images embedded in DOCX to Supabase
+ *   3. Upload images embedded in DOCX to Supabase (graceful degradation on failure)
  *   4. Return clean HTML with Supabase image URLs
  *
  * Request:
@@ -122,6 +154,10 @@ router.post("/image", (req, res) => {
  *
  * Response (200):
  *   { html: "<html content with Supabase image URLs>", images: ["url1", "url2"] }
+ *
+ * Error Response (200 with partial success):
+ *   { html: "<html content>", images: [] }
+ *   (If image uploads fail, HTML is still returned)
  *
  * Error Response (400 or 500):
  *   { message: "error description", source: "docx_parse" }
@@ -146,17 +182,26 @@ router.post("/docx", (req, res) => {
     }
 
     try {
+      // Initialize Supabase at request-time (lazy initialization)
+      let supabase;
+      try {
+        supabase = getSupabase();
+      } catch (initErr) {
+        console.warn("⚠️ Supabase initialization failed, continuing without image upload:", initErr.message);
+        supabase = null; // Continue parsing DOCX without Supabase
+      }
+
       const uploadedImages = [];
 
       // Parse .docx buffer to HTML with image handling
-      // Images are uploaded to Supabase; non-image content is extracted
       const result = await mammoth.convertToHtml(
         { buffer: docxFile.buffer },
         {
-          convertImage: mammoth.images.imgElement(async (image) => {
+          convertImage: supabase ? mammoth.images.imgElement(async (image) => {
             try {
               const buffer = await image.read();
               const url = await uploadImageToSupabase(
+                supabase,
                 buffer,
                 `docx-embedded-${Date.now()}.png`,
                 image.contentType || "image/png"
@@ -165,9 +210,10 @@ router.post("/docx", (req, res) => {
               return { src: url };
             } catch (imgErr) {
               console.warn("⚠️ Skipping embedded image upload:", imgErr.message);
+              // Continue parsing without this image
               return { src: "" };
             }
-          }),
+          }) : undefined
         }
       );
 

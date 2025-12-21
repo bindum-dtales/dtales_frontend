@@ -1,17 +1,16 @@
-const supabase = require("../config/supabase");
-
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET;
 
 /**
  * Upload an image buffer to Supabase Storage and return its public URL.
  * 
+ * @param {Object} supabase - Supabase client instance (passed at request-time)
  * @param {Buffer} buffer - Image file buffer
  * @param {string} filename - Original filename (will be sanitized)
  * @param {string} mimeType - MIME type (e.g., 'image/png', 'image/jpeg')
  * @returns {Promise<string>} Public URL of the uploaded image
  * @throws {Error} If upload fails or bucket is not configured
  */
-async function uploadImageToSupabase(buffer, filename, mimeType) {
+async function uploadImageToSupabase(supabase, buffer, filename, mimeType) {
   if (!SUPABASE_BUCKET) {
     throw new Error("SUPABASE_BUCKET environment variable is not configured");
   }
