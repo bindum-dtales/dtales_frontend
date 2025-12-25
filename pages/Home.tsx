@@ -50,7 +50,7 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
               >
-                DTALES Tech is a comprehensive documentation services organization committed to reshaping the future of technical documentation. Our comprehensive range of services include consulting, strategising, content process management, toolchain management, and technical writing services. With a deep understanding of the evolving technology and consumer behaviour, we help build and maintain relevant, resilient, and reliable knowledge base systems. Our agile and innovative approach ensures an enhanced product understanding and experience through content with zero-overhead for the product teams.
+                DTALES Tech is your expert partner in Technical Storytelling and Market Enablement, committed to transforming complex innovation into market success by providing an end-to-end ecosystem of services. We go beyond traditional documentation, offering sophisticated strategy consulting, content process management, and toolchain optimization to build resilient knowledge base systems. You can then enhance your market reach with specialized technical marketing content supported by professional creatives that articulate your value to technical buyers. Our agile approach ensures the consistent delivery of relevant, reliable product documentation and compelling market narratives, guaranteeing enhanced product understanding and experience with zero-overhead for your product and engineering teams.
               </motion.p>
             </div>
           </motion.div>
