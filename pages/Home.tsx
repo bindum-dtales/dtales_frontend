@@ -188,11 +188,11 @@ const Home: React.FC = () => {
       <Testimonials />
 
       {/* Trusted by Tomorrow's Tech Leaders Section with Horizontal Slider */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6 bg-[#0b0f1a]">
         <div className="max-w-7xl mx-auto">
           <div className="mb-16 text-center max-w-3xl mx-auto">
             <motion.h2
-              className="text-4xl md:text-5xl font-bold tracking-tight text-dtales-navy mb-6"
+              className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -200,7 +200,7 @@ const Home: React.FC = () => {
               <TextColor text="Trusted by Tomorrow's Tech Leaders" />
             </motion.h2>
             <motion.p
-              className="text-xl text-gray-500"
+              className="text-xl text-[#cfd3ff]"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -226,17 +226,20 @@ const Home: React.FC = () => {
               ].map((item, idx) => (
                 <motion.div
                   key={idx}
-                  className="flex-shrink-0 w-96 px-8 py-10 mx-4 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100"
+                  className="flex-shrink-0 w-96 px-8 py-10 mx-4 bg-white/10 backdrop-blur-[14px] rounded-2xl border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] hover:bg-white/[0.15] hover:-translate-y-1 transition-all duration-300"
+                  style={{ 
+                    WebkitBackdropFilter: 'blur(14px)',
+                  }}
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.05 }}
                 >
                   <div className="flex items-start gap-3 mb-4">
-                    <span className="flex-shrink-0 w-6 h-6 rounded bg-dtales-navy/10 flex items-center justify-center text-dtales-navy text-sm font-semibold">●</span>
-                    <h3 className="text-lg font-bold text-dtales-navy">{item.title}</h3>
+                    <span className="flex-shrink-0 w-6 h-6 rounded bg-white/20 flex items-center justify-center text-white text-sm font-semibold backdrop-blur-sm">●</span>
+                    <h3 className="text-lg font-bold text-white">{item.title}</h3>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed pl-9">{item.desc}</p>
+                  <p className="text-[#cfd3ff] text-sm leading-relaxed pl-9">{item.desc}</p>
                 </motion.div>
               ))}
               
@@ -253,17 +256,20 @@ const Home: React.FC = () => {
               ].map((item, idx) => (
                 <motion.div
                   key={`dup-${idx}`}
-                  className="flex-shrink-0 w-96 px-8 py-10 mx-4 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100"
+                  className="flex-shrink-0 w-96 px-8 py-10 mx-4 bg-white/10 backdrop-blur-[14px] rounded-2xl border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] hover:bg-white/[0.15] hover:-translate-y-1 transition-all duration-300"
+                  style={{ 
+                    WebkitBackdropFilter: 'blur(14px)',
+                  }}
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.05 }}
                 >
                   <div className="flex items-start gap-3 mb-4">
-                    <span className="flex-shrink-0 w-6 h-6 rounded bg-dtales-navy/10 flex items-center justify-center text-dtales-navy text-sm font-semibold">●</span>
-                    <h3 className="text-lg font-bold text-dtales-navy">{item.title}</h3>
+                    <span className="flex-shrink-0 w-6 h-6 rounded bg-white/20 flex items-center justify-center text-white text-sm font-semibold backdrop-blur-sm">●</span>
+                    <h3 className="text-lg font-bold text-white">{item.title}</h3>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed pl-9">{item.desc}</p>
+                  <p className="text-[#cfd3ff] text-sm leading-relaxed pl-9">{item.desc}</p>
                 </motion.div>
               ))}
             </div>

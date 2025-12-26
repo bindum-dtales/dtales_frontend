@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   motion,
   AnimatePresence,
@@ -12,7 +12,17 @@ const Navbar: React.FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const location = useLocation();
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
 
   return (
     <motion.nav
@@ -22,7 +32,7 @@ const Navbar: React.FC = () => {
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
       }}
-      className="fixed top-0 left-0 w-full z-50"
+      className="fixed top-0 left-0 w-full z-50 relative"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -135,68 +145,64 @@ const Navbar: React.FC = () => {
       <AnimatePresence>
         {isMobileOpen && (
           <motion.div
-            className="fixed inset-0 bg-black z-40 flex flex-col pt-24 px-6 md:hidden"
-            initial={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
-            animate={{ opacity: 1, clipPath: "circle(150% at 100% 0%)" }}
-            exit={{ opacity: 0, clipPath: "circle(0% at 100% 0%)" }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="absolute left-0 top-full w-full bg-[#0b0f1a] border-t border-white/10 shadow-2xl md:hidden z-40"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
           >
-            <div className="flex flex-col space-y-6">
+            <div className="px-6 py-4 flex flex-col divide-y divide-white/10">
               <Link
                 to="/"
-                className="text-3xl font-bold text-white"
+                className="py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
                 onClick={() => setIsMobileOpen(false)}
               >
                 Home
               </Link>
-
               <Link
                 to="/services"
-                className="text-3xl font-bold text-white"
+                className="py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
                 onClick={() => setIsMobileOpen(false)}
               >
                 Services
               </Link>
-
               <Link
                 to="/team"
-                className="text-3xl font-bold text-white"
+                className="py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
                 onClick={() => setIsMobileOpen(false)}
               >
                 Our Team
               </Link>
-
-              <div className="space-y-4">
-                <span className="text-3xl font-bold text-white/50">
-                  Articles
-                </span>
-                <div className="pl-6 flex flex-col space-y-4 border-l-2 border-white/10">
+              <div className="py-3">
+                <span className="block text-base font-semibold text-white/80 mb-2">Articles</span>
+                <div className="flex flex-col gap-2 pl-2">
                   <Link
                     to="/blogs"
-                    className="text-xl text-white"
+                    className="text-sm text-white transition-colors duration-200 hover:text-white/80"
                     onClick={() => setIsMobileOpen(false)}
                   >
                     Blogs
                   </Link>
                   <Link
                     to="/case-studies"
-                    className="text-xl text-white"
+                    className="text-sm text-white transition-colors duration-200 hover:text-white/80"
                     onClick={() => setIsMobileOpen(false)}
                   >
                     Case Studies
                   </Link>
                 </div>
               </div>
-
-              <button
-                onClick={() => {
-                  navigate('/contact');
-                  setIsMobileOpen(false);
-                }}
-                className="text-3xl font-bold text-white text-left"
-              >
-                Get Started
-              </button>
+              <div className="py-3">
+                <button
+                  onClick={() => {
+                    navigate('/contact');
+                    setIsMobileOpen(false);
+                  }}
+                  className="w-full bg-[#0020BF] text-white px-5 py-3 rounded-full text-sm font-bold uppercase tracking-wide hover:bg-[#0A2CFF] transition-all duration-200 shadow-lg"
+                >
+                  Get Started
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

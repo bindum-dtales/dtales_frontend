@@ -24,12 +24,7 @@ const Testimonials: React.FC = () => {
     const fallbackData: Testimonial[] = [
       { id: 7, quote: "DTALES team is exceptionally methodical in execution. We've worked with a few teams previously for our social media account, but these guys are definitely a class apart. They set the right expectations and follow through with clear, transparent communication to make sure the work gets done. Just hand it over, forget about it. It will be delivered one step above what you expect!", client: "Abilash Kokkath", company: "Trail Tribe, Dubai" },
       { id: 8, quote: "DTALES has consistently demonstrated exceptional professionalism, a highly responsive team, and reliable service delivery. Their attention to detail and commitment to quality truly set them apart. I would confidently recommend DTALES to anyone looking for a dependable and customer-focused partner.", client: "Kiran Patil", company: "Manager (Technical Marketing), Airowire" },
-      { id: 3, quote: "Professional, detail-oriented, and always ahead of deadlines.", client: "Emily R.", company: "CloudVentures" },
-      { id: 4, quote: "DTales Tech helped us scale our documentation without slowing down engineering. Their process clarity and execution were exceptional.", client: "Michael T.", company: "SaaSWorks" },
-      { id: 5, quote: "From strategy to delivery, DTales Tech brought structure and consistency to our technical content across teams.", client: "Ananya P.", company: "DevSphere" },
-      { id: 6, quote: "Clear documentation, strong visuals, and a team that truly understands technical products. DTales Tech exceeded expectations.", client: "Daniel K.", company: "InnovateX" },
-      { id: 1, quote: "DTALES transformed our documentation from chaotic to crystal clear.", client: "Sarah M.", company: "TechCorp" },
-      { id: 2, quote: "Their content strategy increased our user engagement by 300%.", client: "James K.", company: "StartupHub" },
+      
     ];
     setTestimonials(fallbackData);
     setLoading(false);

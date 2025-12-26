@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "framer-motion": "^11.15.0",
@@ -17,7 +18,8 @@
     "pg": "^8.16.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

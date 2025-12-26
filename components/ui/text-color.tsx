@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 export function TextColor({ text }: { text: string }) {
   return (
     <div className="relative">
