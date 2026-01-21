@@ -1,12 +1,9 @@
 const { Router } = require("express");
-const pool = require("../db");
 const slugify = require("slugify");
+const { getSupabase } = require("../config/supabase");
 
 const router = Router();
 
-/**
- * Always generate a valid slug (NEVER null)
- */
 function generateSlug(title) {
   return slugify(String(title || "case-study"), {
     lower: true,
@@ -15,203 +12,215 @@ function generateSlug(title) {
   });
 }
 
-/**
- * Ensure slug is unique in DB
- */
-async function ensureUniqueSlug(baseSlug) {
-  const { rows } = await pool.query(
-    "SELECT id FROM case_studies WHERE slug = $1",
-    [baseSlug]
-  );
-
-  if (rows.length === 0) return baseSlug;
-  return "".concat(baseSlug, "-", Date.now());
+async function slugExists(supabase, slug, excludeId = null) {
+  let query = supabase.from("case_studies").select("id").eq("slug", slug);
+  if (excludeId) {
+    query = query.neq("id", excludeId);
+  }
+  const { data, error } = await query;
+  if (error) throw error;
+  return Array.isArray(data) && data.length > 0;
 }
 
-async function ensureUniqueSlugForUpdate(baseSlug, recordId) {
-  const { rows } = await pool.query(
-    "SELECT id FROM case_studies WHERE slug = $1 AND id <> $2",
-    [baseSlug, recordId]
-  );
-  if (rows.length === 0) return baseSlug;
-  return "".concat(baseSlug, "-", Date.now());
+async function ensureUniqueSlug(supabase, baseSlug, excludeId = null) {
+  const root = baseSlug || "case-study";
+  let slug = root;
+  let counter = 1;
+  while (await slugExists(supabase, slug, excludeId)) {
+    slug = `${root}-${counter}`;
+    counter += 1;
+  }
+  return slug;
 }
 
-/**
- * GET all case studies
- */
+function extractContent(bodyContent) {
+  if (typeof bodyContent === "string") return bodyContent;
+  if (bodyContent && typeof bodyContent.html === "string") return bodyContent.html;
+  return "";
+}
+
 router.get("/", async (_req, res) => {
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM case_studies ORDER BY created_at DESC"
-    );
-    res.json(rows);
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("case_studies")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
   } catch (err) {
-    console.error("FETCH CASE STUDIES ERROR:", err);
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch case studies" });
   }
 });
 
-/**
- * GET published case studies only
- */
 router.get("/public", async (_req, res) => {
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM case_studies WHERE published = true ORDER BY created_at DESC"
-    );
-    res.json(rows);
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("case_studies")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data || []);
   } catch (err) {
-    console.error("FETCH PUBLIC CASE STUDIES ERROR:", err);
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch public case studies" });
   }
 });
 
-/**
- * GET single case study by ID
- */
 router.get("/:id", async (req, res) => {
   try {
-    const { id } = req.params;
-    const { rows } = await pool.query(
-      "SELECT * FROM case_studies WHERE id = $1",
-      [id]
-    );
-    if (!rows.length) {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("case_studies")
+      .select("*")
+      .eq("id", req.params.id)
+      .single();
+
+    if (error && error.code !== "PGRST116") {
+      throw error;
+    }
+
+    if (!data) {
       return res.status(404).json({ error: "Case study not found" });
     }
-    res.json(rows[0]);
+
+    res.json(data);
   } catch (err) {
-    console.error("FETCH CASE STUDY ERROR:", err);
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch case study" });
   }
 });
 
-/**
- * POST create case study
- */
 router.post("/", async (req, res) => {
   try {
-    const {
-      title,
-      cover_image_url,
-      published,
-    } = req.body;
+    const supabase = getSupabase();
+    const title = (req.body.title || "").toString().trim();
+    const content = extractContent(req.body.content);
+    const cover_image_url = req.body.cover_image_url ?? null;
+    const published = req.body.published === true;
 
-    if (!title || typeof title !== "string") {
-      return res.status(400).json({ error: "Title is required" });
-    }
-
-    // Extract HTML from content (handles both string and { html: "..." })
-    let contentHtml = "";
-    if (typeof req.body.content === "string") {
-      contentHtml = req.body.content;
-    } else if (req.body.content && typeof req.body.content.html === "string") {
-      contentHtml = req.body.content.html;
-    }
-
-    if (!contentHtml) {
-      return res.status(400).json({ error: "Content is required" });
-    }
-
-    const baseSlug = generateSlug(title);
-    const slug = await ensureUniqueSlug(baseSlug);
-
-    const { rows } = await pool.query(
-      "INSERT INTO case_studies (title, slug, content, cover_image_url, published) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [
-        title.trim(),
-        slug,
-        contentHtml,
-        cover_image_url ?? null,
-        published === true,
-      ]
-    );
-
-    return res.status(201).json(rows[0]);
-  } catch (err) {
-    console.error("CREATE CASE STUDY ERROR:", err);
-    return res.status(500).json({ error: "Failed to create case study" });
-  }
-});
-
-/**
- * PUT update case study by ID
- */
-router.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Load existing to preserve fields not provided
-    const existingRes = await pool.query(
-      "SELECT * FROM case_studies WHERE id = $1",
-      [id]
-    );
-    if (!existingRes.rows.length) {
-      return res.status(404).json({ error: "Case study not found" });
-    }
-    const current = existingRes.rows[0];
-
-    const newTitle = (req.body.title ?? current.title) || "";
-    const title = String(newTitle).trim();
     if (!title) {
       return res.status(400).json({ error: "Title is required" });
     }
 
-    // Always regenerate slug from the (final) title
-    const baseSlug = generateSlug(title);
-    const slug = await ensureUniqueSlugForUpdate(baseSlug, id);
-
-    // Extract HTML from content (handles both string and { html: "..." })
-    let content = current.content ?? null;
-    if (req.body.content !== undefined) {
-      if (typeof req.body.content === "string") {
-        content = req.body.content;
-      } else if (req.body.content && typeof req.body.content.html === "string") {
-        content = req.body.content.html;
-      }
+    if (!content) {
+      return res.status(400).json({ error: "Content is required" });
     }
-    
-    const cover_image_url =
-      req.body.cover_image_url !== undefined
-        ? req.body.cover_image_url
-        : current.cover_image_url ?? null;
-    const published =
-      typeof req.body.published === "boolean"
-        ? req.body.published
-        : current.published;
 
-    const { rows } = await pool.query(
-      "UPDATE case_studies SET title = $1, slug = $2, content = $3, cover_image_url = $4, published = $5 WHERE id = $6 RETURNING *",
-      [title, slug, content, cover_image_url, published, id]
-    );
+    const slug = await ensureUniqueSlug(supabase, generateSlug(title));
 
-    return res.json(rows[0]);
+    const { data, error } = await supabase
+      .from("case_studies")
+      .insert([
+        {
+          title,
+          slug,
+          content,
+          cover_image_url,
+          published,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return res.status(201).json(data);
   } catch (err) {
-    console.error("UPDATE CASE STUDY ERROR:", err);
+    console.error(err);
+    return res.status(500).json({ error: "Failed to create case study" });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  try {
+    const supabase = getSupabase();
+
+    const { data: current, error: fetchError } = await supabase
+      .from("case_studies")
+      .select("*")
+      .eq("id", req.params.id)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      throw fetchError;
+    }
+
+    if (!current) {
+      return res.status(404).json({ error: "Case study not found" });
+    }
+
+    const title = ((req.body.title ?? current.title) || "").toString().trim();
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
+    }
+
+    const content = req.body.content !== undefined
+      ? extractContent(req.body.content)
+      : current.content ?? "";
+
+    if (!content) {
+      return res.status(400).json({ error: "Content is required" });
+    }
+
+    const cover_image_url = req.body.cover_image_url !== undefined
+      ? req.body.cover_image_url
+      : current.cover_image_url ?? null;
+
+    const published = typeof req.body.published === "boolean"
+      ? req.body.published
+      : current.published === true;
+
+    const slug = await ensureUniqueSlug(supabase, generateSlug(title), req.params.id);
+
+    const { data, error } = await supabase
+      .from("case_studies")
+      .update({
+        title,
+        slug,
+        content,
+        cover_image_url,
+        published,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", req.params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return res.json(data);
+  } catch (err) {
+    console.error(err);
     return res.status(500).json({ error: "Failed to update case study" });
   }
 });
 
-/**
- * DELETE case study by ID
- * Mirrors blog deletion behavior with JSON response
- */
 router.delete("/:id", async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    if (Number.isNaN(id)) {
-      return res.status(400).json({ error: "Invalid case study id" });
-    }
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from("case_studies")
+      .delete()
+      .eq("id", req.params.id)
+      .select("id");
 
-    const result = await pool.query("DELETE FROM case_studies WHERE id = $1", [id]);
-    if (!result.rowCount) {
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
       return res.status(404).json({ error: "Case study not found" });
     }
 
     return res.json({ success: true });
   } catch (err) {
-    console.error("DELETE CASE STUDY ERROR:", err);
+    console.error(err);
     return res.status(500).json({ error: "Failed to delete case study" });
   }
 });

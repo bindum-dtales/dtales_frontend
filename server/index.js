@@ -1,13 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 
-// ============================================================================
-// STARTUP: Only validate DATABASE_URL (critical for schema operations)
-// Supabase is lazy-loaded and optional for initial startup
-// ============================================================================
 const requiredEnv = [
-  "DATABASE_URL",
+  "SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "SUPABASE_BUCKET",
 ];
 
 const missingVars = requiredEnv.filter((key) => !process.env[key]);
@@ -22,10 +19,6 @@ if (missingVars.length > 0) {
 }
 
 console.log("✅ Environment variables validated");
-
-// Supabase is initialized lazily (request-time only, in routes)
-// This prevents crashes if Supabase is unreachable at startup
-
 const blogsRouter = require("./routes/blogs");
 const caseStudiesRouter = require("./routes/case-studies");
 const uploadsRouter = require("./routes/uploads");

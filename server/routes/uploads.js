@@ -5,13 +5,7 @@ const { getSupabase } = require("../config/supabase");
 const { uploadImageToSupabase } = require("../utils/supabaseUpload");
 
 const router = Router();
-
-// Multer in-memory storage (no local disk)
 const memoryStorage = multer.memoryStorage();
-
-// ============================================================================
-// FILE FILTERS
-// ============================================================================
 
 const imageFileFilter = (req, file, cb) => {
   const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
@@ -34,11 +28,10 @@ const docxFileFilter = (req, file, cb) => {
   }
 };
 
-// Unified multer with fields for image and docx (supports legacy 'contentFile')
 const uploadFields = multer({
   storage: memoryStorage,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB max (covers images and docx)
+    fileSize: 50 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
     if (file.fieldname === "image") return imageFileFilter(req, file, cb);
@@ -51,55 +44,20 @@ const uploadFields = multer({
   { name: "contentFile", maxCount: 1 },
 ]);
 
-/**
- * POST /api/uploads/image
- *
- * Upload a single image file to Supabase Storage.
- * 
- * Request:
- *   - multipart/form-data with field "image"
- *
- * Response (201):
- *   { url: "https://<supabase-public-url>/..." }
- *
- * Error Response (200 with warning):
- *   { warning: "Image upload skipped", reason: "error message" }
- *
- * NOTE: Returns 200 on Supabase failures (graceful degradation)
- * to ensure blog/case study creation is not blocked by upload issues.
- */
 router.post("/image", (req, res) => {
   uploadFields(req, res, async (err) => {
     if (err) {
-      console.error("❌ IMAGE UPLOAD ERROR:", err.message);
-      return res.status(400).json({
-        message: err.message || "Failed to upload image",
-        source: "image_upload",
-      });
+      console.error(err);
+      return res.status(400).json({ error: err.message || "Failed to upload image" });
     }
 
     const imageFile = req.files?.image?.[0];
     if (!imageFile) {
-      console.error("❌ IMAGE UPLOAD ERROR: No file provided");
-      return res.status(400).json({
-        message: "No image file provided",
-        source: "image_upload",
-      });
+      return res.status(400).json({ error: "No image file provided" });
     }
 
     try {
-      // Initialize Supabase at request-time (lazy initialization)
-      let supabase;
-      try {
-        supabase = getSupabase();
-      } catch (initErr) {
-        console.warn("⚠️ Supabase initialization failed:", initErr.message);
-        return res.status(200).json({
-          warning: "Image upload skipped",
-          reason: "Supabase configuration error"
-        });
-      }
-
+      const supabase = getSupabase();
       const url = await uploadImageToSupabase(
         supabase,
         imageFile.buffer,
@@ -108,123 +66,49 @@ router.post("/image", (req, res) => {
       );
       return res.status(201).json({ url });
     } catch (uploadErr) {
-      // Check if error is DNS/network related (ENOTFOUND, ECONNREFUSED, ETIMEDOUT)
-      const isDnsError = 
-        uploadErr.code === "ENOTFOUND" || 
-        uploadErr.code === "ECONNREFUSED" || 
-        uploadErr.code === "ETIMEDOUT" ||
-        uploadErr.message?.includes("ENOTFOUND") ||
-        uploadErr.message?.includes("getaddrinfo");
-
-      if (isDnsError) {
-        console.warn("⚠️ Supabase DNS/network error, gracefully degrading:", uploadErr.message);
-        return res.status(200).json({
-          warning: "Image upload skipped",
-          reason: "Supabase service unreachable"
-        });
-      }
-
-      console.error("❌ Image upload failed:", uploadErr.message);
-      // Still return 200 to allow blog/case study creation to succeed
-      return res.status(200).json({
-        warning: "Image upload skipped",
-        reason: uploadErr.message || "Upload failed"
-      });
+      console.error(uploadErr);
+      return res.status(500).json({ error: "Failed to upload image" });
     }
   });
 });
 
-// ============================================================================
-// DOCX UPLOAD HANDLER
-// ============================================================================
-
-/**
- * POST /api/uploads/docx
- *
- * Upload and parse a .docx file.
- * 
- * Flow:
- *   1. Accept DOCX via multer memory storage
- *   2. Parse DOCX → HTML using Mammoth
- *   3. Upload images embedded in DOCX to Supabase (graceful degradation on failure)
- *   4. Return clean HTML with Supabase image URLs
- *
- * Request:
- *   - multipart/form-data with field "contentFile"
- *
- * Response (200):
- *   { html: "<html content with Supabase image URLs>", images: ["url1", "url2"] }
- *
- * Error Response (200 with partial success):
- *   { html: "<html content>", images: [] }
- *   (If image uploads fail, HTML is still returned)
- *
- * Error Response (400 or 500):
- *   { message: "error description", source: "docx_parse" }
- */
 router.post("/docx", (req, res) => {
   uploadFields(req, res, async (err) => {
     if (err) {
-      console.error("❌ DOCX UPLOAD ERROR:", err.message);
-      return res.status(400).json({
-        message: err.message || "Failed to upload .docx file",
-        source: "docx_parse",
-      });
+      console.error(err);
+      return res.status(400).json({ error: err.message || "Failed to upload .docx file" });
     }
 
     const docxFile = req.files?.docx?.[0] || req.files?.contentFile?.[0];
     if (!docxFile) {
-      console.error("❌ DOCX UPLOAD ERROR: DOCX file missing");
-      return res.status(400).json({
-        message: "DOCX file missing",
-        source: "docx_parse",
-      });
+      return res.status(400).json({ error: "DOCX file missing" });
     }
 
     try {
-      // Initialize Supabase at request-time (lazy initialization)
-      let supabase;
-      try {
-        supabase = getSupabase();
-      } catch (initErr) {
-        console.warn("⚠️ Supabase initialization failed, continuing without image upload:", initErr.message);
-        supabase = null; // Continue parsing DOCX without Supabase
-      }
-
+      const supabase = getSupabase();
       const uploadedImages = [];
 
-      // Parse .docx buffer to HTML with image handling
       const result = await mammoth.convertToHtml(
         { buffer: docxFile.buffer },
         {
-          convertImage: supabase ? mammoth.images.imgElement(async (image) => {
-            try {
-              const buffer = await image.read();
-              const url = await uploadImageToSupabase(
-                supabase,
-                buffer,
-                "docx-embedded-".concat(Date.now(), ".png"),
-                image.contentType || "image/png"
-              );
-              uploadedImages.push(url);
-              return { src: url };
-            } catch (imgErr) {
-              console.warn("⚠️ Skipping embedded image upload:", imgErr.message);
-              // Continue parsing without this image
-              return { src: "" };
-            }
-          }) : undefined
+          convertImage: mammoth.images.imgElement(async (image) => {
+            const buffer = await image.read();
+            const url = await uploadImageToSupabase(
+              supabase,
+              buffer,
+              `docx-embedded-${Date.now()}.png`,
+              image.contentType || "image/png"
+            );
+            uploadedImages.push(url);
+            return { src: url };
+          }),
         }
       );
 
-      console.log("✅ DOCX parsed. Uploaded ".concat(uploadedImages.length, " embedded images to Supabase"));
       return res.status(200).json({ html: result.value, images: uploadedImages });
     } catch (parseErr) {
-      console.error("❌ DOCX parse error:", parseErr.message);
-      return res.status(500).json({
-        message: "Failed to parse .docx file: ".concat(parseErr.message),
-        source: "docx_parse",
-      });
+      console.error(parseErr);
+      return res.status(500).json({ error: "Failed to parse .docx file" });
     }
   });
 });
