@@ -1,42 +1,29 @@
 const { Router } = require("express");
-const slugify = require("slugify");
 const { getSupabase } = require("../config/supabase");
 
 const router = Router();
 
-function generateSlug(title) {
-  return slugify(String(title || "case-study"), {
-    lower: true,
-    strict: true,
-    trim: true,
-  });
+function stripHtml(html) {
+  if (!html) return "";
+  return String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-async function slugExists(supabase, slug, excludeId = null) {
-  let query = supabase.from("case_studies").select("id").eq("slug", slug);
-  if (excludeId) {
-    query = query.neq("id", excludeId);
-  }
-  const { data, error } = await query;
-  if (error) throw error;
-  return Array.isArray(data) && data.length > 0;
-}
-
-async function ensureUniqueSlug(supabase, baseSlug, excludeId = null) {
-  const root = baseSlug || "case-study";
-  let slug = root;
-  let counter = 1;
-  while (await slugExists(supabase, slug, excludeId)) {
-    slug = `${root}-${counter}`;
-    counter += 1;
-  }
-  return slug;
+function buildExcerpt(html, maxLen = 200) {
+  const text = stripHtml(html);
+  return text.length > maxLen ? text.slice(0, maxLen) : text;
 }
 
 function extractContent(bodyContent) {
   if (typeof bodyContent === "string") return bodyContent;
   if (bodyContent && typeof bodyContent.html === "string") return bodyContent.html;
   return "";
+}
+
+function mapCaseStudy(row) {
+  return {
+    ...row,
+    cover_image_url: row?.cover_image ?? row?.cover_image_url ?? null,
+  };
 }
 
 router.get("/", async (_req, res) => {
@@ -49,28 +36,9 @@ router.get("/", async (_req, res) => {
 
     if (error) throw error;
 
-    res.json(data || []);
+    res.json((data || []).map(mapCaseStudy));
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to fetch case studies" });
-  }
-});
-
-router.get("/public", async (_req, res) => {
-  try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from("case_studies")
-      .select("*")
-      .eq("published", true)
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-
-    res.json(data || []);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch public case studies" });
   }
 });
 
@@ -91,9 +59,8 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Case study not found" });
     }
 
-    res.json(data);
+    res.json(mapCaseStudy(data));
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to fetch case study" });
   }
 });
@@ -103,7 +70,7 @@ router.post("/", async (req, res) => {
     const supabase = getSupabase();
     const title = (req.body.title || "").toString().trim();
     const content = extractContent(req.body.content);
-    const cover_image_url = req.body.cover_image_url ?? null;
+    const cover_image = req.body.cover_image ?? null;
     const published = req.body.published === true;
 
     if (!title) {
@@ -114,16 +81,16 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Content is required" });
     }
 
-    const slug = await ensureUniqueSlug(supabase, generateSlug(title));
+    const excerpt = buildExcerpt(content, 200);
 
     const { data, error } = await supabase
       .from("case_studies")
       .insert([
         {
           title,
-          slug,
+          excerpt,
           content,
-          cover_image_url,
+          cover_image,
           published,
         },
       ])
@@ -132,10 +99,9 @@ router.post("/", async (req, res) => {
 
     if (error) throw error;
 
-    return res.status(201).json(data);
+    res.status(201).json(mapCaseStudy(data));
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Failed to create case study" });
+    res.status(500).json({ error: "Failed to create case study" });
   }
 });
 
@@ -158,35 +124,28 @@ router.put("/:id", async (req, res) => {
     }
 
     const title = ((req.body.title ?? current.title) || "").toString().trim();
+    const contentRaw = extractContent(req.body.content);
+    const content = contentRaw !== "" ? contentRaw : current.content || "";
+    const cover_image = req.body.cover_image !== undefined ? req.body.cover_image : current.cover_image ?? null;
+    const published = typeof req.body.published === "boolean" ? req.body.published : current.published === true;
+
     if (!title) {
       return res.status(400).json({ error: "Title is required" });
     }
-
-    const content = req.body.content !== undefined
-      ? extractContent(req.body.content)
-      : current.content ?? "";
 
     if (!content) {
       return res.status(400).json({ error: "Content is required" });
     }
 
-    const cover_image_url = req.body.cover_image_url !== undefined
-      ? req.body.cover_image_url
-      : current.cover_image_url ?? null;
-
-    const published = typeof req.body.published === "boolean"
-      ? req.body.published
-      : current.published === true;
-
-    const slug = await ensureUniqueSlug(supabase, generateSlug(title), req.params.id);
+    const excerpt = buildExcerpt(content, 200);
 
     const { data, error } = await supabase
       .from("case_studies")
       .update({
         title,
-        slug,
+        excerpt,
         content,
-        cover_image_url,
+        cover_image,
         published,
         updated_at: new Date().toISOString(),
       })
@@ -196,10 +155,9 @@ router.put("/:id", async (req, res) => {
 
     if (error) throw error;
 
-    return res.json(data);
+    res.json(mapCaseStudy(data));
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Failed to update case study" });
+    res.status(500).json({ error: "Failed to update case study" });
   }
 });
 
@@ -218,10 +176,9 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "Case study not found" });
     }
 
-    return res.json({ success: true });
+    res.status(204).send();
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Failed to delete case study" });
+    res.status(500).json({ error: "Failed to delete case study" });
   }
 });
 

@@ -13,14 +13,10 @@ function buildExcerpt(html, maxLen = 200) {
   return text.length > maxLen ? text.slice(0, maxLen) : text;
 }
 
-function pickContentHtml(bodyContent) {
+function extractContent(bodyContent) {
   if (typeof bodyContent === "string") return bodyContent;
   if (bodyContent && typeof bodyContent.html === "string") return bodyContent.html;
   return "";
-}
-
-function pickCoverImage(body) {
-  return body.cover_image_url ?? body.cover_image ?? null;
 }
 
 function mapBlog(row) {
@@ -42,26 +38,7 @@ router.get("/", async (_req, res) => {
 
     res.json((data || []).map(mapBlog));
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to fetch blogs" });
-  }
-});
-
-router.get("/public", async (_req, res) => {
-  try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from("blogs")
-      .select("*")
-      .eq("published", true)
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-
-    res.json((data || []).map(mapBlog));
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch public blogs" });
   }
 });
 
@@ -84,7 +61,6 @@ router.get("/:id", async (req, res) => {
 
     res.json(mapBlog(data));
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to fetch blog" });
   }
 });
@@ -93,18 +69,19 @@ router.post("/", async (req, res) => {
   try {
     const supabase = getSupabase();
     const title = (req.body.title || "").toString().trim();
-    const contentHtml = pickContentHtml(req.body.content);
-    const coverImage = pickCoverImage(req.body);
+    const content = extractContent(req.body.content);
+    const cover_image = req.body.cover_image ?? null;
     const published = req.body.published === true;
 
     if (!title) {
       return res.status(400).json({ error: "Title is required" });
     }
-    if (!contentHtml) {
-      return res.status(400).json({ error: "Content HTML is required" });
+
+    if (!content) {
+      return res.status(400).json({ error: "Content is required" });
     }
 
-    const excerpt = buildExcerpt(contentHtml, 200);
+    const excerpt = buildExcerpt(content, 200);
 
     const { data, error } = await supabase
       .from("blogs")
@@ -112,8 +89,8 @@ router.post("/", async (req, res) => {
         {
           title,
           excerpt,
-          content: contentHtml,
-          cover_image: coverImage,
+          content,
+          cover_image,
           published,
         },
       ])
@@ -124,7 +101,6 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(mapBlog(data));
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to create blog" });
   }
 });
@@ -148,27 +124,28 @@ router.put("/:id", async (req, res) => {
     }
 
     const title = ((req.body.title ?? current.title) || "").toString().trim();
-    const contentHtmlRaw = pickContentHtml(req.body.content);
-    const contentHtml = contentHtmlRaw !== "" ? contentHtmlRaw : current.content || "";
-    const coverImage = pickCoverImage(req.body);
+    const contentRaw = extractContent(req.body.content);
+    const content = contentRaw !== "" ? contentRaw : current.content || "";
+    const cover_image = req.body.cover_image !== undefined ? req.body.cover_image : current.cover_image ?? null;
     const published = typeof req.body.published === "boolean" ? req.body.published : current.published === true;
 
     if (!title) {
       return res.status(400).json({ error: "Title is required" });
     }
-    if (!contentHtml) {
-      return res.status(400).json({ error: "Content HTML is required" });
+
+    if (!content) {
+      return res.status(400).json({ error: "Content is required" });
     }
 
-    const excerpt = buildExcerpt(contentHtml, 200);
+    const excerpt = buildExcerpt(content, 200);
 
     const { data, error } = await supabase
       .from("blogs")
       .update({
         title,
         excerpt,
-        content: contentHtml,
-        cover_image: coverImage ?? current.cover_image ?? null,
+        content,
+        cover_image,
         published,
         updated_at: new Date().toISOString(),
       })
@@ -180,7 +157,6 @@ router.put("/:id", async (req, res) => {
 
     res.json(mapBlog(data));
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to update blog" });
   }
 });
@@ -202,7 +178,6 @@ router.delete("/:id", async (req, res) => {
 
     res.status(204).send();
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to delete blog" });
   }
 });
