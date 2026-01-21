@@ -38,7 +38,7 @@ router.get("/", async (_req, res) => {
 
     res.json((data || []).map(mapBlog));
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch blogs" });
+    return res.status(500).json({ error: "Failed to fetch blogs" });
   }
 });
 
@@ -61,7 +61,7 @@ router.get("/:id", async (req, res) => {
 
     res.json(mapBlog(data));
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch blog" });
+    return res.status(500).json({ error: "Failed to fetch blog" });
   }
 });
 
@@ -101,7 +101,7 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(mapBlog(data));
   } catch (err) {
-    res.status(500).json({ error: "Failed to create blog" });
+    return res.status(500).json({ error: "Failed to create blog" });
   }
 });
 
@@ -157,7 +157,7 @@ router.put("/:id", async (req, res) => {
 
     res.json(mapBlog(data));
   } catch (err) {
-    res.status(500).json({ error: "Failed to update blog" });
+    return res.status(500).json({ error: "Failed to update blog" });
   }
 });
 
@@ -178,7 +178,7 @@ router.delete("/:id", async (req, res) => {
 
     res.status(204).send();
   } catch (err) {
-    res.status(500).json({ error: "Failed to delete blog" });
+    return res.status(500).json({ error: "Failed to delete blog" });
   }
 });
 

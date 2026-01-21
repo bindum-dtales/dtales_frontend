@@ -2,7 +2,6 @@ const { Router } = require("express");
 const multer = require("multer");
 const mammoth = require("mammoth");
 const { getSupabase } = require("../config/supabase");
-const { uploadImageToSupabase } = require("../utils/supabaseUpload");
 
 const router = Router();
 const memoryStorage = multer.memoryStorage();
@@ -44,10 +43,28 @@ const uploadFields = multer({
   { name: "contentFile", maxCount: 1 },
 ]);
 
+async function uploadImage(supabase, buffer, filename, mimeType) {
+  const bucket = process.env.SUPABASE_BUCKET;
+  if (!bucket) {
+    throw new Error("SUPABASE_BUCKET not configured");
+  }
+
+  const filePath = `${Date.now()}-${filename}`;
+  const { error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, buffer, { contentType: mimeType, upsert: false });
+
+  if (error) {
+    throw new Error("Upload failed");
+  }
+
+  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+  return data.publicUrl;
+}
+
 router.post("/image", (req, res) => {
   uploadFields(req, res, async (err) => {
     if (err) {
-      console.error(err);
       return res.status(400).json({ error: err.message || "Failed to upload image" });
     }
 
@@ -58,7 +75,7 @@ router.post("/image", (req, res) => {
 
     try {
       const supabase = getSupabase();
-      const url = await uploadImageToSupabase(
+      const url = await uploadImage(
         supabase,
         imageFile.buffer,
         imageFile.originalname,
@@ -66,7 +83,6 @@ router.post("/image", (req, res) => {
       );
       return res.status(201).json({ url });
     } catch (uploadErr) {
-      console.error(uploadErr);
       return res.status(500).json({ error: "Failed to upload image" });
     }
   });
@@ -75,7 +91,6 @@ router.post("/image", (req, res) => {
 router.post("/docx", (req, res) => {
   uploadFields(req, res, async (err) => {
     if (err) {
-      console.error(err);
       return res.status(400).json({ error: err.message || "Failed to upload .docx file" });
     }
 
@@ -93,7 +108,7 @@ router.post("/docx", (req, res) => {
         {
           convertImage: mammoth.images.imgElement(async (image) => {
             const buffer = await image.read();
-            const url = await uploadImageToSupabase(
+            const url = await uploadImage(
               supabase,
               buffer,
               `docx-embedded-${Date.now()}.png`,
@@ -107,7 +122,6 @@ router.post("/docx", (req, res) => {
 
       return res.status(200).json({ html: result.value, images: uploadedImages });
     } catch (parseErr) {
-      console.error(parseErr);
       return res.status(500).json({ error: "Failed to parse .docx file" });
     }
   });

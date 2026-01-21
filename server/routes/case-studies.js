@@ -38,7 +38,7 @@ router.get("/", async (_req, res) => {
 
     res.json((data || []).map(mapCaseStudy));
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch case studies" });
+    return res.status(500).json({ error: "Failed to fetch case studies" });
   }
 });
 
@@ -61,7 +61,7 @@ router.get("/:id", async (req, res) => {
 
     res.json(mapCaseStudy(data));
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch case study" });
+    return res.status(500).json({ error: "Failed to fetch case study" });
   }
 });
 
@@ -101,7 +101,7 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(mapCaseStudy(data));
   } catch (err) {
-    res.status(500).json({ error: "Failed to create case study" });
+    return res.status(500).json({ error: "Failed to create case study" });
   }
 });
 
@@ -157,7 +157,7 @@ router.put("/:id", async (req, res) => {
 
     res.json(mapCaseStudy(data));
   } catch (err) {
-    res.status(500).json({ error: "Failed to update case study" });
+    return res.status(500).json({ error: "Failed to update case study" });
   }
 });
 
@@ -178,7 +178,7 @@ router.delete("/:id", async (req, res) => {
 
     res.status(204).send();
   } catch (err) {
-    res.status(500).json({ error: "Failed to delete case study" });
+    return res.status(500).json({ error: "Failed to delete case study" });
   }
 });
 
