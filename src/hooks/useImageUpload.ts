@@ -14,21 +14,19 @@ export const useImageUpload = () => {
 
     try {
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("file", file);
 
       const response = await fetch(`${API_BASE_URL}/api/uploads/image`, {
         method: "POST",
         body: formData,
-        // DO NOT set Content-Type header - browser will set it with boundary
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to upload image");
+        const text = await response.text();
+        throw new Error(text);
       }
 
       const data = await response.json();
-      // Backend returns a full Supabase Storage URL
       return data.url as string;
     } catch (err: any) {
       const errorMessage = err.message || "Failed to upload image";

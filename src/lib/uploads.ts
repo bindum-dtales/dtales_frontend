@@ -12,36 +12,26 @@ const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://dtales-backend
  * @returns URL of uploaded image, or null if upload fails
  * @throws Never throws; returns null on error (caller should check)
  */
-export async function uploadImage(file: File): Promise<string | null> {
+export async function uploadImage(file: File): Promise<string> {
   if (!file) {
-    return null;
+    throw new Error("No file provided");
   }
 
-  try {
-    const formData = new FormData();
-    formData.append("image", file);
+  const formData = new FormData();
+  formData.append("file", file);
 
-    const response = await fetch(`${API_BASE_URL}/api/uploads/image`, {
-      method: "POST",
-      body: formData,
-      // DO NOT set Content-Type - browser will set it with multipart boundary
-    });
+  const res = await fetch(`${API_BASE_URL}/api/uploads/image`, {
+    method: "POST",
+    body: formData,
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData.message || errorData.error || "Failed to upload image";
-      console.error("❌ Image upload failed:", errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    console.log("✅ Image uploaded successfully:", data.url);
-    return data.url as string;
-  } catch (err: any) {
-    const errorMessage = err.message || "Failed to upload image";
-    console.error("Image upload error:", errorMessage);
-    throw new Error(errorMessage);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
   }
+
+  const data = await res.json();
+  return data.url as string;
 }
 
 /**
@@ -57,40 +47,24 @@ export async function uploadImage(file: File): Promise<string | null> {
  * @returns HTML content from DOCX, or null if upload/parsing fails
  * @throws Never throws; returns null on error (caller should check)
  */
-export async function uploadDocx(file: File): Promise<string | null> {
+export async function uploadDocx(file: File): Promise<string> {
   if (!file) {
-    return null;
+    throw new Error("No file provided");
   }
 
-  if (!file.name.endsWith(".docx")) {
-    const error = "Only .docx files are allowed";
-    console.error("❌ DOCX upload rejected:", error);
-    throw new Error(error);
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API_BASE_URL}/api/uploads/docx`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
   }
 
-  try {
-    const formData = new FormData();
-    formData.append("contentFile", file);
-
-    const response = await fetch(`${API_BASE_URL}/api/uploads/docx`, {
-      method: "POST",
-      body: formData,
-      // DO NOT set Content-Type - browser will set it with multipart boundary
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessage = errorData.message || errorData.error || "Failed to upload .docx file";
-      console.error("❌ DOCX upload failed:", errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    console.log("✅ DOCX parsed successfully");
-    return data.html as string;
-  } catch (err: any) {
-    const errorMessage = err.message || "Failed to process .docx file";
-    console.error("DOCX upload error:", errorMessage);
-    throw new Error(errorMessage);
-  }
+  const data = await res.json();
+  return data.html as string;
 }
