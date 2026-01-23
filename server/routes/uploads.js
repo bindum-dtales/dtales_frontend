@@ -5,7 +5,7 @@ import { supabase } from "../config/supabase.js";
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-router.post("/image", upload.single("file"), async (req, res) => {
+router.post("/image", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No image file" });
