@@ -9,6 +9,7 @@ import uploadsRouter from "./routes/uploads.js";
 const app = express();
 
 app.use(cors());
+app.use("/api/uploads", uploadsRouter);
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
@@ -16,8 +17,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/blogs", blogsRouter);
-app.use("/api/case-studies", caseStudiesRouter);
-app.use("/api/uploads", uploadsRouter); // ✅ THIS FIXES IT
+app.use("/api/case-studies", caseStudiesRouter); // ✅ THIS FIXES IT
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
