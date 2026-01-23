@@ -72,7 +72,7 @@ export default function AdminBlogEditor() {
         body: JSON.stringify({
           title,
           coverImage: coverImageUrl,
-          docxUrl,
+          content: docxUrl,
           status: "published",
         }),
       });
