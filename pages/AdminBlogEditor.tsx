@@ -17,6 +17,7 @@ export default function AdminBlogEditor() {
     try {
       const url = await uploadImage(file);
       setCoverImageUrl(url);
+      setError(null);
     } catch (err) {
       setError("Image upload failed");
     } finally {
