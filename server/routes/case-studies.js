@@ -22,7 +22,24 @@ function extractContent(bodyContent) {
 function mapCaseStudy(row) {
   return {
     ...row,
-    cover_image_url: row?.cover_image ?? row?.cover_image_url ?? null,
+    cover_image_url: row?.cover_image_url ?? row?.cover_image ?? null,
+  };
+}
+
+function normalizeCaseStudy(row) {
+  // Normalize cover image field
+  const cover_image_url = row?.cover_image_url ?? row?.cover_image ?? null;
+  
+  // Normalize content: if it's a URL (DOCX), return empty string, otherwise return as-is
+  let content = row?.content ?? "";
+  if (typeof content === "string" && content.startsWith("http")) {
+    content = "";
+  }
+  
+  return {
+    ...row,
+    cover_image_url,
+    content,
   };
 }
 
@@ -35,7 +52,7 @@ router.get("/", async (_req, res) => {
 
     if (error) throw error;
 
-    res.json((data || []).map(mapCaseStudy));
+    res.json((data || []).map(normalizeCaseStudy));
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch case studies" });
   }
@@ -54,7 +71,7 @@ router.get("/public", async (_req, res) => {
       throw error;
     }
 
-    res.json((data || []).map(mapCaseStudy));
+    res.json((data || []).map(normalizeCaseStudy));
   } catch (err) {
     console.error("GET /api/case-studies/public caught error:", err);
     return res.status(500).json({ error: "Failed to fetch published case studies" });
@@ -77,7 +94,7 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Case study not found" });
     }
 
-    res.json(mapCaseStudy(data));
+    res.json(normalizeCaseStudy(data));
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch case study" });
   }
@@ -116,7 +133,7 @@ router.post("/", async (req, res) => {
 
     if (error) throw error;
 
-    res.status(201).json(mapCaseStudy(data));
+    res.status(201).json(normalizeCaseStudy(data));
   } catch (err) {
     return res.status(500).json({ error: "Failed to create case study" });
   }
@@ -171,7 +188,7 @@ router.put("/:id", async (req, res) => {
 
     if (error) throw error;
 
-    res.json(mapCaseStudy(data));
+    res.json(normalizeCaseStudy(data));
   } catch (err) {
     return res.status(500).json({ error: "Failed to update case study" });
   }

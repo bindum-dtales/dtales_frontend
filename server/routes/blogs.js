@@ -26,6 +26,23 @@ function mapBlog(row) {
   };
 }
 
+function normalizeBlog(row) {
+  // Normalize cover image field
+  const cover_image_url = row?.cover_image_url ?? row?.cover_image ?? null;
+  
+  // Normalize content: if it's a URL (DOCX), return empty string, otherwise return as-is
+  let content = row?.content ?? "";
+  if (typeof content === "string" && content.startsWith("http")) {
+    content = "";
+  }
+  
+  return {
+    ...row,
+    cover_image_url,
+    content,
+  };
+}
+
 router.get("/", async (_req, res) => {
   try {
     const { data, error } = await supabase
@@ -35,7 +52,7 @@ router.get("/", async (_req, res) => {
 
     if (error) throw error;
 
-    res.json((data || []).map(mapBlog));
+    res.json((data || []).map(normalizeBlog));
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch blogs" });
   }
@@ -54,7 +71,7 @@ router.get("/public", async (_req, res) => {
       throw error;
     }
 
-    res.json((data || []).map(mapBlog));
+    res.json((data || []).map(normalizeBlog));
   } catch (err) {
     console.error("GET /api/blogs/public caught error:", err);
     return res.status(500).json({ error: "Failed to fetch published blogs" });
@@ -77,7 +94,7 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Blog not found" });
     }
 
-    res.json(mapBlog(data));
+    res.json(normalizeBlog(data));
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch blog" });
   }
@@ -116,7 +133,7 @@ router.post("/", async (req, res) => {
 
     if (error) throw error;
 
-    res.status(201).json(mapBlog(data));
+    res.status(201).json(normalizeBlog(data));
   } catch (err) {
     return res.status(500).json({ error: "Failed to create blog" });
   }
@@ -171,7 +188,7 @@ router.put("/:id", async (req, res) => {
 
     if (error) throw error;
 
-    res.json(mapBlog(data));
+    res.json(normalizeBlog(data));
   } catch (err) {
     return res.status(500).json({ error: "Failed to update blog" });
   }
