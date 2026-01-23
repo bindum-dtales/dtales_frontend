@@ -41,7 +41,7 @@ const AdminBlogEditor: React.FC = () => {
   const [title, setTitle] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [contentFile, setContentFile] = useState<File | null>(null);
-  const [docxContent, setDocxContent] = useState<string | null>(null);
+  const [docxContent, setDocxContent] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +58,7 @@ const AdminBlogEditor: React.FC = () => {
 
         setTitle(data.title || "");
         setCoverUrl(data.cover_image_url || "");
+        setDocxContent((data as any)?.content || "");
       } catch (err: any) {
         setError(err.message || "Failed to load blog");
       } finally {
@@ -89,13 +90,12 @@ const AdminBlogEditor: React.FC = () => {
     if (!file) return;
     setError(null);
     setContentFile(file);
-    setDocxContent(null);
+    setDocxContent("");
 
     try {
       const url = await uploadDocx(file);
-      if (url && url.trim()) {
-        setDocxContent(url);
-      } else {
+      setDocxContent(url || "");
+      if (!url || !url.trim()) {
         setError("Failed to process .docx file: no URL returned");
         setContentFile(null);
       }
@@ -115,7 +115,7 @@ const AdminBlogEditor: React.FC = () => {
         return;
       }
 
-      if (!isEdit && !docxContent) {
+      if (!docxContent) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
         return;
@@ -127,9 +127,7 @@ const AdminBlogEditor: React.FC = () => {
         published: false,
       };
 
-      if (docxContent) {
-        payload.content = docxContent;
-      }
+      payload.content = docxContent;
 
       if (isEdit && id) {
         await apiPut(`/api/blogs/${id}`, payload);
@@ -153,7 +151,7 @@ const AdminBlogEditor: React.FC = () => {
         return;
       }
 
-      if (!isEdit && !docxContent) {
+      if (!docxContent) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
         return;
@@ -165,9 +163,7 @@ const AdminBlogEditor: React.FC = () => {
         published: true,
       };
 
-      if (docxContent) {
-        payload.content = docxContent;
-      }
+      payload.content = docxContent;
 
       if (isEdit && id) {
         await apiPut(`/api/blogs/${id}`, payload);
