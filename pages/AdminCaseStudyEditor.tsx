@@ -41,7 +41,7 @@ const AdminCaseStudyEditor: React.FC = () => {
   const [title, setTitle] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [contentFile, setContentFile] = useState<File | null>(null);
-  const [docxContent, setDocxContent] = useState<string | null>(null);
+  const [docxUrl, setDocxUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,10 +72,10 @@ const AdminCaseStudyEditor: React.FC = () => {
   }, [id, isEdit]);
 
   useEffect(() => {
-    if (docxContent) {
+    if (docxUrl) {
       setError(null);
     }
-  }, [docxContent]);
+  }, [docxUrl]);
 
   useEffect(() => {
     if (coverImageUrl) {
@@ -104,12 +104,12 @@ const AdminCaseStudyEditor: React.FC = () => {
     if (!file) return;
     setError(null);
     setContentFile(file);
-    setDocxContent(null);
+    setDocxUrl(null);
 
     try {
       const url = await uploadDocx(file);
       if (url && url.trim()) {
-        setDocxContent(url);
+        setDocxUrl(url);
       } else {
         setError("Failed to process .docx file: no URL returned");
         setContentFile(null);
@@ -130,7 +130,7 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
-      if (!isEdit && !docxContent) {
+      if (!isEdit && !docxUrl) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
         return;
@@ -142,8 +142,8 @@ const AdminCaseStudyEditor: React.FC = () => {
         published: false,
       };
 
-      if (docxContent) {
-        payload.content = docxContent;
+      if (docxUrl) {
+        payload.content = docxUrl;
       }
 
       if (isEdit && id) {
@@ -168,7 +168,7 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
-      if (!isEdit && !docxContent) {
+      if (!isEdit && !docxUrl) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
         return;
@@ -180,8 +180,8 @@ const AdminCaseStudyEditor: React.FC = () => {
         published: true,
       };
 
-      if (docxContent) {
-        payload.content = docxContent;
+      if (docxUrl) {
+        payload.content = docxUrl;
       }
 
       if (isEdit && id) {
@@ -281,7 +281,7 @@ const AdminCaseStudyEditor: React.FC = () => {
                     type="button"
                     onClick={() => {
                       setContentFile(null);
-                      setDocxContent(null);
+                      setDocxUrl(null);
                     }}
                     className="text-red-400 hover:text-red-300"
                   >
