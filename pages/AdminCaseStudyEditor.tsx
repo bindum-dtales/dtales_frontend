@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { apiFetch, apiPost, apiPut } from "../src/lib/api";
-import { uploadImage as uploadImageHelper, uploadDocx } from "../src/lib/uploads";
+import { uploadImage, uploadDocx } from "../src/lib/uploads";
 
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve) => {
@@ -77,7 +77,7 @@ const AdminCaseStudyEditor: React.FC = () => {
     setUploadingImage(true);
     try {
       const compressed = await compressImage(file);
-      const url = await uploadImageHelper(compressed);
+      const url = await uploadImage(compressed);
       if (url) {
         setCoverImageUrl(url);
       }

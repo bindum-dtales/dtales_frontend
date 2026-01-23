@@ -1,6 +1,8 @@
 
 import { TeamMember, Testimonial, SlideData } from './types';
 
+export const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:10000";
+
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Bindu Mohan",
