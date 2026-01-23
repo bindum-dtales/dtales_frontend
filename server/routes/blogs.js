@@ -41,6 +41,26 @@ router.get("/", async (_req, res) => {
   }
 });
 
+router.get("/public", async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("blogs")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("GET /api/blogs/public error:", error);
+      throw error;
+    }
+
+    res.json((data || []).map(mapBlog));
+  } catch (err) {
+    console.error("GET /api/blogs/public caught error:", err);
+    return res.status(500).json({ error: "Failed to fetch published blogs" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const { data, error } = await supabase

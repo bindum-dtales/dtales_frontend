@@ -41,6 +41,26 @@ router.get("/", async (_req, res) => {
   }
 });
 
+router.get("/public", async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("case_studies")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("GET /api/case-studies/public error:", error);
+      throw error;
+    }
+
+    res.json((data || []).map(mapCaseStudy));
+  } catch (err) {
+    console.error("GET /api/case-studies/public caught error:", err);
+    return res.status(500).json({ error: "Failed to fetch published case studies" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const { data, error } = await supabase
