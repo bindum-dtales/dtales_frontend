@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadImage, uploadDocx } from "../src/lib/uploads";
 import { API_BASE_URL } from "../constants";
 
@@ -9,6 +9,12 @@ export default function AdminBlogEditor() {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (coverImageUrl) {
+      setError(null);
+    }
+  }, [coverImageUrl]);
 
   // ---------------- IMAGE UPLOAD ----------------
   async function handleImageUpload(file: File) {
