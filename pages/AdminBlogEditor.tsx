@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { uploadImage, uploadDocx } from "../lib/uploads";
+import { uploadImage, uploadDocx } from "../src/lib/uploads";
 import { API_BASE_URL } from "../constants";
 
 export default function AdminBlogEditor() {
