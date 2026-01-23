@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { Upload, X } from "lucide-react";
 import { uploadImage, uploadDocx } from "../src/lib/uploads";
 import { API_BASE_URL } from "../constants";
 
@@ -37,6 +39,8 @@ export default function AdminBlogEditor() {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const docxInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (coverImageUrl) {
@@ -117,55 +121,108 @@ export default function AdminBlogEditor() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">New Blog</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 pt-28 pb-16 px-4">
+      <div className="max-w-5xl mx-auto">
+        <motion.h1 className="text-3xl font-bold text-white mb-6">
+          New Blog
+        </motion.h1>
 
-      {error && (
-        <div className="bg-red-900/40 text-red-200 px-4 py-2 rounded mb-4">
-          {error}
+        {error && (
+          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <input
+            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white md:col-span-2"
+            placeholder="Blog Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          
+          {/* Cover Image Upload */}
+          <div className="md:col-span-2">
+            <label className="block text-sm text-gray-300 mb-2">Cover Image</label>
+            <div className="flex gap-3 items-center">
+              <button
+                type="button"
+                onClick={() => coverInputRef.current?.click()}
+                disabled={loading}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white px-4 py-3 rounded-xl font-semibold transition"
+              >
+                <Upload size={18} />
+                {loading ? "Uploading..." : "Choose Image"}
+              </button>
+              {coverImageUrl && (
+                <div className="flex-1 flex items-center gap-3">
+                  <img src={coverImageUrl} alt="Cover preview" className="h-12 w-12 object-cover rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={() => setCoverImageUrl(null)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])}
+              className="hidden"
+            />
+          </div>
+
+          {/* Content File Upload (.docx) */}
+          <div className="md:col-span-2">
+            <label className="block text-sm text-gray-300 mb-2">
+              Upload Content (.docx from Google Docs)
+            </label>
+            <div className="flex gap-3 items-center">
+              <button
+                type="button"
+                onClick={() => docxInputRef.current?.click()}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl font-semibold transition"
+              >
+                <Upload size={18} />
+                Choose .docx File
+              </button>
+              {docxUrl && (
+                <div className="flex-1 flex items-center gap-3">
+                  <span className="text-green-400">DOCX uploaded successfully</span>
+                  <button
+                    type="button"
+                    onClick={() => setDocxUrl(null)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <input
+              ref={docxInputRef}
+              type="file"
+              accept=".docx"
+              onChange={(e) => e.target.files && handleDocxUpload(e.target.files[0])}
+              className="hidden"
+            />
+          </div>
         </div>
-      )}
 
-      <input
-        className="w-full mb-4 p-3 rounded bg-gray-800"
-        placeholder="Blog title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      {/* IMAGE */}
-      <div className="mb-4">
-        <label className="block mb-2">Cover Image</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])}
-        />
-        {coverImageUrl && (
-          <img src={coverImageUrl} className="mt-2 w-32 rounded" />
-        )}
+        <div className="mt-6 flex gap-4 justify-end">
+          <button
+            onClick={handlePublish}
+            disabled={loading}
+            className="px-6 py-3 rounded-xl bg-[#0020BF] text-white font-semibold hover:bg-[#0A2CFF] disabled:opacity-60 transition-all"
+          >
+            {loading ? "Publishing…" : "Publish"}
+          </button>
+        </div>
       </div>
-
-      {/* DOCX */}
-      <div className="mb-6">
-        <label className="block mb-2">Upload Content (.docx)</label>
-        <input
-          type="file"
-          accept=".docx"
-          onChange={(e) => e.target.files && handleDocxUpload(e.target.files[0])}
-        />
-        {docxUrl && (
-          <p className="text-green-400 mt-1">DOCX uploaded successfully</p>
-        )}
-      </div>
-
-      <button
-        onClick={handlePublish}
-        disabled={loading}
-        className="bg-blue-600 px-6 py-2 rounded"
-      >
-        {loading ? "Publishing..." : "Publish"}
-      </button>
     </div>
   );
 }
