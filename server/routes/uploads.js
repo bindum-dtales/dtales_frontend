@@ -7,28 +7,74 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/image", upload.single("image"), async (req, res) => {
   try {
+    // Validate file exists
     if (!req.file) {
-      return res.status(400).json({ error: "No image file" });
+      console.error("POST /image: No file in request");
+      return res.status(400).json({ error: "No image file provided" });
     }
 
-    const filePath = `images/${Date.now()}-${req.file.originalname}`;
+    // Validate file properties
+    if (!req.file.buffer || !req.file.originalname || !req.file.mimetype) {
+      console.error("POST /image: Invalid file properties", {
+        hasBuffer: !!req.file.buffer,
+        hasOriginalname: !!req.file.originalname,
+        hasMimetype: !!req.file.mimetype
+      });
+      return res.status(400).json({ error: "Invalid image file" });
+    }
 
-    const { error } = await supabase.storage
+    // Generate unique file path
+    const timestamp = Date.now();
+    const filePath = `images/${timestamp}-${req.file.originalname}`;
+    console.log("POST /image: Uploading to", filePath);
+
+    // Upload to Supabase
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from(process.env.SUPABASE_BUCKET)
       .upload(filePath, req.file.buffer, {
         contentType: req.file.mimetype,
+        upsert: false
       });
 
-    if (error) throw error;
+    if (uploadError) {
+      console.error("POST /image: Supabase upload error:", {
+        message: uploadError.message,
+        statusCode: uploadError.statusCode,
+        error: uploadError
+      });
+      return res.status(500).json({ 
+        error: "Failed to upload image to storage",
+        details: uploadError.message 
+      });
+    }
 
-    const { data } = supabase.storage
+    // Get public URL
+    const { data: urlData } = supabase.storage
       .from(process.env.SUPABASE_BUCKET)
       .getPublicUrl(filePath);
 
-    res.json({ url: data.publicUrl });
+    if (!urlData || !urlData.publicUrl) {
+      console.error("POST /image: Failed to generate public URL");
+      return res.status(500).json({ error: "Failed to generate image URL" });
+    }
+
+    console.log("POST /image: Success", urlData.publicUrl);
+    return res.status(200).json({ url: urlData.publicUrl });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Image upload failed" });
+    console.error("POST /image: Unexpected error:", {
+      message: err.message,
+      stack: err.stack,
+      error: err
+    });
+    
+    // Ensure we always return JSON, never let Express default error handler run
+    if (!res.headersSent) {
+      return res.status(500).json({ 
+        error: "Internal server error during image upload",
+        message: err.message 
+      });
+    }
   }
 });
 
