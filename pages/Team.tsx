@@ -18,13 +18,12 @@ const Team: React.FC = () => {
             Our Team
             </motion.h1>
             <motion.p
-            className="text-2xl text-gray-500 font-light leading-relaxed"
+            className="text-2xl text-gray-800 font-bold leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
             >
-            We are a collective of dreamers and doers <br className="hidden md:block" />
-            Meet the people leading the charge at DTALES
+            Meet the people leading the change at DTALES
             </motion.p>
         </div>
       </section>
