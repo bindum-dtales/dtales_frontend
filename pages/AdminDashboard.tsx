@@ -57,26 +57,26 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white pt-28 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#0020BF]/20 flex items-center justify-center">
-              <Shield className="text-[#0020BF]" size={24} />
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center shadow-sm">
+              <Shield className="text-[#0020BF]" size={22} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">DTALES Admin Dashboard</h1>
-              <p className="text-gray-400 text-sm">Welcome, Admin</p>
+              <h1 className="text-3xl font-bold text-gray-900 leading-tight">DTALES Admin Dashboard</h1>
+              <p className="text-gray-600 text-sm">Welcome, Admin</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl transition-all border border-white/10"
+            className="flex items-center gap-2 bg-[#0020BF] hover:bg-[#0b2be0] text-white px-6 py-3 rounded-xl transition-all shadow-sm"
           >
             <LogOut size={18} />
             Logout
@@ -84,51 +84,45 @@ const AdminDashboard: React.FC = () => {
         </motion.div>
 
         {/* Management Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
           {/* Blog Management */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.08)",
-              backdropFilter: "blur(28px) saturate(160%)",
-              borderRadius: "20px",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
-            }}
-            className="p-6 shadow-2xl"
+            className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm"
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <FileText className="text-blue-400" size={20} />
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                  <FileText className="text-[#0020BF]" size={20} />
                 </div>
-                <h2 className="text-xl font-bold text-white">Blog Management</h2>
+                <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Blog Management</h2>
               </div>
               <button 
                 onClick={() => navigate('/admin/blogs/new')}
-                className="p-2 bg-[#0020BF] hover:bg-[#0A2CFF] rounded-lg transition-all"
+                className="p-2 rounded-lg bg-[#0020BF] hover:bg-[#0b2be0] text-white transition-all shadow-sm"
               >
                 <Plus className="text-white" size={18} />
               </button>
             </div>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-gray-600 text-sm mb-4">
               Create, edit, and manage blog posts
             </p>
             <div className="space-y-2">
-              <div className="p-3 bg-white/5 rounded-lg border border-white/5">
-                <p className="text-white text-sm">Total Posts: {blogLoading ? "Loading..." : totalBlogs}</p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Total Posts: {blogLoading ? "Loading..." : totalBlogs}</p>
               </div>
-              <div className="p-3 bg-white/5 rounded-lg border border-white/5">
-                <p className="text-white text-sm">Published: {blogLoading ? "Loading..." : publishedBlogs}</p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Published: {blogLoading ? "Loading..." : publishedBlogs}</p>
               </div>
-              <div className="p-3 bg-white/5 rounded-lg border border-white/5">
-                <p className="text-white text-sm">Drafts: {blogLoading ? "Loading..." : draftBlogs}</p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Drafts: {blogLoading ? "Loading..." : draftBlogs}</p>
               </div>
             </div>
             <button 
               onClick={() => navigate('/admin/blogs/manage')}
-              className="mt-4 w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all text-sm font-medium"
+              className="mt-5 w-full py-2.5 bg-[#0020BF] hover:bg-[#0b2be0] text-white rounded-lg transition-all text-sm font-semibold shadow-sm"
             >
               Manage Blogs
             </button>
@@ -139,45 +133,39 @@ const AdminDashboard: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.08)",
-              backdropFilter: "blur(28px) saturate(160%)",
-              borderRadius: "20px",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
-            }}
-            className="p-6 shadow-2xl"
+            className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm"
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                  <Layers className="text-purple-400" size={20} />
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                  <Layers className="text-[#0020BF]" size={20} />
                 </div>
-                <h2 className="text-xl font-bold text-white">Case Studies Management</h2>
+                <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Case Studies Management</h2>
               </div>
               <button
                 onClick={() => navigate('/admin/case-studies/new')}
-                className="p-2 bg-[#0020BF] hover:bg-[#0A2CFF] rounded-lg transition-all"
+                className="p-2 rounded-lg bg-[#0020BF] hover:bg-[#0b2be0] text-white transition-all shadow-sm"
               >
                 <Plus className="text-white" size={18} />
               </button>
             </div>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-gray-600 text-sm mb-4">
               Create, edit, and manage case studies
             </p>
             <div className="space-y-2">
-              <div className="p-3 bg-white/5 rounded-lg border border-white/5">
-                <p className="text-white text-sm">Total Case Studies: {caseLoading ? "Loading..." : totalCases}</p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Total Case Studies: {caseLoading ? "Loading..." : totalCases}</p>
               </div>
-              <div className="p-3 bg-white/5 rounded-lg border border-white/5">
-                <p className="text-white text-sm">Published: {caseLoading ? "Loading..." : publishedCases}</p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Published: {caseLoading ? "Loading..." : publishedCases}</p>
               </div>
-              <div className="p-3 bg-white/5 rounded-lg border border-white/5">
-                <p className="text-white text-sm">Drafts: {caseLoading ? "Loading..." : draftCases}</p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Drafts: {caseLoading ? "Loading..." : draftCases}</p>
               </div>
             </div>
             <button
               onClick={() => navigate('/admin/case-studies/manage')}
-              className="mt-4 w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all text-sm font-medium"
+              className="mt-5 w-full py-2.5 bg-[#0020BF] hover:bg-[#0b2be0] text-white rounded-lg transition-all text-sm font-semibold shadow-sm"
             >
               Manage Case Studies
             </button>
@@ -189,36 +177,30 @@ const AdminDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.08)",
-            backdropFilter: "blur(28px) saturate(160%)",
-            borderRadius: "20px",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-          }}
-          className="p-6 shadow-2xl"
+          className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm"
         >
-          <h2 className="text-xl font-bold text-white mb-4">Quick Stats</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 tracking-tight">Quick Stats</h2>
           {(blogError || caseError) && (
-            <p className="text-sm text-red-300 mb-4">
+            <p className="text-sm text-red-600 mb-4">
               {blogError || caseError}
             </p>
           )}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-white/5 rounded-lg border border-white/5 text-center">
-              <p className="text-2xl font-bold text-white">{isLoading ? "Loading..." : totalContent}</p>
-              <p className="text-gray-400 text-sm">Total Content</p>
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-center">
+              <p className="text-2xl font-bold text-gray-900">{isLoading ? "Loading..." : totalContent}</p>
+              <p className="text-gray-600 text-sm">Total Content</p>
             </div>
-            <div className="p-4 bg-white/5 rounded-lg border border-white/5 text-center">
-              <p className="text-2xl font-bold text-white">{blogLoading ? "Loading..." : totalBlogs}</p>
-              <p className="text-gray-400 text-sm">Blog Posts</p>
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-center">
+              <p className="text-2xl font-bold text-gray-900">{blogLoading ? "Loading..." : totalBlogs}</p>
+              <p className="text-gray-600 text-sm">Blog Posts</p>
             </div>
-            <div className="p-4 bg-white/5 rounded-lg border border-white/5 text-center">
-              <p className="text-2xl font-bold text-white">{caseLoading ? "Loading..." : totalCases}</p>
-              <p className="text-gray-400 text-sm">Case Studies</p>
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-center">
+              <p className="text-2xl font-bold text-gray-900">{caseLoading ? "Loading..." : totalCases}</p>
+              <p className="text-gray-600 text-sm">Case Studies</p>
             </div>
-            <div className="p-4 bg-white/5 rounded-lg border border-white/5 text-center">
-              <p className="text-2xl font-bold text-white">{blogLoading || caseLoading ? "Loading..." : draftBlogs + draftCases}</p>
-              <p className="text-gray-400 text-sm">Drafts</p>
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-center">
+              <p className="text-2xl font-bold text-gray-900">{blogLoading || caseLoading ? "Loading..." : draftBlogs + draftCases}</p>
+              <p className="text-gray-600 text-sm">Drafts</p>
             </div>
           </div>
         </motion.div>

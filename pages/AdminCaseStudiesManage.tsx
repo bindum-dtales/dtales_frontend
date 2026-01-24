@@ -44,41 +44,41 @@ const AdminCaseStudiesManage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 pt-28 pb-16 px-6">
+    <div className="min-h-screen bg-white pt-24 pb-16 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-white">Manage Case Studies</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Manage Case Studies</h1>
           <button
             onClick={() => navigate("/admin/case-studies/new")}
-            className="bg-[#0020BF] hover:bg-[#0A2CFF] text-white px-5 py-2 rounded-xl"
+            className="bg-[#0020BF] hover:bg-[#0b2be0] text-white px-5 py-2 rounded-xl shadow-sm"
           >
             + New Case Study
           </button>
         </div>
 
         {loading ? (
-          <p className="text-gray-400">Loading...</p>
+          <p className="text-gray-600">Loading...</p>
         ) : error ? (
-          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
             {error}
           </div>
         ) : cases.length === 0 ? (
-          <p className="text-gray-400">No case studies found.</p>
+          <p className="text-gray-600">No case studies found.</p>
         ) : (
           <div className="space-y-3">
             {cases.map((c) => (
               <div
                 key={c.id}
-                className="flex items-center justify-between bg-white/10 border border-white/10 rounded-xl px-4 py-3"
+                className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm"
               >
                 <div>
-                  <p className="text-white font-medium">{c.title}</p>
-                  <p className="text-gray-400 text-sm">{c.slug}</p>
+                  <p className="text-gray-900 font-medium">{c.title}</p>
+                  <p className="text-gray-500 text-sm">{c.slug}</p>
                   <span
                     className={`text-xs px-2 py-1 rounded-full ${
                       c.published
-                        ? "bg-green-500/20 text-green-400"
-                        : "bg-yellow-500/20 text-yellow-400"
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : "bg-yellow-50 text-yellow-700 border border-yellow-200"
                     }`}
                   >
                     {c.published ? "Published" : "Draft"}
@@ -88,13 +88,13 @@ const AdminCaseStudiesManage: React.FC = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => navigate(`/admin/case-studies/edit/${c.id}`)}
-                    className="text-blue-400 hover:text-blue-300"
+                    className="text-[#0020BF] hover:text-[#0b2be0]"
                   >
                     <Pencil size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(c.id)}
-                    className="text-red-400 hover:text-red-300"
+                    className="text-red-500 hover:text-red-600"
                   >
                     <Trash2 size={18} />
                   </button>

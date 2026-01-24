@@ -63,7 +63,7 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-950 pt-28 pb-24 px-4">
+    <div className="min-h-screen bg-white pt-28 pb-24 px-4">
       <div className="max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,10 +71,10 @@ const Contact: React.FC = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
             Let's work together
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Interested in working together? Please fill out the form below to book a free consultation
           </p>
         </motion.div>
@@ -83,12 +83,7 @@ const Contact: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.08)",
-            backdropFilter: "blur(28px)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-          }}
-          className="p-8 sm:p-10 rounded-2xl shadow-xl"
+          className="p-8 sm:p-10 rounded-3xl bg-white border border-gray-200 shadow-sm"
         >
           {successMsg && (
             <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 text-center">
@@ -111,7 +106,7 @@ const Contact: React.FC = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-transparent transition-all"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF] transition"
               />
               <input
                 type="text"
@@ -120,7 +115,7 @@ const Contact: React.FC = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-transparent transition-all"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF] transition"
               />
             </div>
 
@@ -131,7 +126,7 @@ const Contact: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-transparent transition-all"
+              className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF] transition"
             />
 
             <input
@@ -139,7 +134,7 @@ const Contact: React.FC = () => {
               name="preferredDate"
               value={formData.preferredDate}
               onChange={handleChange}
-              className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-transparent transition-all"
+              className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF] transition"
             />
 
             <textarea
@@ -149,13 +144,13 @@ const Contact: React.FC = () => {
               onChange={handleChange}
               required
               rows={5}
-              className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-transparent transition-all resize-none"
+              className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF] transition resize-none"
             />
 
             <button
               type="submit"
               disabled={sending}
-              className="w-full bg-[#0020BF] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0A2CFF] transition-all hover:shadow-lg hover:shadow-[#0020BF]/20 disabled:opacity-60"
+              className="w-full bg-[#0020BF] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#0b2be0] transition-all shadow-sm disabled:opacity-60"
             >
               {sending ? "Sending..." : "Send Message"}
             </button>

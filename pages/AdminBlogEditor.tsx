@@ -134,106 +134,108 @@ export default function AdminBlogEditor() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 pt-28 pb-16 px-4">
+    <div className="min-h-screen bg-white pt-24 pb-16 px-4">
       <div className="max-w-5xl mx-auto">
         <motion.h1 className="text-3xl font-bold text-white mb-6">
           New Blog
         </motion.h1>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <input
-            className="bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-white md:col-span-2"
-            placeholder="Blog Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          
-          {/* Cover Image Upload */}
-          <div className="md:col-span-2">
-            <label className="block text-sm text-gray-300 mb-2">Cover Image</label>
-            <div className="flex gap-3 items-center">
-              <button
-                type="button"
-                onClick={() => coverInputRef.current?.click()}
-                disabled={loading}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white px-4 py-3 rounded-xl font-semibold transition"
-              >
-                <Upload size={18} />
-                {loading ? "Uploading..." : "Choose Image"}
-              </button>
-              {coverImageUrl && (
-                <div className="flex-1 flex items-center gap-3">
-                  <img src={coverImageUrl} alt="Cover preview" className="h-12 w-12 object-cover rounded-lg" />
-                  <button
-                    type="button"
-                    onClick={() => setCoverImageUrl(null)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              )}
-            </div>
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <input
-              ref={coverInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])}
-              className="hidden"
+              className="bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF]"
+              placeholder="Blog Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
+            
+            {/* Cover Image Upload */}
+            <div className="md:col-span-2">
+              <label className="block text-sm text-gray-700 mb-2">Cover Image</label>
+              <div className="flex gap-3 items-center">
+                <button
+                  type="button"
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={loading}
+                  className="flex items-center gap-2 bg-[#0020BF] hover:bg-[#0b2be0] disabled:opacity-60 text-white px-4 py-3 rounded-lg font-semibold shadow-sm"
+                >
+                  <Upload size={18} />
+                  {loading ? "Uploading..." : "Choose Image"}
+                </button>
+                {coverImageUrl && (
+                  <div className="flex-1 flex items-center gap-3">
+                    <img src={coverImageUrl} alt="Cover preview" className="h-12 w-12 object-cover rounded-lg border border-gray-200" />
+                    <button
+                      type="button"
+                      onClick={() => setCoverImageUrl(null)}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])}
+                className="hidden"
+              />
+            </div>
+
+            {/* Content File Upload (.docx) */}
+            <div className="md:col-span-2">
+              <label className="block text-sm text-gray-700 mb-2">
+                Upload Content (.docx from Google Docs)
+              </label>
+              <div className="flex gap-3 items-center">
+                <button
+                  type="button"
+                  onClick={() => docxInputRef.current?.click()}
+                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-3 rounded-lg font-semibold border border-gray-200"
+                >
+                  <Upload size={18} />
+                  Choose .docx File
+                </button>
+                {htmlContent && (
+                  <div className="flex-1 flex items-center gap-3">
+                    <span className="text-green-600">Content parsed successfully</span>
+                    <button
+                      type="button"
+                      onClick={() => setHtmlContent(null)}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={docxInputRef}
+                type="file"
+                accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={(e) => e.target.files && handleDocxUpload(e.target.files[0])}
+                className="hidden"
+              />
+            </div>
           </div>
 
-          {/* Content File Upload (.docx) */}
-          <div className="md:col-span-2">
-            <label className="block text-sm text-gray-300 mb-2">
-              Upload Content (.docx from Google Docs)
-            </label>
-            <div className="flex gap-3 items-center">
-              <button
-                type="button"
-                onClick={() => docxInputRef.current?.click()}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl font-semibold transition"
-              >
-                <Upload size={18} />
-                Choose .docx File
-              </button>
-              {htmlContent && (
-                <div className="flex-1 flex items-center gap-3">
-                  <span className="text-green-400">Content parsed successfully</span>
-                  <button
-                    type="button"
-                    onClick={() => setHtmlContent(null)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              )}
-            </div>
-            <input
-              ref={docxInputRef}
-              type="file"
-              accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              onChange={(e) => e.target.files && handleDocxUpload(e.target.files[0])}
-              className="hidden"
-            />
+          <div className="mt-6 flex gap-4 justify-end">
+            <button
+              onClick={handlePublish}
+              disabled={loading}
+              className="px-6 py-3 rounded-lg bg-[#0020BF] text-white font-semibold hover:bg-[#0b2be0] disabled:opacity-60 transition-all shadow-sm"
+            >
+              {loading ? "Publishing…" : "Publish"}
+            </button>
           </div>
-        </div>
-
-        <div className="mt-6 flex gap-4 justify-end">
-          <button
-            onClick={handlePublish}
-            disabled={loading}
-            className="px-6 py-3 rounded-xl bg-[#0020BF] text-white font-semibold hover:bg-[#0A2CFF] disabled:opacity-60 transition-all"
-          >
-            {loading ? "Publishing…" : "Publish"}
-          </button>
         </div>
       </div>
     </div>
