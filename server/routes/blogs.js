@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { supabase } from "../config/supabase.js";
-const mammoth = require("mammoth");
+import mammoth from "mammoth";
 
 const router = Router();
 
