@@ -1,46 +1,7 @@
 import { Router } from "express";
 import { supabase } from "../config/supabase.js";
-import mammoth from "mammoth";
 
 const router = Router();
-
-// Extract file path from Supabase public URL
-function extractFilePathFromUrl(url) {
-  if (!url) return null;
-  // URL format: https://BUCKET.supabase.co/storage/v1/object/public/BUCKET/path/to/file
-  const match = url.match(/\/object\/public\/[^/]+\/(.+)$/);
-  return match ? match[1] : null;
-}
-
-// Download DOCX from Supabase and convert to HTML
-async function convertDocxUrlToHtml(url) {
-  if (!url || typeof url !== "string") {
-    return url;
-  }
-
-  const filePath = extractFilePathFromUrl(url);
-  if (!filePath) {
-    return url; // Not a Supabase URL, return as-is
-  }
-
-  try {
-    // Download file from Supabase Storage
-    const { data, error } = await supabase.storage
-      .from(process.env.SUPABASE_BUCKET)
-      .download(filePath);
-
-    if (error) {
-      throw new Error(`Failed to download DOCX: ${error.message}`);
-    }
-
-    // Convert to HTML using mammoth
-    const buffer = Buffer.from(await data.arrayBuffer());
-    const result = await mammoth.convertToHtml({ buffer });
-    return result.value; // Return HTML string
-  } catch (err) {
-    throw new Error(`DOCX conversion error: ${err.message}`);
-  }
-}
 
 function stripHtml(html) {
   if (!html) return "";
@@ -53,8 +14,14 @@ function buildExcerpt(html, maxLen = 200) {
 }
 
 function extractContent(bodyContent) {
-  if (typeof bodyContent === "string") return bodyContent;
-  if (bodyContent && typeof bodyContent.html === "string") return bodyContent.html;
+  // Handle { html: "..." } format from frontend
+  if (bodyContent && typeof bodyContent === "object" && typeof bodyContent.html === "string") {
+    return bodyContent.html;
+  }
+  // Handle plain string
+  if (typeof bodyContent === "string") {
+    return bodyContent;
+  }
   return "";
 }
 
@@ -63,7 +30,12 @@ function normalizeCaseStudy(row) {
   const cover_image_url = row?.cover_image_url ?? row?.cover_image ?? null;
   
   // Return content as-is (HTML from database)
-  const content = row?.content ?? "";
+  let content = row?.content ?? "";
+  
+  // BACKWARD COMPATIBILITY: If content looks like a DOCX URL, show fallback
+  if (typeof content === "string" && content.startsWith("http") && content.endsWith(".docx")) {
+    content = "<p><em>Content is stored as a legacy DOCX file. Please re-upload to convert to HTML.</em></p>";
+  }
   
   // Generate excerpt from HTML content
   const excerpt = buildExcerpt(content, 200);
@@ -109,31 +81,7 @@ router.get("/public", async (_req, res) => {
       throw error;
     }
 
-    // Convert DOCX URLs to HTML for public responses (runtime-only, not saved)
-    const processedData = await Promise.all(
-      (data || []).map(async (row) => {
-        const contentCopy = { ...row };
-        // Detect if content is a Supabase DOCX URL
-        if (
-          typeof contentCopy.content === "string" &&
-          contentCopy.content.includes("supabase") &&
-          contentCopy.content.includes(".docx")
-        ) {
-          try {
-            console.log("Converting DOCX to HTML for public response:", contentCopy.content);
-            contentCopy.content = await convertDocxUrlToHtml(contentCopy.content);
-            console.log("Conversion successful, content length:", contentCopy.content.length);
-          } catch (err) {
-            console.error("DOCX conversion error in public route:", err);
-            // Fallback: return empty content if conversion fails
-            contentCopy.content = "";
-          }
-        }
-        return contentCopy;
-      })
-    );
-
-    res.json(processedData.map(normalizeCaseStudy));
+    res.json((data || []).map(normalizeCaseStudy));
   } catch (err) {
     console.error("GET /api/case-studies/public caught error:", err);
     return res.status(500).json({ error: "Failed to fetch published case studies" });
@@ -156,25 +104,7 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Case study not found" });
     }
 
-    // Convert DOCX URL to HTML for public response (runtime-only, not saved)
-    const contentCopy = { ...data };
-    if (
-      typeof contentCopy.content === "string" &&
-      contentCopy.content.includes("supabase") &&
-      contentCopy.content.includes(".docx")
-    ) {
-      try {
-        console.log("Converting DOCX to HTML for public response:", contentCopy.content);
-        contentCopy.content = await convertDocxUrlToHtml(contentCopy.content);
-        console.log("Conversion successful, content length:", contentCopy.content.length);
-      } catch (err) {
-        console.error("DOCX conversion error in public route:", err);
-        // Fallback: return empty content if conversion fails
-        contentCopy.content = "";
-      }
-    }
-
-    res.json(normalizeCaseStudy(contentCopy));
+    res.json(normalizeCaseStudy(data));
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch case study" });
   }
@@ -183,39 +113,17 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const title = (req.body.title || "").toString().trim();
-    let content = extractContent(req.body.content);
-    
-    // Convert DOCX URL to HTML if content is a .docx file from Supabase
-    if (
-      typeof content === "string" &&
-      content.includes("supabase") &&
-      content.includes(".docx")
-    ) {
-      try {
-        console.log("Converting DOCX URL to HTML in POST handler:", content);
-        content = await convertDocxUrlToHtml(content);
-        console.log("DOCX conversion successful, content length:", content.length);
-      } catch (err) {
-        console.error("DOCX conversion error in POST handler:", err);
-        return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
-      }
-    }
-    
-    // Handle direct file upload (from multer)
-    if (req.file && req.file.buffer) {
-      const result = await mammoth.convertToHtml({ buffer: req.file.buffer });
-      content = result.value;
-    }
-    
+    const content = extractContent(req.body.content);
     const cover_image_url = req.body.cover_image_url ?? null;
     const published = req.body.published === true;
 
+    // Validation
     if (!title) {
       return res.status(400).json({ error: "Title is required" });
     }
 
-    if (!content) {
-      return res.status(400).json({ error: "Content is required" });
+    if (!content || typeof content !== "string" || !content.trim()) {
+      return res.status(400).json({ error: "Content is required (must be HTML string)" });
     }
 
     const excerpt = buildExcerpt(content, 200);
@@ -261,39 +169,17 @@ router.put("/:id", async (req, res) => {
 
     const title = ((req.body.title ?? current.title) || "").toString().trim();
     const contentRaw = extractContent(req.body.content);
-    let content = contentRaw !== "" ? contentRaw : current.content || "";
-    
-    // Convert DOCX URL to HTML if content is a .docx file from Supabase
-    if (
-      typeof content === "string" &&
-      content.includes("supabase") &&
-      content.includes(".docx")
-    ) {
-      try {
-        console.log("Converting DOCX URL to HTML in PUT handler:", content);
-        content = await convertDocxUrlToHtml(content);
-        console.log("DOCX conversion successful, content length:", content.length);
-      } catch (err) {
-        console.error("DOCX conversion error in PUT handler:", err);
-        return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
-      }
-    }
-    
-    // Handle direct file upload (from multer)
-    if (req.file && req.file.buffer) {
-      const result = await mammoth.convertToHtml({ buffer: req.file.buffer });
-      content = result.value;
-    }
-    
+    const content = contentRaw !== "" ? contentRaw : current.content || "";
     const cover_image_url = req.body.cover_image_url !== undefined ? req.body.cover_image_url : current.cover_image_url ?? null;
     const published = typeof req.body.published === "boolean" ? req.body.published : current.published === true;
 
+    // Validation
     if (!title) {
       return res.status(400).json({ error: "Title is required" });
     }
 
-    if (!content) {
-      return res.status(400).json({ error: "Content is required" });
+    if (!content || typeof content !== "string" || !content.trim()) {
+      return res.status(400).json({ error: "Content is required (must be HTML string)" });
     }
 
     const excerpt = buildExcerpt(content, 200);
