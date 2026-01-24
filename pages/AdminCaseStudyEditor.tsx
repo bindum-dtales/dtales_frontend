@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { apiFetch, apiPost, apiPut } from "../src/lib/api";
-import { uploadImage, uploadDocx } from "../src/lib/uploads";
+import { uploadImage } from "../src/lib/uploads";
+import { parseDocxToHtml } from "../src/lib/docxParser";
 
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve) => {
@@ -40,8 +41,7 @@ const AdminCaseStudyEditor: React.FC = () => {
 
   const [title, setTitle] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
-  const [contentFile, setContentFile] = useState<File | null>(null);
-  const [docxUrl, setDocxUrl] = useState<string | null>(null);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,10 +72,10 @@ const AdminCaseStudyEditor: React.FC = () => {
   }, [id, isEdit]);
 
   useEffect(() => {
-    if (docxUrl) {
+    if (htmlContent) {
       setError(null);
     }
-  }, [docxUrl]);
+  }, [htmlContent]);
 
   useEffect(() => {
     if (coverImageUrl) {
@@ -103,20 +103,16 @@ const AdminCaseStudyEditor: React.FC = () => {
   const handleDocxFileChange = async (file: File | null) => {
     if (!file) return;
     setError(null);
-    setContentFile(file);
-    setDocxUrl(null);
 
     try {
-      const url = await uploadDocx(file);
-      if (url && url.trim()) {
-        setDocxUrl(url);
+      const html = await parseDocxToHtml(file);
+      if (html && html.trim()) {
+        setHtmlContent(html);
       } else {
-        setError("Failed to process .docx file: no URL returned");
-        setContentFile(null);
+        setError("Failed to parse .docx file: no content extracted");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to process .docx file");
-      setContentFile(null);
+      setError(err.message || "Failed to parse .docx file");
     }
   };
 
@@ -130,7 +126,7 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
-      if (!isEdit && !docxUrl) {
+      if (!isEdit && !htmlContent) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
         return;
@@ -142,8 +138,8 @@ const AdminCaseStudyEditor: React.FC = () => {
         published: false,
       };
 
-      if (docxUrl) {
-        payload.content = { html: docxUrl };
+      if (htmlContent) {
+        payload.content = { html: htmlContent };
       }
 
       if (isEdit && id) {
@@ -168,7 +164,7 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
-      if (!isEdit && !docxUrl) {
+      if (!isEdit && !htmlContent) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
         return;
@@ -180,8 +176,8 @@ const AdminCaseStudyEditor: React.FC = () => {
         published: true,
       };
 
-      if (docxUrl) {
-        payload.content = { html: docxUrl };
+      if (htmlContent) {
+        payload.content = { html: htmlContent };
       }
 
       if (isEdit && id) {
@@ -274,15 +270,12 @@ const AdminCaseStudyEditor: React.FC = () => {
                 <Upload size={18} />
                 Choose .docx File
               </button>
-              {contentFile && (
+              {htmlContent && (
                 <div className="flex-1 flex items-center gap-3">
-                  <span className="text-gray-300">{contentFile.name}</span>
+                  <span className="text-green-400">Content parsed successfully</span>
                   <button
                     type="button"
-                    onClick={() => {
-                      setContentFile(null);
-                      setDocxUrl(null);
-                    }}
+                    onClick={() => setHtmlContent(null)}
                     className="text-red-400 hover:text-red-300"
                   >
                     <X size={18} />
@@ -297,7 +290,7 @@ const AdminCaseStudyEditor: React.FC = () => {
               onChange={(e) => handleDocxFileChange(e.target.files?.[0] || null)}
               className="hidden"
             />
-            {isEdit && !contentFile && (
+            {isEdit && !htmlContent && (
               <p className="text-xs text-gray-400 mt-2">
                 Leave empty to keep existing content
               </p>

@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Upload, X } from "lucide-react";
-import { uploadImage, uploadDocx } from "../src/lib/uploads";
+import { uploadImage } from "../src/lib/uploads";
 import { API_BASE_URL } from "../constants";
+import { parseDocxToHtml } from "../src/lib/docxParser";
 
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve) => {
@@ -35,7 +36,7 @@ async function compressImage(file: File): Promise<File> {
 export default function AdminBlogEditor() {
   const [title, setTitle] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
-  const [docxUrl, setDocxUrl] = useState<string | null>(null);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,10 +44,10 @@ export default function AdminBlogEditor() {
   const docxInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (coverImageUrl) {
+    if (coverImageUrl || htmlContent) {
       setError(null);
     }
-  }, [coverImageUrl]);
+  }, [coverImageUrl, htmlContent]);
 
   // ---------------- IMAGE UPLOAD ----------------
   async function handleImageUpload(file: File) {
@@ -69,10 +70,10 @@ export default function AdminBlogEditor() {
     setError(null);
     setLoading(true);
     try {
-      const url = await uploadDocx(file); // backend returns { url }
-      setDocxUrl(url); // ✅ THIS WAS MISSING BEFORE
+      const html = await parseDocxToHtml(file);
+      setHtmlContent(html);
     } catch (err) {
-      setError("DOCX upload failed");
+      setError("Failed to parse DOCX file. Please ensure it's a valid .docx file.");
     } finally {
       setLoading(false);
     }
@@ -87,7 +88,7 @@ export default function AdminBlogEditor() {
       return;
     }
 
-    if (!docxUrl) {
+    if (!htmlContent || !htmlContent.trim()) {
       setError("Please upload a .docx file with your content");
       return;
     }
@@ -105,7 +106,7 @@ export default function AdminBlogEditor() {
         body: JSON.stringify({
           title,
           cover_image_url: coverImageUrl,
-          content: { html: docxUrl },
+          content: { html: htmlContent },
           published: true,
         }),
       });
@@ -190,12 +191,12 @@ export default function AdminBlogEditor() {
                 <Upload size={18} />
                 Choose .docx File
               </button>
-              {docxUrl && (
+              {htmlContent && (
                 <div className="flex-1 flex items-center gap-3">
-                  <span className="text-green-400">DOCX uploaded successfully</span>
+                  <span className="text-green-400">Content parsed successfully</span>
                   <button
                     type="button"
-                    onClick={() => setDocxUrl(null)}
+                    onClick={() => setHtmlContent(null)}
                     className="text-red-400 hover:text-red-300"
                   >
                     <X size={18} />
@@ -206,7 +207,7 @@ export default function AdminBlogEditor() {
             <input
               ref={docxInputRef}
               type="file"
-              accept=".docx"
+              accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               onChange={(e) => e.target.files && handleDocxUpload(e.target.files[0])}
               className="hidden"
             />
