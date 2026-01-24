@@ -9,6 +9,7 @@ type Blog = {
 	title: string;
 	slug: string;
 	cover_image_url?: string | null;
+	excerpt: string;
 	content?: string;
 	published: boolean;
 	created_at: string;
@@ -97,20 +98,20 @@ const Blogs: React.FC = () => {
 						</p>
 
 						<p className="text-gray-600 text-lg leading-relaxed">
-							{getExcerpt(blog.content)}
-						</p>
+						{blog.excerpt || getExcerpt(blog.content)}
+					</p>
 
-						<div className="flex items-center justify-between mt-auto pt-2">
-							<span className="text-sm text-blue-800 font-semibold">
-								{blog.slug}
-							</span>
-							<Link
-								to={`/blogs/${blog.id}`}
-								className="text-dtales-navy font-semibold hover:underline flex items-center gap-2"
-							>
-								Read More <ArrowRight size={18} />
-							</Link>
-						</div>
+					<div className="flex items-center justify-between mt-auto pt-2">
+						<span className="text-sm text-blue-800 font-semibold">
+							{blog.slug}
+						</span>
+						<Link
+							to={`/blogs/${blog.id}`}
+							className="text-dtales-navy font-semibold hover:underline flex items-center gap-2"
+						>
+							Read More <ArrowRight size={18} />
+						</Link>
+					</div>
 					</motion.div>
 				))}
 			</div>

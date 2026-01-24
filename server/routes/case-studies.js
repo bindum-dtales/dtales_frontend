@@ -1,38 +1,44 @@
 import { Router } from "express";
 import { supabase } from "../config/supabase.js";
 import mammoth from "mammoth";
-import https from "https";
-import http from "http";
 
 const router = Router();
 
-// Convert DOCX URL to HTML
+// Extract file path from Supabase public URL
+function extractFilePathFromUrl(url) {
+  if (!url) return null;
+  // URL format: https://BUCKET.supabase.co/storage/v1/object/public/BUCKET/path/to/file
+  const match = url.match(/\/object\/public\/[^/]+\/(.+)$/);
+  return match ? match[1] : null;
+}
+
+// Download DOCX from Supabase and convert to HTML
 async function convertDocxUrlToHtml(url) {
-  if (!url || typeof url !== "string" || !url.startsWith("http")) {
-    return url; // Return as-is if not a URL
+  if (!url || typeof url !== "string") {
+    return url;
   }
 
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith("https") ? https : http;
-    
-    protocol.get(url, (response) => {
-      if (response.statusCode !== 200) {
-        return reject(new Error(`Failed to download DOCX: ${response.statusCode}`));
-      }
+  const filePath = extractFilePathFromUrl(url);
+  if (!filePath) {
+    return url; // Not a Supabase URL, return as-is
+  }
 
-      const chunks = [];
-      response.on("data", (chunk) => chunks.push(chunk));
-      response.on("end", async () => {
-        try {
-          const buffer = Buffer.concat(chunks);
-          const result = await mammoth.convertToHtml({ buffer });
-          resolve(result.value); // HTML string
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }).on("error", reject);
-  });
+  try {
+    // Download file from Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(process.env.SUPABASE_BUCKET)
+      .download(filePath);
+
+    if (error) {
+      throw new Error(`Failed to download DOCX: ${error.message}`);
+    }
+
+    // Convert to HTML using mammoth
+    const result = await mammoth.convertToHtml({ arrayBuffer: data.arrayBuffer() });
+    return result.value; // Return HTML string
+  } catch (err) {
+    throw new Error(`DOCX conversion error: ${err.message}`);
+  }
 }
 
 function stripHtml(html) {
@@ -51,13 +57,6 @@ function extractContent(bodyContent) {
   return "";
 }
 
-function mapCaseStudy(row) {
-  return {
-    ...row,
-    cover_image_url: row?.cover_image_url ?? row?.cover_image ?? null,
-  };
-}
-
 function normalizeCaseStudy(row) {
   // Normalize cover image field
   const cover_image_url = row?.cover_image_url ?? row?.cover_image ?? null;
@@ -65,11 +64,15 @@ function normalizeCaseStudy(row) {
   // Return content as-is (HTML from database)
   const content = row?.content ?? "";
   
+  // Generate excerpt from HTML content
+  const excerpt = buildExcerpt(content, 200);
+  
   return {
     id: row.id,
     title: row.title,
     slug: row.slug,
     cover_image_url,
+    excerpt,
     content,
     published: row.published,
     created_at: row.created_at,
@@ -105,7 +108,31 @@ router.get("/public", async (_req, res) => {
       throw error;
     }
 
-    res.json((data || []).map(normalizeCaseStudy));
+    // Convert DOCX URLs to HTML for public responses (runtime-only, not saved)
+    const processedData = await Promise.all(
+      (data || []).map(async (row) => {
+        const contentCopy = { ...row };
+        // Detect if content is a Supabase DOCX URL
+        if (
+          typeof contentCopy.content === "string" &&
+          contentCopy.content.includes("supabase") &&
+          contentCopy.content.includes(".docx")
+        ) {
+          try {
+            console.log("Converting DOCX to HTML for public response:", contentCopy.content);
+            contentCopy.content = await convertDocxUrlToHtml(contentCopy.content);
+            console.log("Conversion successful, content length:", contentCopy.content.length);
+          } catch (err) {
+            console.error("DOCX conversion error in public route:", err);
+            // Fallback: return empty content if conversion fails
+            contentCopy.content = "";
+          }
+        }
+        return contentCopy;
+      })
+    );
+
+    res.json(processedData.map(normalizeCaseStudy));
   } catch (err) {
     console.error("GET /api/case-studies/public caught error:", err);
     return res.status(500).json({ error: "Failed to fetch published case studies" });
@@ -128,7 +155,25 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Case study not found" });
     }
 
-    res.json(normalizeCaseStudy(data));
+    // Convert DOCX URL to HTML for public response (runtime-only, not saved)
+    const contentCopy = { ...data };
+    if (
+      typeof contentCopy.content === "string" &&
+      contentCopy.content.includes("supabase") &&
+      contentCopy.content.includes(".docx")
+    ) {
+      try {
+        console.log("Converting DOCX to HTML for public response:", contentCopy.content);
+        contentCopy.content = await convertDocxUrlToHtml(contentCopy.content);
+        console.log("Conversion successful, content length:", contentCopy.content.length);
+      } catch (err) {
+        console.error("DOCX conversion error in public route:", err);
+        // Fallback: return empty content if conversion fails
+        contentCopy.content = "";
+      }
+    }
+
+    res.json(normalizeCaseStudy(contentCopy));
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch case study" });
   }
@@ -138,7 +183,7 @@ router.post("/", async (req, res) => {
   try {
     const title = (req.body.title || "").toString().trim();
     let content = extractContent(req.body.content);
-    const cover_image = req.body.cover_image ?? null;
+    const cover_image_url = req.body.cover_image_url ?? null;
     const published = req.body.published === true;
 
     if (!title) {
@@ -150,9 +195,11 @@ router.post("/", async (req, res) => {
     }
 
     // Convert DOCX URL to HTML if needed
-    if (typeof content === "string" && content.startsWith("http") && content.includes(".docx")) {
+    if (typeof content === "string" && content.includes("supabase") && content.includes(".docx")) {
       try {
+        console.log("Converting DOCX to HTML:", content);
         content = await convertDocxUrlToHtml(content);
+        console.log("Conversion successful, content length:", content.length);
       } catch (err) {
         console.error("DOCX conversion error:", err);
         return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
@@ -168,7 +215,7 @@ router.post("/", async (req, res) => {
           title,
           excerpt,
           content,
-          cover_image,
+          cover_image_url,
           published,
         },
       ])
@@ -179,13 +226,13 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(normalizeCaseStudy(data));
   } catch (err) {
+    console.error("POST /case-studies error:", err);
     return res.status(500).json({ error: "Failed to create case study" });
   }
 });
 
 router.put("/:id", async (req, res) => {
   try {
-
     const { data: current, error: fetchError } = await supabase
       .from("case_studies")
       .select("*")
@@ -203,7 +250,7 @@ router.put("/:id", async (req, res) => {
     const title = ((req.body.title ?? current.title) || "").toString().trim();
     const contentRaw = extractContent(req.body.content);
     let content = contentRaw !== "" ? contentRaw : current.content || "";
-    const cover_image = req.body.cover_image !== undefined ? req.body.cover_image : current.cover_image ?? null;
+    const cover_image_url = req.body.cover_image_url !== undefined ? req.body.cover_image_url : current.cover_image_url ?? null;
     const published = typeof req.body.published === "boolean" ? req.body.published : current.published === true;
 
     if (!title) {
@@ -215,9 +262,11 @@ router.put("/:id", async (req, res) => {
     }
 
     // Convert DOCX URL to HTML if needed
-    if (typeof content === "string" && content.startsWith("http") && content.includes(".docx")) {
+    if (typeof content === "string" && content.includes("supabase") && content.includes(".docx")) {
       try {
+        console.log("Converting DOCX to HTML:", content);
         content = await convertDocxUrlToHtml(content);
+        console.log("Conversion successful, content length:", content.length);
       } catch (err) {
         console.error("DOCX conversion error:", err);
         return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
@@ -232,7 +281,7 @@ router.put("/:id", async (req, res) => {
         title,
         excerpt,
         content,
-        cover_image,
+        cover_image_url,
         published,
         updated_at: new Date().toISOString(),
       })
@@ -244,6 +293,7 @@ router.put("/:id", async (req, res) => {
 
     res.json(normalizeCaseStudy(data));
   } catch (err) {
+    console.error("PUT /case-studies/:id error:", err);
     return res.status(500).json({ error: "Failed to update case study" });
   }
 });
