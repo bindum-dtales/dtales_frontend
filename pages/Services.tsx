@@ -64,7 +64,7 @@ const Services: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                 {/* Left Content */}
                 <motion.div
-                    className="lg:col-span-5 sticky top-32"
+                    className="lg:col-span-5 relative lg:sticky lg:top-32"
                     initial={{ opacity: 0, x: -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -132,7 +132,7 @@ const Services: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start lg:flex-row-reverse">
                 {/* Right Content (Text) - Swapped for visual interest */}
                 <motion.div
-                    className="lg:col-span-5 lg:order-2 sticky top-32"
+                    className="lg:col-span-5 lg:order-2 relative lg:sticky lg:top-32"
                     initial={{ opacity: 0, x: 30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
