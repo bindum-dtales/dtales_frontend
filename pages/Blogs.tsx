@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FileText, ArrowRight } from "lucide-react";
 import { apiFetch } from "../src/lib/api";
+import ContentCard from "../components/ContentCard";
 
 type Blog = {
 	id: string;
@@ -33,90 +32,58 @@ const Blogs: React.FC = () => {
 			.finally(() => setLoading(false));
 	}, []);
 
-	return (
-		<div className="pt-28 pb-24 min-h-screen bg-white px-6">
-			<div className="max-w-4xl mx-auto text-center mb-20">
-				<motion.h1
-					className="text-6xl md:text-7xl font-bold text-dtales-navy mb-6 tracking-tight"
-					initial={{ opacity: 0, y: -20 }}
-					animate={{ opacity: 1, y: 0 }}
-				>
-					Blogs
-				</motion.h1>
-				<motion.p
-					className="text-xl text-gray-500"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-				>
-					Latest published insights from DTALES Tech.
-				</motion.p>
-			</div>
+    return (
+        <div className="min-h-screen bg-gray-50 px-4 pb-20 pt-24">
+            <div className="mx-auto max-w-5xl text-center mb-16">
+                <motion.h1
+                    className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight"
+                    initial={{ opacity: 0, y: -16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                >
+                    Insights from DTales Tech
+                </motion.h1>
+                <motion.p
+                    className="mt-4 text-lg text-gray-600"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                >
+                    Practical guidance, product thinking, and documentation strategy for B2B technology teams.
+                </motion.p>
+            </div>
 
-			{loading && (
-				<div className="text-center text-gray-500">Loading blogs...</div>
-			)}
+            {loading && (
+                <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
+                    Loading blogs...
+                </div>
+            )}
 
-			{error && (
-				<div className="text-center text-red-500 bg-red-50 border border-red-200 rounded-xl py-3 px-4 max-w-2xl mx-auto">
-					{error}
-				</div>
-			)}
+            {error && (
+                <div className="mx-auto max-w-2xl text-center text-red-600 bg-red-50 border border-red-200 rounded-2xl py-4 px-6">
+                    {error}
+                </div>
+            )}
 
-			{!loading && !error && blogs.length === 0 && (
-				<div className="text-center text-gray-500">No blogs found.</div>
-			)}
+            {!loading && !error && blogs.length === 0 && (
+                <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
+                    No blogs found.
+                </div>
+            )}
 
-		<div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-			{blogs.map((blog) => (
-				<motion.div
-						key={blog.id}
-						className="bg-[#F5F5F7] p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all border border-gray-200 flex flex-col gap-4"
-						initial={{ opacity: 0, y: 30 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true }}
-					>
-						<div className="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
-							<FileText size={26} />
-						</div>
-
-					{blog.cover_image_url && (
-						<Link to={`/blogs/${blog.id}`}>
-							<img
-								src={blog.cover_image_url}
-								alt={blog.title}
-								className="w-full h-auto object-contain rounded-2xl bg-gray-50"
-							/>
-						</Link>
-					)}						<Link to={`/blogs/${blog.id}`}>
-							<h2 className="text-2xl font-bold text-black leading-snug">
-								{blog.title}
-							</h2>
-						</Link>
-
-						<p className="text-gray-500 text-sm">
-							{new Date(blog.created_at).toLocaleDateString()}
-						</p>
-
-						<p className="text-gray-600 text-lg leading-relaxed">
-						{blog.excerpt || getExcerpt(blog.content)}
-					</p>
-
-					<div className="flex items-center justify-between mt-auto pt-2">
-						<span className="text-sm text-blue-800 font-semibold">
-							{blog.slug}
-						</span>
-						<Link
-							to={`/blogs/${blog.id}`}
-							className="text-dtales-navy font-semibold hover:underline flex items-center gap-2"
-						>
-							Read More <ArrowRight size={18} />
-						</Link>
-					</div>
-					</motion.div>
-				))}
-			</div>
-		</div>
-	);
+            <div className="mx-auto max-w-7xl grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3">
+                {blogs.map((blog) => (
+                    <ContentCard
+                        key={blog.id}
+                        title={blog.title}
+                        excerpt={blog.excerpt || getExcerpt(blog.content)}
+                        coverImageUrl={blog.cover_image_url || undefined}
+                        date={blog.created_at}
+                        category="Blog"
+                        href={`/blogs/${blog.id}`}
+                    />
+                ))}
+            </div>
+        </div>
+    );
 };
 
 export default Blogs;
