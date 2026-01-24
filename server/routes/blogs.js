@@ -1,7 +1,39 @@
 import { Router } from "express";
 import { supabase } from "../config/supabase.js";
+import mammoth from "mammoth";
+import https from "https";
+import http from "http";
 
 const router = Router();
+
+// Convert DOCX URL to HTML
+async function convertDocxUrlToHtml(url) {
+  if (!url || typeof url !== "string" || !url.startsWith("http")) {
+    return url; // Return as-is if not a URL
+  }
+
+  return new Promise((resolve, reject) => {
+    const protocol = url.startsWith("https") ? https : http;
+    
+    protocol.get(url, (response) => {
+      if (response.statusCode !== 200) {
+        return reject(new Error(`Failed to download DOCX: ${response.statusCode}`));
+      }
+
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.on("end", async () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const result = await mammoth.convertToHtml({ buffer });
+          resolve(result.value); // HTML string
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }).on("error", reject);
+  });
+}
 
 function stripHtml(html) {
   if (!html) return "";
@@ -105,7 +137,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const title = (req.body.title || "").toString().trim();
-    const content = extractContent(req.body.content);
+    let content = extractContent(req.body.content);
     const cover_image = req.body.cover_image ?? null;
     const published = req.body.published === true;
 
@@ -115,6 +147,16 @@ router.post("/", async (req, res) => {
 
     if (!content) {
       return res.status(400).json({ error: "Content is required" });
+    }
+
+    // Convert DOCX URL to HTML if needed
+    if (typeof content === "string" && content.startsWith("http") && content.includes(".docx")) {
+      try {
+        content = await convertDocxUrlToHtml(content);
+      } catch (err) {
+        console.error("DOCX conversion error:", err);
+        return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
+      }
     }
 
     const excerpt = buildExcerpt(content, 200);
@@ -160,7 +202,7 @@ router.put("/:id", async (req, res) => {
 
     const title = ((req.body.title ?? current.title) || "").toString().trim();
     const contentRaw = extractContent(req.body.content);
-    const content = contentRaw !== "" ? contentRaw : current.content || "";
+    let content = contentRaw !== "" ? contentRaw : current.content || "";
     const cover_image = req.body.cover_image !== undefined ? req.body.cover_image : current.cover_image ?? null;
     const published = typeof req.body.published === "boolean" ? req.body.published : current.published === true;
 
@@ -170,6 +212,16 @@ router.put("/:id", async (req, res) => {
 
     if (!content) {
       return res.status(400).json({ error: "Content is required" });
+    }
+
+    // Convert DOCX URL to HTML if needed
+    if (typeof content === "string" && content.startsWith("http") && content.includes(".docx")) {
+      try {
+        content = await convertDocxUrlToHtml(content);
+      } catch (err) {
+        console.error("DOCX conversion error:", err);
+        return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
+      }
     }
 
     const excerpt = buildExcerpt(content, 200);
