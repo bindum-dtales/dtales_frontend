@@ -101,10 +101,11 @@ export default function AdminBlogEditor() {
     try {
       setLoading(true);
       
+      // Payload matches Supabase schema exactly: cover_image_url (text), content (text/HTML)
       const payload = {
-        title,
-        cover_image_url: coverImageUrl,
-        content: htmlContent,
+        title: title.trim(),
+        cover_image_url: coverImageUrl,  // Supabase column name
+        content: htmlContent,            // Plain HTML string
         published: true,
       };
       

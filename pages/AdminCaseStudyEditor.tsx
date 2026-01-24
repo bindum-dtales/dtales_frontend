@@ -132,14 +132,16 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
+      // Payload matches Supabase schema: cover_image_url (text), content (text/HTML)
       const payload: any = {
         title: title.trim(),
-        cover_image_url: coverImageUrl,
+        cover_image_url: coverImageUrl,  // Supabase column name
         published: false,
       };
 
+      // Only include content if it's being updated
       if (htmlContent) {
-        payload.content = htmlContent;
+        payload.content = htmlContent;  // Plain HTML string
       }
 
       if (isEdit && id) {
@@ -170,14 +172,16 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
+      // Payload matches Supabase schema exactly: cover_image_url (text), content (text/HTML)
       const payload: any = {
         title: title.trim(),
-        cover_image_url: coverImageUrl,
+        cover_image_url: coverImageUrl,  // Supabase column name
         published: true,
       };
 
+      // Only include content if it's being updated
       if (htmlContent) {
-        payload.content = htmlContent;
+        payload.content = htmlContent;  // Plain HTML string
       }
 
       console.log("Publishing case study with payload:", JSON.stringify(payload, null, 2));

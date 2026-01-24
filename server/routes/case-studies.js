@@ -26,16 +26,11 @@ function extractContent(bodyContent) {
 }
 
 function normalizeCaseStudy(row) {
-  // Normalize cover image field
-  const cover_image_url = row?.cover_image_url ?? row?.cover_image ?? null;
+  // Use cover_image_url directly from database (schema column)
+  const cover_image_url = row?.cover_image_url ?? null;
   
-  // Return content as-is (HTML from database)
-  let content = row?.content ?? "";
-  
-  // BACKWARD COMPATIBILITY: If content looks like a DOCX URL, show fallback
-  if (typeof content === "string" && content.startsWith("http") && content.endsWith(".docx")) {
-    content = "<p><em>Content is stored as a legacy DOCX file. Please re-upload to convert to HTML.</em></p>";
-  }
+  // Content is plain HTML string from database
+  const content = row?.content ?? "";
   
   // Generate excerpt from HTML content
   const excerpt = buildExcerpt(content, 200);
