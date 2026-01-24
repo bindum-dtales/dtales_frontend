@@ -184,10 +184,29 @@ router.post("/", async (req, res) => {
   try {
     const title = (req.body.title || "").toString().trim();
     let content = extractContent(req.body.content);
+    
+    // Convert DOCX URL to HTML if content is a .docx file from Supabase
+    if (
+      typeof content === "string" &&
+      content.includes("supabase") &&
+      content.includes(".docx")
+    ) {
+      try {
+        console.log("Converting DOCX URL to HTML in POST handler:", content);
+        content = await convertDocxUrlToHtml(content);
+        console.log("DOCX conversion successful, content length:", content.length);
+      } catch (err) {
+        console.error("DOCX conversion error in POST handler:", err);
+        return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
+      }
+    }
+    
+    // Handle direct file upload (from multer)
     if (req.file && req.file.buffer) {
       const result = await mammoth.convertToHtml({ buffer: req.file.buffer });
       content = result.value;
     }
+    
     const cover_image_url = req.body.cover_image_url ?? null;
     const published = req.body.published === true;
 
@@ -243,10 +262,29 @@ router.put("/:id", async (req, res) => {
     const title = ((req.body.title ?? current.title) || "").toString().trim();
     const contentRaw = extractContent(req.body.content);
     let content = contentRaw !== "" ? contentRaw : current.content || "";
+    
+    // Convert DOCX URL to HTML if content is a .docx file from Supabase
+    if (
+      typeof content === "string" &&
+      content.includes("supabase") &&
+      content.includes(".docx")
+    ) {
+      try {
+        console.log("Converting DOCX URL to HTML in PUT handler:", content);
+        content = await convertDocxUrlToHtml(content);
+        console.log("DOCX conversion successful, content length:", content.length);
+      } catch (err) {
+        console.error("DOCX conversion error in PUT handler:", err);
+        return res.status(500).json({ error: "Failed to convert DOCX to HTML" });
+      }
+    }
+    
+    // Handle direct file upload (from multer)
     if (req.file && req.file.buffer) {
       const result = await mammoth.convertToHtml({ buffer: req.file.buffer });
       content = result.value;
     }
+    
     const cover_image_url = req.body.cover_image_url !== undefined ? req.body.cover_image_url : current.cover_image_url ?? null;
     const published = typeof req.body.published === "boolean" ? req.body.published : current.published === true;
 
