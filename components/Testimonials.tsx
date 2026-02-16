@@ -47,8 +47,8 @@ const Testimonials: React.FC = () => {
         id: 10,
         quote:
           "DTALES Tech is truly the extension of our team we didn't know we needed. Handing over our tech documentation services to them was the best strategic move we made this year. They are proactive, professional, and understand our product as deeply as we do. If you want to free up your team to do what they do best, give the content to DTALES.",
-        client: "Sona Sreenivasan",
-        company: "Serial Entrepreneur | Tech Investor, Bangalore",
+        client: "Rakesh Ramakrishnaiah",
+        company: "Co-Founder & CPO, LinkEye",
       },
     ];
     setTestimonials(fallbackData);
