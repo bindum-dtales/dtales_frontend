@@ -1,6 +1,5 @@
 import { useState } from "react";
-
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://dtales-backend.onrender.com";
+import { API_BASE_URL } from '../../constants';
 
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);

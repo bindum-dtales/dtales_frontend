@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://dtales-backend.onrender.com";
+import { API_BASE_URL } from '../../constants';
 
 export async function apiFetch<T>(endpoint: string): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${endpoint}`);

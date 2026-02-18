@@ -1,11 +1,13 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Team from './pages/Team';
 import Services from './pages/Services';
+import Portfolio from './pages/Portfolio';
 import Blogs from './pages/Blogs';
 import BlogDetails from './pages/BlogDetails';
 import CaseStudies from './pages/CaseStudies';
@@ -34,16 +36,27 @@ const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }
 };
 
 const App: React.FC = () => {
+  const location = useLocation();
+
   return (
-    <Router>
+    <>
       <ScrollToTop />
       <div className="flex flex-col min-h-screen bg-[#EEEEEE] font-sans text-black">
         <Navbar />
         <div className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+            >
+              <Routes>
+                <Route path="/" element={<Home />} />
             <Route path="/team" element={<Team />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blogs/:id" element={<BlogDetails />} />
             <Route path="/case-studies" element={<CaseStudies />} />
@@ -106,11 +119,13 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } 
             />
-          </Routes>
+              </Routes>
+            </motion.div>
+          </AnimatePresence>
         </div>
         <Footer />
       </div>
-    </Router>
+    </>
   );
 };
 

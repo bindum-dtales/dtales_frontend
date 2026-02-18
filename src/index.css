@@ -16,3 +16,53 @@ body {
   color: #000000;
   font-family: Inter, sans-serif;
 }
+
+/* Premium Card with Monochrome Glow */
+.premium-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.premium-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.08),
+    rgba(0, 0, 0, 0.15)
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.premium-card::after {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  border-radius: 20px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0.2),
+    transparent 70%
+  );
+  filter: blur(25px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.premium-card:hover {
+  transform: translateY(-10px);
+}
+
+.premium-card:hover::before,
+.premium-card:hover::after {
+  opacity: 1;
+}
