@@ -1,6 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 
+// Debug: Confirm portfolio page loaded
+console.log("PORTFOLIO PAGE LOADED");
+
 // Portfolio Item Type
 type PortfolioItem = {
   id: number;
