@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { uploadImage } from "../src/lib/uploads";
 import { API_BASE_URL } from "../constants";
@@ -34,6 +35,7 @@ async function compressImage(file: File): Promise<File> {
 }
 
 export default function AdminBlogEditor() {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
@@ -124,7 +126,7 @@ export default function AdminBlogEditor() {
         throw new Error(responseData?.details || responseData?.error || "Failed to publish blog");
       }
 
-      window.location.href = "/#/admin/dashboard";
+      navigate("/admin/dashboard");
     } catch (err: any) {
       console.error("Publish error:", err);
       setError(err.message || "Failed to publish blog");

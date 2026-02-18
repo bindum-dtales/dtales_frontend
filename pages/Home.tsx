@@ -17,12 +17,11 @@ import {
 } from 'lucide-react';
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
   // Helper for icon animation
   const iconVariants: Variants = {
     hover: { scale: 1.1, rotate: 5, transition: { type: "spring", stiffness: 400, damping: 10 } }
   };
-
-  const navigate = useNavigate();
 
   return (
     <main className="bg-[#F5F5F7]"> {/* Apple-like light gray background */}
@@ -295,7 +294,7 @@ const Home: React.FC = () => {
               </p>
               <button
                 className="bg-dtales-navy text-white px-12 py-5 rounded-full text-xl font-semibold transition-all hover:scale-105 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#001cc3]"
-                onClick={() => window.location.assign('https://dtales.tech/#/contact')}
+                onClick={() => navigate('/contact')}
                 aria-label="Start a Project"
               >
                 Start a Project

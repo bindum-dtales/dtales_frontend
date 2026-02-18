@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   FileText, 
   BookOpen, 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 const Services: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white">
       {/* Header with Background Image */}
@@ -198,7 +200,7 @@ const Services: React.FC = () => {
             </p>
                         <button
                             className="bg-white text-dtales-navy px-10 py-4 rounded-full text-lg font-bold hover:scale-105 transition-all shadow-lg hover:shadow-white/20"
-                            onClick={() => window.location.assign('https://dtales.tech/#/contact')}
+                            onClick={() => navigate('/contact')}
                             aria-label="Get in Touch"
                         >
                             Get in Touch
