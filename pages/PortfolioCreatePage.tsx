@@ -7,6 +7,10 @@ import {
   uploadPortfolioImage,
 } from "../src/lib/portfolioApi";
 
+// Image upload constraints
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 interface PortfolioFormData {
   title: string;
   projectLink: string;
@@ -51,18 +55,21 @@ export default function PortfolioCreatePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("Please upload a valid image file");
+    setError(null);
+
+    // Validate file type - only allow specific MIME types
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError("Only JPG, PNG, or WEBP images are allowed");
       return;
     }
 
     // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > MAX_IMAGE_SIZE) {
       setError("Image size must be less than 5MB");
       return;
     }
 
+    // Read and preview the image
     const reader = new FileReader();
     reader.onload = (event) => {
       const previewUrl = event.target?.result as string;
@@ -71,7 +78,6 @@ export default function PortfolioCreatePage() {
         coverImage: file,
         previewUrl: previewUrl,
       }));
-      setError(null);
     };
     reader.readAsDataURL(file);
   };
