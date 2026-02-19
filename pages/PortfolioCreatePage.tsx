@@ -2,6 +2,10 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Upload, X, CheckCircle } from "lucide-react";
+import {
+  createPortfolio,
+  uploadPortfolioImage,
+} from "../src/lib/portfolioApi";
 
 interface PortfolioFormData {
   title: string;
@@ -111,21 +115,22 @@ export default function PortfolioCreatePage() {
     setLoading(true);
 
     try {
-      // Temporary success handling - will be replaced with actual API call
-      console.log("Portfolio Form Data:", {
-        title: formData.title,
-        projectLink: formData.projectLink,
-        category: formData.category,
-        coverImage: formData.coverImage.name,
-      });
+      // Upload image first
+      const imageUrl = await uploadPortfolioImage(formData.coverImage);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Create portfolio with uploaded image URL
+      await createPortfolio({
+        title: formData.title,
+        link: formData.projectLink,
+        category: formData.category,
+        cover_image_url: imageUrl,
+        published: true,
+      });
 
       setSuccess(true);
       setTimeout(() => {
         navigate("/admin/portfolio/manage");
-      }, 2000);
+      }, 1500);
     } catch (err: any) {
       setError(err.message || "Failed to create portfolio item");
     } finally {

@@ -2,68 +2,53 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Trash2, Plus, ExternalLink } from "lucide-react";
-
-interface PortfolioItem {
-  id: string;
-  title: string;
-  category: "Video" | "Web" | "Branding";
-  projectLink: string;
-  coverImageUrl: string;
-}
+import {
+  getAllPortfolio,
+  deletePortfolio,
+  PortfolioItem,
+} from "../src/lib/portfolioApi";
 
 const PortfolioManagePage: React.FC = () => {
   const navigate = useNavigate();
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([
-    {
-      id: "1",
-      title: "E-commerce Platform Redesign",
-      category: "Web",
-      projectLink: "https://example.com/1",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1460925895917-aeb19be489a6?w=500&h=300&fit=crop",
-    },
-    {
-      id: "2",
-      title: "Brand Identity System",
-      category: "Branding",
-      projectLink: "https://example.com/2",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=300&fit=crop",
-    },
-    {
-      id: "3",
-      title: "Product Launch Video",
-      category: "Video",
-      projectLink: "https://example.com/3",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1533228100845-08145b01de14?w=500&h=300&fit=crop",
-    },
-  ]);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
-  // Simulate loading
+  // Fetch portfolio items on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    const fetchPortfolio = async () => {
+      try {
+        setError(null);
+        const data = await getAllPortfolio();
+        setPortfolioItems(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to load portfolio items");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolio();
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: number) => {
     if (deleteConfirm === id) {
-      setPortfolioItems((prev) => prev.filter((item) => item.id !== id));
-      setDeleteConfirm(null);
+      try {
+        await deletePortfolio(id);
+        setPortfolioItems((prev) => prev.filter((item) => item.id !== id));
+        setDeleteConfirm(null);
+      } catch (err: any) {
+        setError(err.message || "Failed to delete portfolio item");
+      }
     } else {
       setDeleteConfirm(id);
       setTimeout(() => setDeleteConfirm(null), 3000);
     }
   };
 
-  const getCategoryColor = (
-    category: "Video" | "Web" | "Branding"
-  ): string => {
+  const getCategoryColor = (category: string): string => {
     switch (category) {
       case "Web":
         return "bg-blue-50 text-blue-700 border-blue-200";
@@ -102,6 +87,17 @@ const PortfolioManagePage: React.FC = () => {
             </button>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
+            >
+              <p className="text-red-700 font-medium">{error}</p>
+            </motion.div>
+          )}
+
           {/* Loading State */}
           {loading ? (
             <p className="text-gray-600">Loading portfolio items...</p>
@@ -133,7 +129,7 @@ const PortfolioManagePage: React.FC = () => {
                   {/* Image */}
                   <div className="relative h-40 bg-gray-100 overflow-hidden">
                     <img
-                      src={item.coverImageUrl}
+                      src={item.cover_image_url}
                       alt={item.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
@@ -159,7 +155,7 @@ const PortfolioManagePage: React.FC = () => {
 
                     {/* Project Link */}
                     <a
-                      href={item.projectLink}
+                      href={item.link}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-[#0020BF] hover:text-[#0b2be0] flex items-center gap-1 mb-4 break-all"
