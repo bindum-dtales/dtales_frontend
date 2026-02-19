@@ -8,7 +8,6 @@ import {
 } from "../src/lib/portfolioApi";
 
 // Image upload constraints
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 interface PortfolioFormData {
@@ -60,12 +59,6 @@ export default function PortfolioCreatePage() {
     // Validate file type - only allow specific MIME types
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       setError("Only JPG, PNG, or WEBP images are allowed");
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > MAX_IMAGE_SIZE) {
-      setError("Image size must be less than 5MB");
       return;
     }
 
@@ -280,7 +273,7 @@ export default function PortfolioCreatePage() {
                     Click to upload image
                   </span>
                   <span className="text-gray-500 text-xs">
-                    PNG, JPG, GIF up to 5MB
+                    PNG, JPG, or WEBP
                   </span>
                 </button>
               )}
