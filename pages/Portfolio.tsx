@@ -1,67 +1,18 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import { getAllPortfolio } from '../src/lib/portfolioApi';
 
 // Debug: Confirm portfolio page loaded
 console.log("PORTFOLIO PAGE LOADED");
 
-// Portfolio Item Type
+// Portfolio Item Type (mapped from API)
 type PortfolioItem = {
   id: number;
   title: string;
   category: string;
   thumbnail: string;
-  youtubeLink?: string;
-  externalLink?: string;
-  featured?: boolean;
+  link: string;
 };
-
-// Mock Portfolio Data
-const portfolioItems: PortfolioItem[] = [
-  {
-    id: 1,
-    title: "Brand Identity Design",
-    category: "Branding",
-    thumbnail: "https://via.placeholder.com/600x400?text=Brand+Identity",
-    externalLink: "https://example.com",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "E-Commerce Platform Redesign",
-    category: "Web",
-    thumbnail: "https://via.placeholder.com/600x400?text=E-Commerce",
-    youtubeLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-  {
-    id: 3,
-    title: "Product Launch Campaign",
-    category: "Video",
-    thumbnail: "https://via.placeholder.com/600x400?text=Product+Launch",
-    youtubeLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    featured: true,
-  },
-  {
-    id: 4,
-    title: "SaaS Dashboard Development",
-    category: "Web",
-    thumbnail: "https://via.placeholder.com/600x400?text=SaaS+Dashboard",
-    externalLink: "https://example.com/saas",
-  },
-  {
-    id: 5,
-    title: "Corporate Video Production",
-    category: "Video",
-    thumbnail: "https://via.placeholder.com/600x400?text=Corporate+Video",
-    youtubeLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-  {
-    id: 7,
-    title: "Brand Refresh Project",
-    category: "Branding",
-    thumbnail: "https://via.placeholder.com/600x400?text=Brand+Refresh",
-    youtubeLink: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
-];
 
 const categories = ["All", "Video", "Web", "Branding"];
 
@@ -70,8 +21,37 @@ export default function Portfolio() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const projectsPerPage = 10;
   const gridRef = useRef<HTMLDivElement>(null);
+
+  // Fetch portfolio items on mount
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getAllPortfolio();
+        // Map API data to local format
+        const mappedData: PortfolioItem[] = data.map((item) => ({
+          id: item.id,
+          title: item.title,
+          category: item.category,
+          thumbnail: item.cover_image_url,
+          link: item.link,
+        }));
+        setPortfolioItems(mappedData);
+      } catch (err: any) {
+        setError(err.message || "Failed to load portfolio items");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolio();
+  }, []);
 
   useEffect(() => {
     setIsTransitioning(true);
@@ -125,6 +105,30 @@ export default function Portfolio() {
       initial="hidden"
       animate="visible"
     >
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex items-center justify-center min-h-screen px-4">
+          <div className="text-center">
+            <p className="text-xl text-gray-600">Loading portfolio...</p>
+          </div>
+        </div>
+      ) : error ? (
+        /* Error State */
+        <div className="flex items-center justify-center min-h-screen px-4">
+          <div className="text-center max-w-md">
+            <p className="text-xl text-red-600 mb-4">Failed to load portfolio</p>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      ) : portfolioItems.length === 0 ? (
+        /* Empty State */
+        <div className="flex items-center justify-center min-h-screen px-4">
+          <div className="text-center max-w-md">
+            <p className="text-xl text-gray-600">No portfolio items available yet.</p>
+          </div>
+        </div>
+      ) : (
+        <>
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="max-w-3xl text-center">
           <motion.h1
@@ -159,7 +163,8 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Featured Projects Section */}
+      {/* Featured Projects Section - Only show first 2 items */}
+      {portfolioItems.length > 0 && (
       <section className="bg-white py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -175,9 +180,7 @@ export default function Portfolio() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {portfolioItems
-              .filter((item) => item.featured)
-              .map((item, index) => (
+            {portfolioItems.slice(0, 2).map((item, index) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -189,10 +192,8 @@ export default function Portfolio() {
                   }}
                   viewport={{ once: true, margin: '-100px' }}
                   onClick={() => {
-                    if (item.youtubeLink) {
-                      window.open(item.youtubeLink, '_blank');
-                    } else if (item.externalLink) {
-                      window.open(item.externalLink, '_blank');
+                    if (item.link) {
+                      window.open(item.link, '_blank');
                     }
                   }}
                   className="group cursor-pointer"
@@ -220,6 +221,7 @@ export default function Portfolio() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Filter Buttons */}
       <div className="max-w-7xl mx-auto px-4 flex justify-center gap-6 mb-16">
@@ -278,11 +280,10 @@ export default function Portfolio() {
               }}
             >
             {(() => {
-              const nonFeaturedItems = portfolioItems.filter((item) => !item.featured);
               const filteredItems =
                 activeCategory === "All"
-                  ? nonFeaturedItems
-                  : nonFeaturedItems.filter((item) => item.category === activeCategory);
+                  ? portfolioItems
+                  : portfolioItems.filter((item) => item.category === activeCategory);
               
               const indexOfLastProject = currentPage * projectsPerPage;
               const indexOfFirstProject = indexOfLastProject - projectsPerPage;
@@ -302,10 +303,8 @@ export default function Portfolio() {
                     delay: index * 0.03
                   }}
                     onClick={() => {
-                      if (item.youtubeLink) {
-                        window.open(item.youtubeLink, '_blank');
-                      } else if (item.externalLink) {
-                        window.open(item.externalLink, '_blank');
+                      if (item.link) {
+                        window.open(item.link, '_blank');
                       }
                     }}
                     className="group cursor-pointer relative rounded-xl bg-white shadow-md transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_0_120px_rgba(37,99,235,0.95)]"
@@ -338,11 +337,10 @@ export default function Portfolio() {
 
           {/* Pagination Controls */}
           {(() => {
-            const nonFeaturedItems = portfolioItems.filter((item) => !item.featured);
             const filteredItems =
               activeCategory === "All"
-                ? nonFeaturedItems
-                : nonFeaturedItems.filter((item) => item.category === activeCategory);
+                ? portfolioItems
+                : portfolioItems.filter((item) => item.category === activeCategory);
             const totalPages = Math.ceil(filteredItems.length / projectsPerPage);
 
             return (
@@ -398,6 +396,8 @@ export default function Portfolio() {
           </div>
         </div>
       </section>
+      </>
+      )}
     </motion.div>
   );
 }
