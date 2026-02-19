@@ -14,15 +14,23 @@ type CaseStudy = {
   published: boolean;
 };
 
+type Portfolio = {
+  id: string;
+  published: boolean;
+};
+
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [cases, setCases] = useState<CaseStudy[]>([]);
+  const [portfolio, setPortfolio] = useState<Portfolio[]>([]);
   const [blogLoading, setBlogLoading] = useState(true);
   const [caseLoading, setCaseLoading] = useState(true);
+  const [portfolioLoading, setPortfolioLoading] = useState(true);
   const [blogError, setBlogError] = useState<string | null>(null);
   const [caseError, setCaseError] = useState<string | null>(null);
+  const [portfolioError, setPortfolioError] = useState<string | null>(null);
 
   useEffect(() => {
     setBlogLoading(true);
@@ -40,6 +48,14 @@ const AdminDashboard: React.FC = () => {
       .finally(() => setCaseLoading(false));
   }, []);
 
+  useEffect(() => {
+    setPortfolioLoading(true);
+    apiFetch<Portfolio[]>("/api/portfolio")
+      .then(setPortfolio)
+      .catch((err) => setPortfolioError(err.message || "Failed to load portfolio"))
+      .finally(() => setPortfolioLoading(false));
+  }, []);
+
   const totalBlogs = blogs.length;
   const publishedBlogs = blogs.filter((b) => b.published).length;
   const draftBlogs = totalBlogs - publishedBlogs;
@@ -48,8 +64,12 @@ const AdminDashboard: React.FC = () => {
   const publishedCases = cases.filter((c) => c.published).length;
   const draftCases = totalCases - publishedCases;
 
+  const totalPortfolio = portfolio.length;
+  const publishedPortfolio = portfolio.filter((p) => p.published).length;
+  const draftPortfolio = totalPortfolio - publishedPortfolio;
+
   const totalContent = totalBlogs + totalCases;
-  const isLoading = blogLoading || caseLoading;
+  const isLoading = blogLoading || caseLoading || portfolioLoading;
 
   const handleLogout = () => {
     sessionStorage.removeItem('isAdminLoggedIn');
@@ -170,19 +190,62 @@ const AdminDashboard: React.FC = () => {
               Manage Case Studies
             </button>
           </motion.div>
+
+          {/* Portfolio Management */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                  <Layers className="text-[#0020BF]" size={20} />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900 tracking-tight">Portfolio Management</h2>
+              </div>
+              <button
+                onClick={() => navigate('/admin/portfolio/create')}
+                className="p-2 rounded-lg bg-[#0020BF] hover:bg-[#0b2be0] text-white transition-all shadow-sm"
+              >
+                <Plus className="text-white" size={18} />
+              </button>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">
+              Create, edit, and manage portfolio projects
+            </p>
+            <div className="space-y-2">
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Total Portfolio: {portfolioLoading ? "Loading..." : totalPortfolio}</p>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Published: {portfolioLoading ? "Loading..." : publishedPortfolio}</p>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-900 text-sm">Drafts: {portfolioLoading ? "Loading..." : draftPortfolio}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/admin/portfolio/manage')}
+              className="mt-5 w-full py-2.5 bg-[#0020BF] hover:bg-[#0b2be0] text-white rounded-lg transition-all text-sm font-semibold shadow-sm"
+            >
+              Manage Portfolio
+            </button>
+          </motion.div>
         </div>
 
         {/* Quick Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
           className="p-6 rounded-3xl bg-white border border-gray-200 shadow-sm"
         >
           <h2 className="text-xl font-semibold text-gray-900 mb-4 tracking-tight">Quick Stats</h2>
-          {(blogError || caseError) && (
+          {(blogError || caseError || portfolioError) && (
             <p className="text-sm text-red-600 mb-4">
-              {blogError || caseError}
+              {blogError || caseError || portfolioError}
             </p>
           )}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

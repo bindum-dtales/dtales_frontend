@@ -19,6 +19,8 @@ import AdminBlogEditor from './pages/AdminBlogEditor';
 import AdminBlogsManage from './pages/AdminBlogsManage';
 import AdminCaseStudyEditor from './pages/AdminCaseStudyEditor';
 import AdminCaseStudiesManage from './pages/AdminCaseStudiesManage';
+import PortfolioCreatePage from './pages/PortfolioCreatePage';
+import PortfolioManagePage from './pages/PortfolioManagePage';
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -116,6 +118,22 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <AdminCaseStudiesManage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/portfolio/create" 
+              element={
+                <ProtectedRoute>
+                  <PortfolioCreatePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/portfolio/manage" 
+              element={
+                <ProtectedRoute>
+                  <PortfolioManagePage />
                 </ProtectedRoute>
               } 
             />
