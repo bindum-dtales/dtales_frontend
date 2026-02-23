@@ -13,7 +13,7 @@ const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 interface PortfolioFormData {
   title: string;
   projectLink: string;
-  category: "Video" | "Web" | "Branding" | "";
+  category: "video" | "web" | "branding" | "featured_project" | "";
   coverImage: File | null;
   previewUrl: string | null;
 }
@@ -45,7 +45,7 @@ export default function PortfolioCreatePage() {
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData((prev) => ({
       ...prev,
-      category: e.target.value as "Video" | "Web" | "Branding" | "",
+      category: e.target.value as "video" | "web" | "branding" | "featured_project" | "",
     }));
     setError(null);
   };
@@ -226,9 +226,10 @@ export default function PortfolioCreatePage() {
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 focus:outline-none focus:border-[#0020BF] transition-colors cursor-pointer"
               >
                 <option value="">Select a category</option>
-                <option value="Video">Video</option>
-                <option value="Web">Web</option>
-                <option value="Branding">Branding</option>
+                <option value="video">Video</option>
+                <option value="web">Web</option>
+                <option value="branding">Branding</option>
+                <option value="featured_project">Featured Project</option>
               </select>
             </div>
 
