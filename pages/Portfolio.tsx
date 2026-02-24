@@ -26,6 +26,10 @@ export default function Portfolio() {
   const [error, setError] = useState<string | null>(null);
   const projectsPerPage = 10;
   const gridRef = useRef<HTMLDivElement>(null);
+  
+  // Background Image Slider State
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const backgroundImages = ['/1.png', '/2.png', '/3.png', '/4.png'];
 
   // Fetch portfolio items on mount
   useEffect(() => {
@@ -74,6 +78,17 @@ export default function Portfolio() {
     }, 300);
     return () => clearTimeout(timeout);
   }, [currentPage]);
+
+  // Background Image Slider Effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        (prevIndex + 1) % backgroundImages.length
+      );
+    }, 5000); // Change image every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [backgroundImages.length]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -129,10 +144,33 @@ export default function Portfolio() {
         </div>
       ) : (
         <>
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="max-w-3xl text-center">
+      {/* Hero Section with Background Image Slider */}
+      <div className="relative flex items-center justify-center min-h-screen px-4 overflow-hidden">
+        {/* Background Images */}
+        {backgroundImages.map((image, index) => (
+          <div
+            key={image}
+            className="absolute inset-0 transition-all duration-1000 ease-in-out"
+            style={{
+              opacity: currentImageIndex === index ? 1 : 0,
+              transform: currentImageIndex === index ? 'translateX(0)' : 'translateX(100%)',
+            }}
+          >
+            <img
+              src={image}
+              alt={`Background ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+
+        {/* Dark Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-black/50" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-3xl text-center">
           <motion.h1
-            className="text-5xl md:text-6xl font-bold text-gray-900 mb-6"
+            className="text-5xl md:text-6xl font-bold text-white mb-6"
             variants={itemVariants}
             initial="hidden"
             animate="visible"
@@ -142,7 +180,7 @@ export default function Portfolio() {
           </motion.h1>
 
           <motion.h2
-            className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6"
+            className="text-2xl md:text-3xl font-semibold text-white/90 mb-6"
             variants={itemVariants}
             initial="hidden"
             animate="visible"
@@ -152,7 +190,7 @@ export default function Portfolio() {
           </motion.h2>
 
           <motion.p
-            className="text-lg text-gray-600 leading-relaxed"
+            className="text-lg text-white/80 leading-relaxed"
             variants={itemVariants}
             initial="hidden"
             animate="visible"
