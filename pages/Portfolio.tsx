@@ -90,6 +90,26 @@ export default function Portfolio() {
     return () => clearInterval(interval);
   }, [backgroundImages.length]);
 
+  // Filter logic for portfolio items
+  const getFeaturedProjects = () => {
+    return portfolioItems.filter(item => 
+      item.category.toLowerCase() === 'featured_project'
+    );
+  };
+
+  const getFilteredProjects = () => {
+    if (activeCategory === 'All') {
+      // Show all items in the All tab
+      return portfolioItems;
+    }
+    
+    // For specific category tabs (Video/Web/Branding),
+    // only show items matching that category (exclude featured_project)
+    return portfolioItems.filter(item => 
+      item.category.toLowerCase() === activeCategory.toLowerCase()
+    );
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -201,8 +221,8 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Featured Projects Section - Only show first 2 items */}
-      {portfolioItems.length > 0 && (
+      {/* Featured Projects Section - Only show featured_project items */}
+      {getFeaturedProjects().length > 0 && (
       <section className="bg-white py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -218,7 +238,7 @@ export default function Portfolio() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {portfolioItems.slice(0, 2).map((item, index) => (
+            {getFeaturedProjects().map((item, index) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -318,10 +338,7 @@ export default function Portfolio() {
               }}
             >
             {(() => {
-              const filteredItems =
-                activeCategory === "All"
-                  ? portfolioItems
-                  : portfolioItems.filter((item) => item.category === activeCategory);
+              const filteredItems = getFilteredProjects();
               
               const indexOfLastProject = currentPage * projectsPerPage;
               const indexOfFirstProject = indexOfLastProject - projectsPerPage;
@@ -375,10 +392,7 @@ export default function Portfolio() {
 
           {/* Pagination Controls */}
           {(() => {
-            const filteredItems =
-              activeCategory === "All"
-                ? portfolioItems
-                : portfolioItems.filter((item) => item.category === activeCategory);
+            const filteredItems = getFilteredProjects();
             const totalPages = Math.ceil(filteredItems.length / projectsPerPage);
 
             return (
