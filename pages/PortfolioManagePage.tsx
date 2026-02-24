@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, ExternalLink } from "lucide-react";
+import { Trash2, Plus, ExternalLink, ArrowLeft } from "lucide-react";
 import {
   getAllPortfolio,
   deletePortfolio,
@@ -68,6 +68,15 @@ const PortfolioManagePage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
+          {/* Back to Dashboard Button */}
+          <button
+            onClick={() => navigate("/admin/dashboard")}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+          >
+            <ArrowLeft size={18} />
+            <span className="font-medium">Back to Dashboard</span>
+          </button>
+
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
