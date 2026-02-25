@@ -7,6 +7,7 @@ import {
   deletePortfolio,
   PortfolioItem,
 } from "../src/lib/portfolioApi";
+import { getProxiedImageUrl } from "../src/utils/imageProxy";
 
 const PortfolioManagePage: React.FC = () => {
   const navigate = useNavigate();
@@ -138,7 +139,7 @@ const PortfolioManagePage: React.FC = () => {
                   {/* Image */}
                   <div className="relative h-40 bg-gray-100 overflow-hidden">
                     <img
-                      src={item.cover_image_url}
+                      src={getProxiedImageUrl(item.cover_image_url) || item.cover_image_url}
                       alt={item.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />

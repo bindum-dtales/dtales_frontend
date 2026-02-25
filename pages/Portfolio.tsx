@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { getAllPortfolio } from '../src/lib/portfolioApi';
+import { getProxiedImageUrl } from '../src/utils/imageProxy';
 
 // Debug: Confirm portfolio page loaded
 console.log("PORTFOLIO PAGE LOADED");
@@ -258,7 +259,7 @@ export default function Portfolio() {
                 >
                   <div className="relative h-80 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                     <img
-                      src={item.thumbnail}
+                      src={getProxiedImageUrl(item.thumbnail) || item.thumbnail}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -367,7 +368,7 @@ export default function Portfolio() {
                   {/* Image Container */}
                   <div className="relative h-[420px] w-full overflow-hidden rounded-t-xl">
                     <img
-                      src={item.thumbnail}
+                      src={getProxiedImageUrl(item.thumbnail) || item.thumbnail}
                       alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />

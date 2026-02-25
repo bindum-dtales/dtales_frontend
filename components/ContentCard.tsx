@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { getProxiedImageUrl } from "../src/utils/imageProxy";
 
 export type ContentCardProps = {
   title: string;
@@ -32,7 +33,7 @@ const ContentCard: React.FC<ContentCardProps> = ({
         <div className="relative aspect-[16/9] w-full bg-gray-100">
           {coverImageUrl ? (
             <img
-              src={coverImageUrl}
+              src={getProxiedImageUrl(coverImageUrl) || coverImageUrl}
               alt={title}
               className="absolute inset-0 h-full w-full object-cover"
             />

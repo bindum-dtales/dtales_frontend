@@ -5,6 +5,7 @@ import { Upload, X } from "lucide-react";
 import { uploadImage } from "../src/lib/uploads";
 import { API_BASE_URL } from "../constants";
 import { parseDocxToHtml } from "../src/lib/docxParser";
+import { getProxiedImageUrl } from "../src/utils/imageProxy";
 
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve) => {
@@ -172,7 +173,7 @@ export default function AdminBlogEditor() {
                 </button>
                 {coverImageUrl && (
                   <div className="flex-1 flex items-center gap-3">
-                    <img src={coverImageUrl} alt="Cover preview" className="h-12 w-12 object-cover rounded-lg border border-gray-200" />
+                    <img src={getProxiedImageUrl(coverImageUrl) || coverImageUrl} alt="Cover preview" className="h-12 w-12 object-cover rounded-lg border border-gray-200" />
                     <button
                       type="button"
                       onClick={() => setCoverImageUrl(null)}
