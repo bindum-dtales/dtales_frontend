@@ -25,9 +25,9 @@ const Testimonials: React.FC = () => {
       {
         id: 7,
         quote:
-          "DTALES team is exceptionally methodical in execution. We've worked with a few teams previously for our account, but these guys are definitely a class apart.\nThey set the right expectations and follow through with clear, transparent communication to make sure the work gets done. Just hand it over, forget about it.\nIt will be delivered one step above what you expect!",
-        client: "Abilash Kokkath",
-        company: "Trail Tribe, Dubai",
+          "DTALES Tech is our extended team for all things, Content. I can't imagine how we would operate without them! I highly recommend their services to any company looking to improve their Tech Content game.",
+        client: "Akshay Balaganur",
+        company: "CEO, LinkEye",
       },
       {
         id: 8,
@@ -39,9 +39,10 @@ const Testimonials: React.FC = () => {
       {
         id: 9,
         quote:
-          "DTALES Tech is our extended team for all things, Content. I can't imagine how we would operate without them! I highly recommend their services to any company looking to improve their Tech Content game.",
-        client: "Akshay Balaganur",
-        company: "CEO, LinkEye",
+          "DTALES team is exceptionally methodical in execution. We've worked with a few teams previously for our account, but these guys are definitely a class apart.\nThey set the right expectations and follow through with clear, transparent communication to make sure the work gets done. Just hand it over, forget about it.\nIt will be delivered one step above what you expect!",
+        client: "Abilash Kokkath",
+        company: "Trail Tribe, Dubai",
+        
       },
       {
         id: 10,
