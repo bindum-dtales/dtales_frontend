@@ -47,7 +47,7 @@ const CaseStudies: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                 >
-                    Documentation-led transformations and outcomes from DTales Tech clients.
+                    Documentation-led transformations and outcomes from DTALES Tech clients.
                 </motion.p>
             </div>
 
