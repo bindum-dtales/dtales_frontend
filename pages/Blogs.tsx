@@ -40,7 +40,7 @@ const Blogs: React.FC = () => {
                     initial={{ opacity: 0, y: -16 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    Insights from DTales Tech
+                    Insights from DTALES Tech
                 </motion.h1>
                 <motion.p
                     className="mt-4 text-lg text-gray-600"
