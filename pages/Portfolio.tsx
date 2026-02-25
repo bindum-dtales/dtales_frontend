@@ -207,7 +207,7 @@ export default function Portfolio() {
             animate="visible"
             transition={{ delay: 0.2 }}
           >
-            Selected Works by DTales
+            Selected Works by DTALES Tech
           </motion.h2>
 
           <motion.p
