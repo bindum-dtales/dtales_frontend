@@ -52,6 +52,33 @@ export async function getAllPortfolio(): Promise<PortfolioItem[]> {
 }
 
 /**
+ * Update a portfolio item
+ * @param id Portfolio item ID
+ * @param data Updated portfolio item data
+ * @returns Updated portfolio item
+ */
+export async function updatePortfolio(id: number, data: {
+  title: string;
+  link: string;
+  category: string;
+  cover_image_url: string;
+  published: boolean;
+}): Promise<PortfolioItem> {
+  const res = await fetch(`${API_BASE_URL}/api/portfolio/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || `Failed to update portfolio item (${res.status})`);
+  }
+
+  return res.json();
+}
+
+/**
  * Delete a portfolio item
  * @param id Portfolio item ID
  */

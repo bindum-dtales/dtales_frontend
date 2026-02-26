@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, ExternalLink, ArrowLeft } from "lucide-react";
+import { Trash2, Plus, ExternalLink, ArrowLeft, Edit } from "lucide-react";
 import {
   getAllPortfolio,
   deletePortfolio,
@@ -47,6 +47,10 @@ const PortfolioManagePage: React.FC = () => {
       setDeleteConfirm(id);
       setTimeout(() => setDeleteConfirm(null), 3000);
     }
+  };
+
+  const handleEdit = (item: PortfolioItem) => {
+    navigate("/admin/portfolio/create", { state: { item } });
   };
 
   const getCategoryColor = (category: string): string => {
@@ -174,20 +178,29 @@ const PortfolioManagePage: React.FC = () => {
                       View Project
                     </a>
 
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className={`w-full py-2 px-3 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
-                        deleteConfirm === item.id
-                          ? "bg-red-500 hover:bg-red-600 text-white"
-                          : "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
-                      }`}
-                    >
-                      <Trash2 size={16} />
-                      {deleteConfirm === item.id
-                        ? "Confirm Delete"
-                        : "Delete"}
-                    </button>
+                    {/* Edit and Delete Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(item)}
+                        className="flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200"
+                      >
+                        <Edit size={16} />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+                          deleteConfirm === item.id
+                            ? "bg-red-500 hover:bg-red-600 text-white"
+                            : "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
+                        }`}
+                      >
+                        <Trash2 size={16} />
+                        {deleteConfirm === item.id
+                          ? "Confirm Delete"
+                          : "Delete"}
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ))}

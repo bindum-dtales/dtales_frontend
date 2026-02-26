@@ -1,10 +1,12 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Upload, X, CheckCircle } from "lucide-react";
 import {
   createPortfolio,
+  updatePortfolio,
   uploadPortfolioImage,
+  PortfolioItem,
 } from "../src/lib/portfolioApi";
 
 // Image upload constraints
@@ -20,12 +22,16 @@ interface PortfolioFormData {
 
 export default function PortfolioCreatePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const editingItem = location.state?.item as PortfolioItem | undefined;
+  const isEditing = !!editingItem;
+
   const [formData, setFormData] = useState<PortfolioFormData>({
-    title: "",
-    projectLink: "",
-    category: "",
+    title: editingItem?.title || "",
+    projectLink: editingItem?.link || "",
+    category: (editingItem?.category.toLowerCase() as any) || "",
     coverImage: null,
-    previewUrl: null,
+    previewUrl: editingItem?.cover_image_url || null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -106,7 +112,8 @@ export default function PortfolioCreatePage() {
       return;
     }
 
-    if (!formData.coverImage) {
+    // For new items, image is required; for editing, image is optional (can keep existing)
+    if (!isEditing && !formData.coverImage) {
       setError("Cover image is required");
       return;
     }
@@ -114,24 +121,35 @@ export default function PortfolioCreatePage() {
     setLoading(true);
 
     try {
-      // Upload image first
-      const imageUrl = await uploadPortfolioImage(formData.coverImage);
+      let imageUrl = formData.previewUrl;
 
-      // Create portfolio with uploaded image URL
-      await createPortfolio({
+      // Upload image only if a new file was selected
+      if (formData.coverImage) {
+        imageUrl = await uploadPortfolioImage(formData.coverImage);
+      }
+
+      const portfolioData = {
         title: formData.title,
         link: formData.projectLink,
         category: formData.category,
-        cover_image_url: imageUrl,
+        cover_image_url: imageUrl!,
         published: true,
-      });
+      };
+
+      if (isEditing && editingItem) {
+        // Update existing portfolio
+        await updatePortfolio(editingItem.id, portfolioData);
+      } else {
+        // Create new portfolio
+        await createPortfolio(portfolioData);
+      }
 
       setSuccess(true);
       setTimeout(() => {
         navigate("/admin/portfolio/manage");
       }, 1500);
     } catch (err: any) {
-      setError(err.message || "Failed to create portfolio item");
+      setError(err.message || `Failed to ${isEditing ? "update" : "create"} portfolio item`);
     } finally {
       setLoading(false);
     }
@@ -147,10 +165,10 @@ export default function PortfolioCreatePage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-              Create Portfolio Item
+              {isEditing ? "Edit Portfolio Item" : "Create Portfolio Item"}
             </h1>
             <p className="text-gray-600 text-sm mt-1">
-              Add a new project to your portfolio
+              {isEditing ? "Update your project details" : "Add a new project to your portfolio"}
             </p>
           </div>
 
@@ -163,7 +181,7 @@ export default function PortfolioCreatePage() {
             >
               <CheckCircle className="text-green-600" size={20} />
               <span className="text-green-700 font-medium">
-                Portfolio item created successfully!
+                Portfolio item {isEditing ? "updated" : "created"} successfully!
               </span>
             </motion.div>
           )}
@@ -302,7 +320,7 @@ export default function PortfolioCreatePage() {
                 disabled={loading}
                 className="flex-1 py-2.5 px-4 bg-[#0020BF] hover:bg-[#0b2be0] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-colors"
               >
-                {loading ? "Saving..." : "Save Portfolio"}
+                {loading ? (isEditing ? "Updating..." : "Saving...") : (isEditing ? "Update Portfolio" : "Add Portfolio")}
               </button>
             </div>
           </form>
