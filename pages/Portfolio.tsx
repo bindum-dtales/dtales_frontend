@@ -74,15 +74,27 @@ export default function Portfolio() {
         console.log("[PORTFOLIO] Response received at:", new Date().toISOString());
         console.log("[PORTFOLIO] Response status:", response.status);
 
+        // Parse JSON first to see the actual data
+        const data = await response.json();
+        console.log("[PORTFOLIO] Received data:", data);
+        console.log("[PORTFOLIO] Data type:", Array.isArray(data) ? 'array' : typeof data);
+        console.log("[PORTFOLIO] Data length:", data?.length);
+
+        // Only throw error if response status indicates failure
         if (!response.ok) {
+          console.error("[PORTFOLIO] Non-OK response but got data:", data);
           throw new Error(`Server error: ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log("[PORTFOLIO] Data parsed, items count:", data.length);
-
         // Map API data to local format
         console.time("PORTFOLIO_DATA_MAPPING");
+        
+        // ✅ Handle empty array as valid response (not an error)
+        if (!Array.isArray(data)) {
+          console.error("[PORTFOLIO] Expected array but got:", typeof data, data);
+          throw new Error("Invalid data format from server");
+        }
+
         const mappedData: PortfolioItem[] = data.map((item: any) => ({
           id: item.id,
           title: item.title,
@@ -91,10 +103,13 @@ export default function Portfolio() {
           link: item.link,
         }));
         console.timeEnd("PORTFOLIO_DATA_MAPPING");
+        console.log("[PORTFOLIO] Mapped data count:", mappedData.length);
 
         // Immediately update portfolioItems and clear loading state
         // DO NOT wait for images to load
         setPortfolioItems(mappedData);
+        console.log("[PORTFOLIO] Set portfolioItems to:", mappedData.length, "items");
+        
         setLoading(false);
         setIsServerWakingUp(false);
         console.log("[PORTFOLIO] Loading state cleared, UI ready");
