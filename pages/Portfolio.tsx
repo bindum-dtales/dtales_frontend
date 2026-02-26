@@ -16,8 +16,10 @@ type PortfolioItem = {
 };
 
 const categories = ["All", "Video", "Web", "Branding"];
-const BACKEND_URL = "https://dtales-backend-gzlj.onrender.com";
+// Use environment variable for backend URL with fallback to Render deployment
+const API_URL = `${import.meta.env.VITE_API_URL || "https://dtales-backend-gzlj.onrender.com"}/api/portfolio`;
 const COLD_START_TIMEOUT = 8000; // 8 seconds
+const RETRY_DELAY = 3000; // 3 seconds before retry
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -36,14 +38,16 @@ export default function Portfolio() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const backgroundImages = ['/1.png', '/2.png', '/3.png', '/4.png'];
 
-  // Fetch portfolio items on mount with performance monitoring
+  // Fetch portfolio items on mount with robust error handling and retry logic
   useEffect(() => {
-    const fetchPortfolio = async () => {
+    const fetchPortfolioWithRetry = async (retryCount = 0) => {
+      const maxRetries = 1;
       try {
         // Mark fetch as started
         setLoading(true);
         setError(null);
         console.log("[PORTFOLIO] Fetch started at:", new Date().toISOString());
+        console.log("[PORTFOLIO] Retry attempt:", retryCount);
         console.time("PORTFOLIO_API_FETCH");
 
         // Set up cold start detection timeout
@@ -52,16 +56,26 @@ export default function Portfolio() {
           setIsServerWakingUp(true);
         }, COLD_START_TIMEOUT);
 
-        // Fetch data from API
-        console.log("[PORTFOLIO] Fetching from:", `${BACKEND_URL}/api/portfolio`);
-        const response = await fetch(`${BACKEND_URL}/api/portfolio`);
+        // Fetch data with CORS headers and robust configuration
+        console.log("[PORTFOLIO] Fetching from:", API_URL);
+        console.log("[PORTFOLIO] Browser:", navigator.userAgent);
+        console.log("[PORTFOLIO] Origin:", window.location.origin);
+
+        const response = await fetch(API_URL, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          mode: "cors",
+          credentials: "omit",
+        });
         
         console.timeEnd("PORTFOLIO_API_FETCH");
         console.log("[PORTFOLIO] Response received at:", new Date().toISOString());
         console.log("[PORTFOLIO] Response status:", response.status);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch portfolio items (${response.status})`);
+          throw new Error(`Server error: ${response.status}`);
         }
 
         const data = await response.json();
@@ -87,8 +101,32 @@ export default function Portfolio() {
         console.log("[PORTFOLIO] Images will load asynchronously");
 
       } catch (err: any) {
-        console.error("[PORTFOLIO] Fetch error:", err);
-        setError(err.message || "Failed to load portfolio items");
+        console.error("[PORTFOLIO] Fetch error:", {
+          message: err.message,
+          userAgent: navigator.userAgent,
+          origin: window.location.origin,
+          error: err,
+        });
+
+        // Retry logic: retry once after 3 seconds if first attempt fails
+        if (retryCount < 1) {
+          console.warn("[PORTFOLIO] Retrying after 3 seconds...");
+          setError("Connection failed. Retrying...");
+          
+          // Clear cold start timeout before retry
+          if (coldStartTimeoutRef.current) {
+            clearTimeout(coldStartTimeoutRef.current);
+          }
+
+          // Wait 3 seconds then retry
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          return fetchPortfolioWithRetry(retryCount + 1);
+        }
+
+        // After retry fails, show user-friendly error message
+        const userMessage = "Unable to connect to server. Please check your internet connection.";
+        console.error("[PORTFOLIO] Final error after retry:", userMessage);
+        setError(userMessage);
         setLoading(false);
         setIsServerWakingUp(false);
       } finally {
@@ -99,7 +137,7 @@ export default function Portfolio() {
       }
     };
 
-    fetchPortfolio();
+    fetchPortfolioWithRetry();
 
     // Cleanup timeout on unmount
     return () => {

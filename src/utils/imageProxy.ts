@@ -5,7 +5,7 @@
  * Backend proxy route: https://dtales-backend-gzlj.onrender.com/media/:filename
  */
 
-const BACKEND_MEDIA_PROXY = "https://dtales-backend-gzlj.onrender.com/media";
+const BACKEND_MEDIA_PROXY = `${import.meta.env.VITE_API_URL || "https://dtales-backend-gzlj.onrender.com"}/media`;
 
 /**
  * Extract filename from Supabase URL and convert to backend proxy URL

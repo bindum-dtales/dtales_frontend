@@ -26,6 +26,8 @@ export async function createPortfolio(data: {
   const res = await fetch(`${API_BASE_URL}/api/portfolio`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    mode: "cors",
+    credentials: "omit",
     body: JSON.stringify(data),
   });
 
@@ -42,7 +44,14 @@ export async function createPortfolio(data: {
  * @returns Array of portfolio items
  */
 export async function getAllPortfolio(): Promise<PortfolioItem[]> {
-  const res = await fetch(`${API_BASE_URL}/api/portfolio`);
+  const res = await fetch(`${API_BASE_URL}/api/portfolio`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    mode: "cors",
+    credentials: "omit",
+  });
 
   if (!res.ok) {
     throw new Error(`Failed to fetch portfolio items (${res.status})`);
@@ -67,6 +76,8 @@ export async function updatePortfolio(id: number, data: {
   const res = await fetch(`${API_BASE_URL}/api/portfolio/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    mode: "cors",
+    credentials: "omit",
     body: JSON.stringify(data),
   });
 
@@ -85,6 +96,8 @@ export async function updatePortfolio(id: number, data: {
 export async function deletePortfolio(id: number): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/api/portfolio/${id}`, {
     method: "DELETE",
+    mode: "cors",
+    credentials: "omit",
   });
 
   if (!res.ok) {
@@ -108,6 +121,8 @@ export async function uploadPortfolioImage(file: File): Promise<string> {
 
   const res = await fetch(`${API_BASE_URL}/api/uploads/image`, {
     method: "POST",
+    mode: "cors",
+    credentials: "omit",
     body: formData,
   });
 

@@ -6,7 +6,7 @@
  */
 
 const SUPABASE_STORAGE_BASE = "supabase.co/storage";
-const BACKEND_MEDIA_PROXY = "https://dtales-backend-gzlj.onrender.com/media";
+const BACKEND_MEDIA_PROXY = `${import.meta.env.VITE_API_URL || "https://dtales-backend-gzlj.onrender.com"}/media`;
 
 /**
  * Converts a Supabase image URL to a backend proxied URL
