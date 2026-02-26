@@ -16,6 +16,8 @@ type PortfolioItem = {
 };
 
 const categories = ["All", "Video", "Web", "Branding"];
+const BACKEND_URL = "https://dtales-backend-gzlj.onrender.com";
+const COLD_START_TIMEOUT = 8000; // 8 seconds
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -25,40 +27,90 @@ export default function Portfolio() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isServerWakingUp, setIsServerWakingUp] = useState(false);
   const projectsPerPage = 10;
   const gridRef = useRef<HTMLDivElement>(null);
+  const coldStartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Background Image Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const backgroundImages = ['/1.png', '/2.png', '/3.png', '/4.png'];
 
-  // Fetch portfolio items on mount
+  // Fetch portfolio items on mount with performance monitoring
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
+        // Mark fetch as started
         setLoading(true);
         setError(null);
-        const data = await getAllPortfolio();
+        console.log("[PORTFOLIO] Fetch started at:", new Date().toISOString());
+        console.time("PORTFOLIO_API_FETCH");
+
+        // Set up cold start detection timeout
+        coldStartTimeoutRef.current = setTimeout(() => {
+          console.warn("[PORTFOLIO] Backend taking >8s, likely cold start");
+          setIsServerWakingUp(true);
+        }, COLD_START_TIMEOUT);
+
+        // Fetch data from API
+        console.log("[PORTFOLIO] Fetching from:", `${BACKEND_URL}/api/portfolio`);
+        const response = await fetch(`${BACKEND_URL}/api/portfolio`);
+        
+        console.timeEnd("PORTFOLIO_API_FETCH");
+        console.log("[PORTFOLIO] Response received at:", new Date().toISOString());
+        console.log("[PORTFOLIO] Response status:", response.status);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch portfolio items (${response.status})`);
+        }
+
+        const data = await response.json();
+        console.log("[PORTFOLIO] Data parsed, items count:", data.length);
+
         // Map API data to local format
-        const mappedData: PortfolioItem[] = data.map((item) => ({
+        console.time("PORTFOLIO_DATA_MAPPING");
+        const mappedData: PortfolioItem[] = data.map((item: any) => ({
           id: item.id,
           title: item.title,
           category: item.category,
           thumbnail: item.cover_image_url,
           link: item.link,
         }));
+        console.timeEnd("PORTFOLIO_DATA_MAPPING");
+
+        // Immediately update portfolioItems and clear loading state
+        // DO NOT wait for images to load
         setPortfolioItems(mappedData);
-      } catch (err: any) {
-        setError(err.message || "Failed to load portfolio items");
-      } finally {
         setLoading(false);
+        setIsServerWakingUp(false);
+        console.log("[PORTFOLIO] Loading state cleared, UI ready");
+        console.log("[PORTFOLIO] Images will load asynchronously");
+
+      } catch (err: any) {
+        console.error("[PORTFOLIO] Fetch error:", err);
+        setError(err.message || "Failed to load portfolio items");
+        setLoading(false);
+        setIsServerWakingUp(false);
+      } finally {
+        // Clear the cold start timeout if it hasn't fired
+        if (coldStartTimeoutRef.current) {
+          clearTimeout(coldStartTimeoutRef.current);
+        }
       }
     };
 
     fetchPortfolio();
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (coldStartTimeoutRef.current) {
+        clearTimeout(coldStartTimeoutRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
+    console.log("[PORTFOLIO] Active category changed to:", activeCategory);
     setIsTransitioning(true);
     const timer = setTimeout(() => setIsTransitioning(false), 150);
     return () => clearTimeout(timer);
@@ -146,6 +198,11 @@ export default function Portfolio() {
         <div className="flex items-center justify-center min-h-screen px-4">
           <div className="text-center">
             <p className="text-xl text-gray-600">Loading portfolio...</p>
+            {isServerWakingUp && (
+              <p className="text-sm text-orange-500 mt-4 animate-pulse">
+                ⏳ Waking up server... This may take a moment
+              </p>
+            )}
           </div>
         </div>
       ) : error ? (
@@ -180,7 +237,15 @@ export default function Portfolio() {
             <img
               src={image}
               alt={`Background ${index + 1}`}
+              loading={index === 0 ? "eager" : "lazy"}
+              width={1920}
+              height={1080}
               className="w-full h-full object-cover"
+              onLoad={() => {
+                if (index === 0) {
+                  console.log("[PORTFOLIO] Hero background image loaded");
+                }
+              }}
             />
           </div>
         ))}
@@ -259,9 +324,16 @@ export default function Portfolio() {
                 >
                   <div className="relative h-80 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
                     <img
+                      key={`featured-${item.id}`}
                       src={getProxiedImageUrl(item.thumbnail) || item.thumbnail}
                       alt={item.title}
+                      loading="lazy"
+                      width={600}
+                      height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onLoad={() => {
+                        console.log("[PORTFOLIO] Featured project image loaded:", item.title);
+                      }}
                     />
 
                     {/* Dark Overlay on Hover */}
@@ -350,7 +422,7 @@ export default function Portfolio() {
 
               return currentProjects.map((item, index) => (
                 <motion.div
-                  key={item.id}
+                  key={`portfolio-${item.id}`}
                   layout
                   initial={false}
                   transition={{
@@ -368,9 +440,16 @@ export default function Portfolio() {
                   {/* Image Container */}
                   <div className="relative h-[420px] w-full overflow-hidden rounded-t-xl">
                     <img
+                      key={`img-${item.id}`}
                       src={getProxiedImageUrl(item.thumbnail) || item.thumbnail}
                       alt={item.title}
+                      loading="lazy"
+                      width={800}
+                      height={420}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onLoad={() => {
+                        console.log("[PORTFOLIO] Portfolio item image loaded:", item.title);
+                      }}
                     />
 
                     {/* Hover Overlay with Content */}
