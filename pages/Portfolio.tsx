@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-import { getAllPortfolio } from '../src/lib/portfolioApi';
 import { getProxiedImageUrl } from '../src/utils/imageProxy';
 
 // Debug: Confirm portfolio page loaded
@@ -18,8 +17,8 @@ type PortfolioItem = {
 const categories = ["All", "Video", "Web", "Branding"];
 // Use environment variable for backend URL with fallback to Render deployment
 const API_URL = `${import.meta.env.VITE_API_URL || "https://dtales-backend-gzlj.onrender.com"}/api/portfolio`;
-const COLD_START_TIMEOUT = 8000; // 8 seconds
-const RETRY_DELAY = 3000; // 3 seconds before retry
+const REQUEST_TIMEOUT = 4000; // 4 seconds
+const RETRY_DELAY = 1000; // 1 second before retry
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -29,37 +28,24 @@ export default function Portfolio() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isServerWakingUp, setIsServerWakingUp] = useState(false);
   const projectsPerPage = 10;
   const gridRef = useRef<HTMLDivElement>(null);
-  const coldStartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Background Image Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const backgroundImages = ['/1.png', '/2.png', '/3.png', '/4.png'];
 
-  // Fetch portfolio items on mount with robust error handling and retry logic
+  // Fetch portfolio items on mount with 4-second timeout and retry logic
   useEffect(() => {
     const fetchPortfolioWithRetry = async (retryCount = 0) => {
-      const maxRetries = 1;
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), REQUEST_TIMEOUT);
+
       try {
-        // Mark fetch as started
         setLoading(true);
         setError(null);
-        console.log("[PORTFOLIO] Fetch started at:", new Date().toISOString());
-        console.log("[PORTFOLIO] Retry attempt:", retryCount);
+        console.log("[PORTFOLIO] Fetch started (attempt", retryCount + 1, ")");
         console.time("PORTFOLIO_API_FETCH");
-
-        // Set up cold start detection timeout
-        coldStartTimeoutRef.current = setTimeout(() => {
-          console.warn("[PORTFOLIO] Backend taking >8s, likely cold start");
-          setIsServerWakingUp(true);
-        }, COLD_START_TIMEOUT);
-
-        // Fetch data with CORS headers and robust configuration
-        console.log("[PORTFOLIO] Fetching from:", API_URL);
-        console.log("[PORTFOLIO] Browser:", navigator.userAgent);
-        console.log("[PORTFOLIO] Origin:", window.location.origin);
 
         const response = await fetch(API_URL, {
           method: "GET",
@@ -68,30 +54,23 @@ export default function Portfolio() {
           },
           mode: "cors",
           credentials: "omit",
+          signal: abortController.signal,
         });
         
+        clearTimeout(timeoutId);
         console.timeEnd("PORTFOLIO_API_FETCH");
-        console.log("[PORTFOLIO] Response received at:", new Date().toISOString());
         console.log("[PORTFOLIO] Response status:", response.status);
 
-        // Parse JSON first to see the actual data
         const data = await response.json();
-        console.log("[PORTFOLIO] Received data:", data);
-        console.log("[PORTFOLIO] Data type:", Array.isArray(data) ? 'array' : typeof data);
-        console.log("[PORTFOLIO] Data length:", data?.length);
+        console.log("[PORTFOLIO] Received", data?.length, "items");
 
-        // Only throw error if response status indicates failure
         if (!response.ok) {
-          console.error("[PORTFOLIO] Non-OK response but got data:", data);
+          console.error("[PORTFOLIO] Server error:", response.status);
           throw new Error(`Server error: ${response.status}`);
         }
 
-        // Map API data to local format
-        console.time("PORTFOLIO_DATA_MAPPING");
-        
-        // ✅ Handle empty array as valid response (not an error)
         if (!Array.isArray(data)) {
-          console.error("[PORTFOLIO] Expected array but got:", typeof data, data);
+          console.error("[PORTFOLIO] Invalid data format:", typeof data);
           throw new Error("Invalid data format from server");
         }
 
@@ -102,64 +81,36 @@ export default function Portfolio() {
           thumbnail: item.cover_image_url,
           link: item.link,
         }));
-        console.timeEnd("PORTFOLIO_DATA_MAPPING");
-        console.log("[PORTFOLIO] Mapped data count:", mappedData.length);
 
-        // Immediately update portfolioItems and clear loading state
-        // DO NOT wait for images to load
         setPortfolioItems(mappedData);
-        console.log("[PORTFOLIO] Set portfolioItems to:", mappedData.length, "items");
-        
         setLoading(false);
-        setIsServerWakingUp(false);
-        console.log("[PORTFOLIO] Loading state cleared, UI ready");
-        console.log("[PORTFOLIO] Images will load asynchronously");
+        console.log("[PORTFOLIO] Successfully loaded", mappedData.length, "items");
 
       } catch (err: any) {
-        console.error("[PORTFOLIO] Fetch error:", {
-          message: err.message,
-          userAgent: navigator.userAgent,
-          origin: window.location.origin,
-          error: err,
-        });
+        clearTimeout(timeoutId);
+        console.error("[PORTFOLIO] Error:", err.message);
 
-        // Retry logic: retry once after 3 seconds if first attempt fails
-        if (retryCount < 1) {
-          console.warn("[PORTFOLIO] Retrying after 3 seconds...");
-          setError("Connection failed. Retrying...");
-          
-          // Clear cold start timeout before retry
-          if (coldStartTimeoutRef.current) {
-            clearTimeout(coldStartTimeoutRef.current);
-          }
-
-          // Wait 3 seconds then retry
+        // Retry once if this is the first attempt
+        if (retryCount === 0) {
+          console.warn("[PORTFOLIO] Retrying in", RETRY_DELAY / 1000, "seconds...");
+          setError("Loading portfolio, please wait...");
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
           return fetchPortfolioWithRetry(retryCount + 1);
         }
 
-        // After retry fails, show user-friendly error message
-        const userMessage = "Unable to connect to server. Please check your internet connection.";
-        console.error("[PORTFOLIO] Final error after retry:", userMessage);
+        // After retry fails, show user-friendly message
+        const isTimeout = err.name === 'AbortError';
+        const userMessage = isTimeout 
+          ? "Portfolio is waking up, please refresh in a few seconds."
+          : "Unable to load portfolio. Please check your connection and try again.";
+        
+        console.error("[PORTFOLIO] Final error:", userMessage);
         setError(userMessage);
         setLoading(false);
-        setIsServerWakingUp(false);
-      } finally {
-        // Clear the cold start timeout if it hasn't fired
-        if (coldStartTimeoutRef.current) {
-          clearTimeout(coldStartTimeoutRef.current);
-        }
       }
     };
 
     fetchPortfolioWithRetry();
-
-    // Cleanup timeout on unmount
-    return () => {
-      if (coldStartTimeoutRef.current) {
-        clearTimeout(coldStartTimeoutRef.current);
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -251,11 +202,6 @@ export default function Portfolio() {
         <div className="flex items-center justify-center min-h-screen px-4">
           <div className="text-center">
             <p className="text-xl text-gray-600">Loading portfolio...</p>
-            {isServerWakingUp && (
-              <p className="text-sm text-orange-500 mt-4 animate-pulse">
-                ⏳ Waking up server... This may take a moment
-              </p>
-            )}
           </div>
         </div>
       ) : error ? (
