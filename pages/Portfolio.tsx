@@ -15,10 +15,8 @@ type PortfolioItem = {
 };
 
 const categories = ["All", "Video", "Web", "Branding"];
-// Use environment variable for backend URL with fallback to Render deployment
-const API_URL = `${import.meta.env.VITE_API_URL || "https://dtales-backend-gzlj.onrender.com"}/api/portfolio`;
-const REQUEST_TIMEOUT = 4000; // 4 seconds
-const RETRY_DELAY = 1000; // 1 second before retry
+// Use environment variable for VPS backend URL
+const API_URL = `${import.meta.env.VITE_API_URL}/api/portfolio`;
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -35,17 +33,13 @@ export default function Portfolio() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const backgroundImages = ['/1.png', '/2.png', '/3.png', '/4.png'];
 
-  // Fetch portfolio items on mount with 4-second timeout and retry logic
+  // Fetch portfolio items on mount
   useEffect(() => {
-    const fetchPortfolioWithRetry = async (retryCount = 0) => {
-      const abortController = new AbortController();
-      const timeoutId = setTimeout(() => abortController.abort(), REQUEST_TIMEOUT);
-
+    const fetchPortfolio = async () => {
       try {
         setLoading(true);
         setError(null);
-        console.log("[PORTFOLIO] Fetch started (attempt", retryCount + 1, ")");
-        console.time("PORTFOLIO_API_FETCH");
+        console.log("[PORTFOLIO] Fetching from:", API_URL);
 
         const response = await fetch(API_URL, {
           method: "GET",
@@ -54,23 +48,15 @@ export default function Portfolio() {
           },
           mode: "cors",
           credentials: "omit",
-          signal: abortController.signal,
         });
-        
-        clearTimeout(timeoutId);
-        console.timeEnd("PORTFOLIO_API_FETCH");
-        console.log("[PORTFOLIO] Response status:", response.status);
-
-        const data = await response.json();
-        console.log("[PORTFOLIO] Received", data?.length, "items");
 
         if (!response.ok) {
-          console.error("[PORTFOLIO] Server error:", response.status);
-          throw new Error(`Server error: ${response.status}`);
+          throw new Error(`API error: ${response.status}`);
         }
 
+        const data = await response.json();
+
         if (!Array.isArray(data)) {
-          console.error("[PORTFOLIO] Invalid data format:", typeof data);
           throw new Error("Invalid data format from server");
         }
 
@@ -83,34 +69,17 @@ export default function Portfolio() {
         }));
 
         setPortfolioItems(mappedData);
-        setLoading(false);
         console.log("[PORTFOLIO] Successfully loaded", mappedData.length, "items");
 
       } catch (err: any) {
-        clearTimeout(timeoutId);
-        console.error("[PORTFOLIO] Error:", err.message);
-
-        // Retry once if this is the first attempt
-        if (retryCount === 0) {
-          console.warn("[PORTFOLIO] Retrying in", RETRY_DELAY / 1000, "seconds...");
-          setError("Loading portfolio, please wait...");
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-          return fetchPortfolioWithRetry(retryCount + 1);
-        }
-
-        // After retry fails, show user-friendly message
-        const isTimeout = err.name === 'AbortError';
-        const userMessage = isTimeout 
-          ? "Portfolio is waking up, please refresh in a few seconds."
-          : "Unable to load portfolio. Please check your connection and try again.";
-        
-        console.error("[PORTFOLIO] Final error:", userMessage);
-        setError(userMessage);
+        console.error("[PORTFOLIO] Fetch error:", err);
+        setError("Failed to load portfolio. Please try again.");
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchPortfolioWithRetry();
+    fetchPortfolio();
   }, []);
 
   useEffect(() => {
