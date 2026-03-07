@@ -15,8 +15,7 @@ type PortfolioItem = {
 };
 
 const categories = ["All", "Video", "Web", "Branding"];
-// Use environment variable for VPS backend URL
-const API_URL = `${import.meta.env.VITE_API_URL}/api/portfolio`;
+const API = import.meta.env.VITE_API_URL;
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -39,19 +38,18 @@ export default function Portfolio() {
       try {
         setLoading(true);
         setError(null);
-        console.log("[PORTFOLIO] Fetching from:", API_URL);
 
-        const response = await fetch(API_URL, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          mode: "cors",
-          credentials: "omit",
-        });
+        if (!API) {
+          throw new Error("Missing VITE_API_URL configuration");
+        }
+
+        const endpoint = `${API}/api/portfolio`;
+        console.log("[PORTFOLIO] Fetching from:", endpoint);
+
+        const response = await fetch(endpoint);
 
         if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
+          throw new Error("Failed request");
         }
 
         const data = await response.json();
@@ -170,6 +168,7 @@ export default function Portfolio() {
       {loading ? (
         <div className="flex items-center justify-center min-h-screen px-4">
           <div className="text-center">
+            <div className="w-10 h-10 border-4 border-gray-300 border-t-gray-700 rounded-full animate-spin mx-auto mb-4" />
             <p className="text-xl text-gray-600">Loading portfolio...</p>
           </div>
         </div>
