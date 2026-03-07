@@ -1,7 +1,10 @@
 
 import { TeamMember, Testimonial, SlideData } from './types';
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:10000";
+const PROD_API_BASE_URL = import.meta.env.VITE_API_URL;
+export const API_BASE_URL = import.meta.env.DEV
+  ? "http://localhost:10000"
+  : PROD_API_BASE_URL;
 
 export const TEAM_MEMBERS: TeamMember[] = [
   {

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { getProxiedImageUrl } from '../src/utils/imageProxy';
+import { API_BASE_URL } from '../constants';
 
 // Debug: Confirm portfolio page loaded
 console.log("PORTFOLIO PAGE LOADED");
@@ -15,7 +16,6 @@ type PortfolioItem = {
 };
 
 const categories = ["All", "Video", "Web", "Branding"];
-const API = import.meta.env.VITE_API_URL;
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -39,11 +39,11 @@ export default function Portfolio() {
         setLoading(true);
         setError(null);
 
-        if (!API) {
-          throw new Error("Missing VITE_API_URL configuration");
+        if (!API_BASE_URL) {
+          throw new Error("Missing VITE_API_URL configuration for production build");
         }
 
-        const endpoint = `${API}/api/portfolio`;
+        const endpoint = `${API_BASE_URL}/api/portfolio`;
         console.log("[PORTFOLIO] Fetching from:", endpoint);
 
         const response = await fetch(endpoint);
