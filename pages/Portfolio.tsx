@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { getProxiedImageUrl } from '../src/utils/imageProxy';
-import { API_BASE_URL } from '../constants';
+import { API_BASE_URL } from '../src/config/api';
 
 // Debug: Confirm portfolio page loaded
 console.log("PORTFOLIO PAGE LOADED");

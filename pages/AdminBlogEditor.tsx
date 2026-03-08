@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { uploadImage } from "../src/lib/uploads";
-import { API_BASE_URL } from "../constants";
+import { API_BASE_URL } from "../src/config/api";
 import { parseDocxToHtml } from "../src/lib/docxParser";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
 

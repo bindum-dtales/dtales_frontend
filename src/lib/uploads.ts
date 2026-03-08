@@ -3,7 +3,7 @@
  * Used consistently across all admin editors (Blogs, Case Studies).
  */
 
-import { API_BASE_URL } from '../../constants';
+import { API_BASE_URL } from '../config/api';
 
 /**
  * Upload an image to Supabase Storage via the backend.

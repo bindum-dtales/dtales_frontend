@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API_BASE_URL } from '../../constants';
+import { API_BASE_URL } from '../config/api';
 
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
