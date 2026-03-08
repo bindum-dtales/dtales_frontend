@@ -43,10 +43,9 @@ export default function Portfolio() {
           throw new Error("Missing VITE_API_URL configuration for production build");
         }
 
-        const endpoint = `${API_BASE_URL}/api/portfolio`;
-        console.log("[PORTFOLIO] Fetching from:", endpoint);
+        console.log("[PORTFOLIO] Fetching from:", `${API_BASE_URL}/api/portfolio`);
 
-        const response = await fetch(endpoint);
+        const response = await fetch(`${API_BASE_URL}/api/portfolio`);
 
         if (!response.ok) {
           throw new Error("Failed request");
