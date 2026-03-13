@@ -35,45 +35,66 @@ export default function Portfolio() {
   // Fetch portfolio items on mount
   useEffect(() => {
     const fetchPortfolio = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      const MAX_RETRIES = 2;
+      let lastError: Error | null = null;
 
-        if (!API_BASE_URL) {
-          throw new Error("Missing VITE_API_URL configuration for production build");
-        }
-
-        console.log("[PORTFOLIO] Fetching from:", `${API_BASE_URL}/api/portfolio`);
-
-        const response = await fetch(`${API_BASE_URL}/api/portfolio`);
-
-        if (!response.ok) {
-          throw new Error("Failed request");
-        }
-
-        const data = await response.json();
-
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid data format from server");
-        }
-
-        const mappedData: PortfolioItem[] = data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          category: item.category,
-          thumbnail: item.cover_image_url,
-          link: item.link,
-        }));
-
-        setPortfolioItems(mappedData);
-        console.log("[PORTFOLIO] Successfully loaded", mappedData.length, "items");
-
-      } catch (err: any) {
-        console.error("[PORTFOLIO] Fetch error:", err);
-        setError("Failed to load portfolio. Please try again.");
-      } finally {
+      if (!API_BASE_URL) {
+        console.error("[PORTFOLIO] Missing VITE_API_URL configuration");
+        setError("Portfolio temporarily unavailable. Please try again later.");
         setLoading(false);
+        return;
       }
+
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        try {
+          setLoading(true);
+          setError(null);
+
+          console.log(`[PORTFOLIO] Fetching from: ${API_BASE_URL}/api/portfolio (attempt ${attempt + 1})`);
+
+          const response = await fetch(`${API_BASE_URL}/api/portfolio`, {
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (!Array.isArray(data)) {
+            throw new Error("Invalid data format from server");
+          }
+
+          const mappedData: PortfolioItem[] = data.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            category: item.category,
+            thumbnail: item.cover_image_url,
+            link: item.link,
+          }));
+
+          setPortfolioItems(mappedData);
+          setLoading(false);
+          console.log("[PORTFOLIO] Successfully loaded", mappedData.length, "items");
+          return;
+
+        } catch (err: any) {
+          clearTimeout(timeoutId);
+          lastError = err;
+          console.warn(`[PORTFOLIO] Attempt ${attempt + 1} failed:`, err.message);
+        }
+      }
+
+      // All attempts exhausted
+      console.error("[PORTFOLIO] All attempts failed:", lastError);
+      setError("Portfolio temporarily unavailable. Please try again later.");
+      setLoading(false);
     };
 
     fetchPortfolio();
@@ -175,8 +196,7 @@ export default function Portfolio() {
         /* Error State */
         <div className="flex items-center justify-center min-h-screen px-4">
           <div className="text-center max-w-md">
-            <p className="text-xl text-red-600 mb-4">Failed to load portfolio</p>
-            <p className="text-gray-600">{error}</p>
+            <p className="text-xl text-gray-700">{error}</p>
           </div>
         </div>
       ) : portfolioItems.length === 0 ? (
