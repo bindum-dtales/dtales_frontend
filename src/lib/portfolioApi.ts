@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config/api";
+import { fetchWithRetry } from "./fetchWithRetry";
 
 export interface PortfolioItem {
   id: number;
@@ -25,7 +26,11 @@ export async function createPortfolio(data: {
 }): Promise<PortfolioItem> {
   const res = await fetch(`${API_BASE_URL}/api/portfolio`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
     mode: "cors",
     credentials: "omit",
     body: JSON.stringify(data),
@@ -40,24 +45,26 @@ export async function createPortfolio(data: {
 }
 
 /**
- * Get all portfolio items
+ * Get all portfolio items with retry logic
  * @returns Array of portfolio items
  */
 export async function getAllPortfolio(): Promise<PortfolioItem[]> {
-  const res = await fetch(`${API_BASE_URL}/api/portfolio`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    mode: "cors",
-    credentials: "omit",
-  });
+  const data = await fetchWithRetry<PortfolioItem[]>(
+    `${API_BASE_URL}/api/portfolio`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "cors",
+      credentials: "omit",
+    }
+  );
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch portfolio items (${res.status})`);
+  if (!data) {
+    throw new Error("Failed to fetch portfolio items after retries");
   }
 
-  return res.json();
+  return data;
 }
 
 /**
@@ -75,7 +82,11 @@ export async function updatePortfolio(id: number, data: {
 }): Promise<PortfolioItem> {
   const res = await fetch(`${API_BASE_URL}/api/portfolio/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
     mode: "cors",
     credentials: "omit",
     body: JSON.stringify(data),
@@ -96,6 +107,10 @@ export async function updatePortfolio(id: number, data: {
 export async function deletePortfolio(id: number): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/api/portfolio/${id}`, {
     method: "DELETE",
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+    },
     mode: "cors",
     credentials: "omit",
   });
@@ -121,6 +136,10 @@ export async function uploadPortfolioImage(file: File): Promise<string> {
 
   const res = await fetch(`${API_BASE_URL}/api/uploads/image`, {
     method: "POST",
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+    },
     mode: "cors",
     credentials: "omit",
     body: formData,

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { apiFetch } from "../src/lib/api";
+import { API_BASE_URL } from "../src/config/api";
+import { fetchWithRetry } from "../src/lib/fetchWithRetry";
 import ContentCard from "../components/ContentCard";
 
 type CaseStudy = {
@@ -22,14 +23,45 @@ const getExcerpt = (html?: string) => {
 
 const CaseStudies: React.FC = () => {
 	const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
+	const [previousCaseStudies, setPreviousCaseStudies] = useState<CaseStudy[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		apiFetch<CaseStudy[]>("/api/case-studies/public")
-			.then(setCaseStudies)
-			.catch((e) => setError(e.message || "Failed to load case studies"))
-			.finally(() => setLoading(false));
+		const fetchCaseStudies = async () => {
+			try {
+				setLoading(true);
+				setError(null);
+
+				const data = await fetchWithRetry<CaseStudy[]>(
+					`${API_BASE_URL}/api/case-studies/public`,
+					{}
+				);
+
+				if (!data) {
+					throw new Error("Failed to load case studies after retries");
+				}
+
+				setCaseStudies(data ?? []);
+				setPreviousCaseStudies(data ?? []);
+				setLoading(false);
+				setError(null);
+			} catch (err: any) {
+				console.error("[CASE_STUDIES] Failed to load case studies:", err.message);
+				setLoading(false);
+				// Only show error if we have no previous data to fall back on
+				if (previousCaseStudies.length === 0) {
+					setError("Unable to load case studies at this time. Please try refreshing the page.");
+				} else {
+					// Show previous data instead of error
+					setCaseStudies(previousCaseStudies);
+					setError(null);
+					console.log("[CASE_STUDIES] Using cached data");
+				}
+			}
+		};
+
+		fetchCaseStudies();
 	}, []);
 
     return (
@@ -51,13 +83,14 @@ const CaseStudies: React.FC = () => {
                 </motion.p>
             </div>
 
-            {loading && (
+            {loading && previousCaseStudies.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
+                    <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mx-auto mb-2" />
                     Loading case studies...
                 </div>
             )}
 
-            {error && (
+            {error && caseStudies.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-red-600 bg-red-50 border border-red-200 rounded-2xl py-4 px-6">
                     {error}
                 </div>

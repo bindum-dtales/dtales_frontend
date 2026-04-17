@@ -22,6 +22,10 @@ export async function uploadImage(file: File): Promise<string> {
 
   const res = await fetch(`${API_BASE_URL}/api/uploads/image`, {
     method: "POST",
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+    },
     body: formData,
   });
 
@@ -57,6 +61,10 @@ export async function uploadDocx(file: File): Promise<string> {
 
   const res = await fetch(`${API_BASE_URL}/api/uploads/docx`, {
     method: "POST",
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+    },
     body: formData,
   });
 

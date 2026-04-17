@@ -17,6 +17,10 @@ export const useImageUpload = () => {
 
       const response = await fetch(`${API_BASE_URL}/api/uploads/image`, {
         method: "POST",
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
         body: formData,
       });
 

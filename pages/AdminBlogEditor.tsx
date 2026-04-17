@@ -116,7 +116,11 @@ export default function AdminBlogEditor() {
       
       const res = await fetch(`${API_BASE_URL}/api/blogs`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
         body: JSON.stringify(payload),
       });
 

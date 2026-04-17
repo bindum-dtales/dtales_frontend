@@ -18,6 +18,29 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        // Enable hashed filenames for all output files
+        rollupOptions: {
+          output: {
+            // Hash entry chunks
+            entryFileNames: 'assets/[name].[hash].js',
+            // Hash chunk files
+            chunkFileNames: 'assets/[name].[hash].js',
+            // Hash asset files (CSS, images, etc.)
+            assetFileNames: 'assets/[name].[hash][extname]'
+          }
+        },
+        // Generate manifest for tracking old/new file mappings
+        manifest: true,
+        // Ensure cache busting on every build
+        sourcemap: false,
+        minify: 'terser',
+        terserOptions: {
+          compress: {
+            drop_console: true
+          }
+        }
       }
     };
 });
