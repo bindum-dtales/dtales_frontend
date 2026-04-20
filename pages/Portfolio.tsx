@@ -3,6 +3,11 @@ import { useState, useEffect, useRef } from 'react';
 import { getProxiedImageUrl } from '../src/utils/imageProxy';
 import { API_BASE_URL } from '../src/config/api';
 import { fetchWithRetry } from '../src/lib/fetchWithRetry';
+import { getCache, saveCache } from '../src/lib/cache';
+import backgroundImage1 from '../src/assets/1.png';
+import backgroundImage2 from '../src/assets/2.png';
+import backgroundImage3 from '../src/assets/3.png';
+import backgroundImage4 from '../src/assets/4.png';
 
 // Debug: Confirm portfolio page loaded
 console.log("PORTFOLIO PAGE LOADED");
@@ -17,6 +22,7 @@ type PortfolioItem = {
 };
 
 const categories = ["All", "Video", "Web", "Branding"];
+const PORTFOLIO_CACHE_KEY = 'portfolio_items_cache';
 
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -24,78 +30,68 @@ export default function Portfolio() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
-  const [previousPortfolioItems, setPreviousPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const projectsPerPage = 10;
   const gridRef = useRef<HTMLDivElement>(null);
   
   // Background Image Slider State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const backgroundImages = ['/1.png', '/2.png', '/3.png', '/4.png'];
+  const backgroundImages = [backgroundImage1, backgroundImage2, backgroundImage3, backgroundImage4];
 
-  // Fetch portfolio items on mount
   useEffect(() => {
-    const fetchPortfolio = async () => {
+    let isActive = true;
+
+    const fetchPortfolio = async (initialLoad = false) => {
+      if (initialLoad) {
+        setLoading(true);
+      }
+
       if (!API_BASE_URL) {
-        console.error("[PORTFOLIO] Missing VITE_API_URL configuration");
-        // Only show error if we have no fallback data
-        if (previousPortfolioItems.length === 0) {
-          setError("Unable to load portfolio at this time. Please refresh the page.");
+        const cached = getCache<PortfolioItem[]>(PORTFOLIO_CACHE_KEY);
+        if (isActive) {
+          setPortfolioItems(Array.isArray(cached) ? cached : []);
+          setLoading(false);
         }
-        setLoading(false);
         return;
       }
 
       try {
-        setLoading(true);
-        setError(null);
+        const data = await fetchWithRetry<any[]>(`${API_BASE_URL}/api/portfolio`);
+        const mappedData: PortfolioItem[] = Array.isArray(data)
+          ? data.map((item: any) => ({
+              id: item.id,
+              title: item.title,
+              category: item.category,
+              thumbnail: item.cover_image_url,
+              link: item.link,
+            }))
+          : [];
 
-        console.log(`[PORTFOLIO] Fetching from: ${API_BASE_URL}/api/portfolio`);
-
-        const data = await fetchWithRetry<any[]>(
-          `${API_BASE_URL}/api/portfolio`,
-          {},
-          3
-        );
-
-        if (!data) {
-          throw new Error("Failed to fetch portfolio items after retries");
+        if (isActive) {
+          setPortfolioItems(mappedData);
+          saveCache(PORTFOLIO_CACHE_KEY, mappedData);
         }
-
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid data format from server");
+      } catch {
+        const cached = getCache<PortfolioItem[]>(PORTFOLIO_CACHE_KEY);
+        if (isActive) {
+          setPortfolioItems(Array.isArray(cached) ? cached : []);
         }
-
-        const mappedData: PortfolioItem[] = data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          category: item.category,
-          thumbnail: item.cover_image_url,
-          link: item.link,
-        }));
-
-        setPortfolioItems(mappedData);
-        setPreviousPortfolioItems(mappedData);
-        setLoading(false);
-        setError(null);
-        console.log("[PORTFOLIO] Successfully loaded", mappedData.length, "items");
-      } catch (err: any) {
-        console.error("[PORTFOLIO] Failed to fetch portfolio:", err.message);
-        setLoading(false);
-        // Only show error if we have no previous data to fall back on
-        if (previousPortfolioItems.length === 0) {
-          setError("Unable to load portfolio at this time. Please try refreshing the page.");
-        } else {
-          // Show previous data instead of error
-          setPortfolioItems(previousPortfolioItems);
-          setError(null);
-          console.log("[PORTFOLIO] Using cached data");
+      } finally {
+        if (initialLoad && isActive) {
+          setLoading(false);
         }
       }
     };
 
-    fetchPortfolio();
+    fetchPortfolio(true);
+    const intervalId = setInterval(() => {
+      fetchPortfolio(false);
+    }, 30000);
+
+    return () => {
+      isActive = false;
+      clearInterval(intervalId);
+    };
   }, []);
 
   useEffect(() => {
@@ -182,23 +178,14 @@ export default function Portfolio() {
       initial="hidden"
       animate="visible"
     >
-      {/* Loading State (only on initial load, not retrying) */}
-      {loading && previousPortfolioItems.length === 0 ? (
+      {loading && portfolioItems.length === 0 ? (
         <div className="flex items-center justify-center min-h-screen px-4">
           <div className="text-center">
             <div className="w-10 h-10 border-4 border-gray-300 border-t-gray-700 rounded-full animate-spin mx-auto mb-4" />
             <p className="text-xl text-gray-600">Loading portfolio...</p>
           </div>
         </div>
-      ) : error && portfolioItems.length === 0 ? (
-        /* Error State (only when no data available) */
-        <div className="flex items-center justify-center min-h-screen px-4">
-          <div className="text-center max-w-md">
-            <p className="text-xl text-gray-700">{error}</p>
-          </div>
-        </div>
       ) : portfolioItems.length === 0 ? (
-        /* Empty State */
         <div className="flex items-center justify-center min-h-screen px-4">
           <div className="text-center max-w-md">
             <p className="text-xl text-gray-600">No portfolio items available yet.</p>

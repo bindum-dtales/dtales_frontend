@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Linkedin, Mail } from "lucide-react";
+import dtalesLogo from "../src/assets/dtales-logo.png";
 
 
 const Footer: React.FC = () => {
@@ -13,7 +14,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="inline-block mb-6">
               <img 
-                src="/dtales-logo.png" 
+                src={dtalesLogo} 
                 alt="DTALES Tech Logo" 
                 className="h-14 w-auto"
               />

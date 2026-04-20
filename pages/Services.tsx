@@ -13,6 +13,7 @@ import {
   BarChart, 
   Users 
 } from 'lucide-react';
+import icon4 from '../src/assets/icon4.png';
 
 const Services: React.FC = () => {
   const navigate = useNavigate();
@@ -117,7 +118,7 @@ const Services: React.FC = () => {
                         delay={0.5}
                     />
                     <ServiceCard 
-                        iconImg="/icon4.png"
+                        iconImg={icon4}
                         iconAlt="Social Media Management icon"
                         title="Social Media Management"
                         description="Creating and curating technical, platform-optimized content for LinkedIn and Instagram."

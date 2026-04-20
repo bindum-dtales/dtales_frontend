@@ -5,6 +5,7 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
+import dtalesLogo from "../src/assets/dtales-logo.png";
 
 
 const Navbar: React.FC = () => {
@@ -47,7 +48,7 @@ const Navbar: React.FC = () => {
             className="flex items-center"
           >
             <motion.img
-              src="/dtales-logo.png"
+              src={dtalesLogo}
               alt="DTALES Tech Logo"
               className="h-12 w-auto"
               initial={{ opacity: 0, scale: 0.9 }}

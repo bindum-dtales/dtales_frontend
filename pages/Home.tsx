@@ -5,6 +5,9 @@ import HeroSlider from '../components/HeroSlider';
 import Testimonials from '../components/Testimonials';
 import { useNavigate } from 'react-router-dom';
 import { TextColor } from '../components/ui/text-color';
+import icon1 from '../src/assets/icon1.png';
+import icon2 from '../src/assets/icon2.png';
+import icon3 from '../src/assets/icon3.png';
 import { 
   ArrowUpRight, 
   Lightbulb, 
@@ -117,7 +120,7 @@ const Home: React.FC = () => {
            >
               <div>
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-8">
-                  <img src="/icon1.png" alt="Content icon" className="w-7 h-7 object-contain" />
+                  <img src={icon1} alt="Content icon" className="w-7 h-7 object-contain" />
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Content</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
@@ -142,7 +145,7 @@ const Home: React.FC = () => {
            >
               <div>
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-8">
-                  <img src="/icon2.png" alt="Creatives icon" className="w-7 h-7 object-contain" />
+                  <img src={icon2} alt="Creatives icon" className="w-7 h-7 object-contain" />
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Creatives</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
@@ -167,7 +170,7 @@ const Home: React.FC = () => {
            >
               <div>
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-8">
-                  <img src="/icon3.png" alt="Technology icon" className="w-7 h-7 object-contain" />
+                  <img src={icon3} alt="Technology icon" className="w-7 h-7 object-contain" />
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Technology</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">

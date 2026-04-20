@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "../src/config/api";
 import { fetchWithRetry } from "../src/lib/fetchWithRetry";
+import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
 type Blog = {
@@ -21,47 +22,58 @@ const getExcerpt = (html?: string) => {
 	return text.length > 150 ? `${text.slice(0, 150)}…` : text;
 };
 
+const BLOGS_CACHE_KEY = "blogs_cache";
+
 const Blogs: React.FC = () => {
 	const [blogs, setBlogs] = useState<Blog[]>([]);
-	const [previousBlogs, setPreviousBlogs] = useState<Blog[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchBlogs = async () => {
+        let isActive = true;
+
+        const fetchBlogs = async (initialLoad = false) => {
+            if (initialLoad) {
+                setLoading(true);
+            }
+
+            if (!API_BASE_URL) {
+                const cached = getCache<Blog[]>(BLOGS_CACHE_KEY);
+                if (isActive) {
+                    setBlogs(Array.isArray(cached) ? cached : []);
+                    setLoading(false);
+                }
+                return;
+            }
+
 			try {
-				setLoading(true);
-				setError(null);
+                const data = await fetchWithRetry<Blog[]>(`${API_BASE_URL}/api/blogs/public`);
+                const safeBlogs = Array.isArray(data) ? data : [];
 
-				const data = await fetchWithRetry<Blog[]>(
-					`${API_BASE_URL}/api/blogs/public`,
-					{}
-				);
-
-				if (!data) {
-					throw new Error("Failed to load blogs after retries");
+                if (isActive) {
+                    setBlogs(safeBlogs);
+                    saveCache(BLOGS_CACHE_KEY, safeBlogs);
 				}
-
-				setBlogs(data ?? []);
-				setPreviousBlogs(data ?? []);
-				setLoading(false);
-				setError(null);
-			} catch (err: any) {
-				console.error("[BLOGS] Failed to load blogs:", err.message);
-				setLoading(false);
-				// Only show error if we have no previous data to fall back on
-				if (previousBlogs.length === 0) {
-					setError("Unable to load blogs at this time. Please try refreshing the page.");
-				} else {
-					// Show previous data instead of error
-					setBlogs(previousBlogs);
-					setError(null);
-					console.log("[BLOGS] Using cached data");
+            } catch {
+                const cached = getCache<Blog[]>(BLOGS_CACHE_KEY);
+                if (isActive) {
+                    setBlogs(Array.isArray(cached) ? cached : []);
 				}
+            } finally {
+                if (initialLoad && isActive) {
+                    setLoading(false);
+                }
 			}
 		};
 
-		fetchBlogs();
+        fetchBlogs(true);
+        const intervalId = setInterval(() => {
+            fetchBlogs(false);
+        }, 30000);
+
+        return () => {
+            isActive = false;
+            clearInterval(intervalId);
+        };
 	}, []);
 
     return (
@@ -83,20 +95,14 @@ const Blogs: React.FC = () => {
                 </motion.p>
             </div>
 
-            {loading && previousBlogs.length === 0 && (
+            {loading && blogs.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mx-auto mb-2" />
                     Loading blogs...
                 </div>
             )}
 
-            {error && blogs.length === 0 && (
-                <div className="mx-auto max-w-2xl text-center text-red-600 bg-red-50 border border-red-200 rounded-2xl py-4 px-6">
-                    {error}
-                </div>
-            )}
-
-            {!loading && !error && blogs.length === 0 && (
+            {!loading && blogs.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     No blogs found.
                 </div>

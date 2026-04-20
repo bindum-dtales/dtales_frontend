@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "../src/config/api";
 import { fetchWithRetry } from "../src/lib/fetchWithRetry";
+import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
 type CaseStudy = {
@@ -21,47 +22,58 @@ const getExcerpt = (html?: string) => {
     return text.length > 150 ? `${text.slice(0, 150)}…` : text;
 };
 
+const CASE_STUDIES_CACHE_KEY = "case_studies_cache";
+
 const CaseStudies: React.FC = () => {
 	const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
-	const [previousCaseStudies, setPreviousCaseStudies] = useState<CaseStudy[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchCaseStudies = async () => {
+        let isActive = true;
+
+        const fetchCaseStudies = async (initialLoad = false) => {
+            if (initialLoad) {
+                setLoading(true);
+            }
+
+            if (!API_BASE_URL) {
+                const cached = getCache<CaseStudy[]>(CASE_STUDIES_CACHE_KEY);
+                if (isActive) {
+                    setCaseStudies(Array.isArray(cached) ? cached : []);
+                    setLoading(false);
+                }
+                return;
+            }
+
 			try {
-				setLoading(true);
-				setError(null);
+                const data = await fetchWithRetry<CaseStudy[]>(`${API_BASE_URL}/api/case-studies/public`);
+                const safeCaseStudies = Array.isArray(data) ? data : [];
 
-				const data = await fetchWithRetry<CaseStudy[]>(
-					`${API_BASE_URL}/api/case-studies/public`,
-					{}
-				);
-
-				if (!data) {
-					throw new Error("Failed to load case studies after retries");
+                if (isActive) {
+                    setCaseStudies(safeCaseStudies);
+                    saveCache(CASE_STUDIES_CACHE_KEY, safeCaseStudies);
 				}
-
-				setCaseStudies(data ?? []);
-				setPreviousCaseStudies(data ?? []);
-				setLoading(false);
-				setError(null);
-			} catch (err: any) {
-				console.error("[CASE_STUDIES] Failed to load case studies:", err.message);
-				setLoading(false);
-				// Only show error if we have no previous data to fall back on
-				if (previousCaseStudies.length === 0) {
-					setError("Unable to load case studies at this time. Please try refreshing the page.");
-				} else {
-					// Show previous data instead of error
-					setCaseStudies(previousCaseStudies);
-					setError(null);
-					console.log("[CASE_STUDIES] Using cached data");
+            } catch {
+                const cached = getCache<CaseStudy[]>(CASE_STUDIES_CACHE_KEY);
+                if (isActive) {
+                    setCaseStudies(Array.isArray(cached) ? cached : []);
 				}
+            } finally {
+                if (initialLoad && isActive) {
+                    setLoading(false);
+                }
 			}
 		};
 
-		fetchCaseStudies();
+        fetchCaseStudies(true);
+        const intervalId = setInterval(() => {
+            fetchCaseStudies(false);
+        }, 30000);
+
+        return () => {
+            isActive = false;
+            clearInterval(intervalId);
+        };
 	}, []);
 
     return (
@@ -83,20 +95,14 @@ const CaseStudies: React.FC = () => {
                 </motion.p>
             </div>
 
-            {loading && previousCaseStudies.length === 0 && (
+            {loading && caseStudies.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mx-auto mb-2" />
                     Loading case studies...
                 </div>
             )}
 
-            {error && caseStudies.length === 0 && (
-                <div className="mx-auto max-w-2xl text-center text-red-600 bg-red-50 border border-red-200 rounded-2xl py-4 px-6">
-                    {error}
-                </div>
-            )}
-
-            {!loading && !error && caseStudies.length === 0 && (
+            {!loading && caseStudies.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     No case studies found.
                 </div>

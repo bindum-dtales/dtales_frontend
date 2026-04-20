@@ -1,23 +1,26 @@
 
 import { TeamMember, Testimonial, SlideData } from './types';
+import binduImage from './src/assets/bindu.jpeg';
+import sneehaImage from './src/assets/sneeha.jpeg';
+import yashImage from './src/assets/yash.png';
 
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Bindu Mohan",
     role: "Founder & Principal",
-    image: "/bindu.jpeg",
+    image: binduImage,
     bio: "A seasoned technical documentation leader and consultant with almost two decades of experience in building and optimizing documentation processes and teams. Bindu's expertise spans the entire documentation lifecycle, from establishing foundational practices to leading complex content migrations and strategies. With a passion for empowering organizations with clean, effective, and user-centric documentation, Bindu leads her team at DTALES Tech in keeping pace with the evolving landscape of technical communication."
   },
   {
     name: "Sneha Peri",
     role: "Content Lead",
-    image: "/sneeha.jpeg",
+    image: sneehaImage,
     bio: "As a Content Lead with a Master's in Language and Literature, Sneha Peri blends analytical rigor with narrative depth to transform complex B2B and tech concepts into compelling stories. She specializes in the intersection of Information Development and Narrative Design, ensuring technical documentation is both precise and strategically aligned with market needs. Leveraging her expertise in market research, Sneha crafts data-driven strategies that bridge the gap between sophisticated technology and impactful communication."
   },
   {
     name: "Yashas Niranjana",
     role: "Creatives Lead",
-    image: "/yash.png",
+    image: yashImage,
     bio: "A creative strategist and graphic designer with an MA from Coventry University, Yashas Niranjana specializes in building modern brands through impactful visuals and clean, minimalist design. He works closely with startups and creators to transform abstract ideas into fresh, authentic digital content and effective brand identities. By combining advanced design theory with a results-driven approach, Yashas is focused on delivering solutions that foster a genuine connection between brands and their audiences."
   }
 ];
