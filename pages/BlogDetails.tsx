@@ -21,9 +21,16 @@ const BlogDetails: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    console.log("Blog Details API fetch:", `/api/blogs/${id}`);
     apiFetch<Blog>(`/api/blogs/${id}`)
-      .then(setBlog)
-      .catch((e) => setError(e.message || "Failed to load blog"))
+      .then((data) => {
+        console.log("Blog Details API response:", data);
+        setBlog(data);
+      })
+      .catch((e) => {
+        console.error("Blog Details API error:", e);
+        setError(e.message || "Failed to load blog");
+      })
       .finally(() => setLoading(false));
   }, [id]);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "../src/config/api";
-import { fetchWithRetry } from "../src/lib/fetchWithRetry";
+import { fetchWithRetry, EmptyResponseError } from "../src/lib/fetchWithRetry";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
@@ -27,6 +27,7 @@ const BLOGS_CACHE_KEY = "blogs_cache";
 const Blogs: React.FC = () => {
 	const [blogs, setBlogs] = useState<Blog[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
         let isActive = true;
@@ -34,6 +35,7 @@ const Blogs: React.FC = () => {
         const fetchBlogs = async (initialLoad = false) => {
             if (initialLoad) {
                 setLoading(true);
+			setError(null);
             }
 
             if (!API_BASE_URL) {
@@ -46,17 +48,34 @@ const Blogs: React.FC = () => {
             }
 
 			try {
-                const data = await fetchWithRetry<Blog[]>(`${API_BASE_URL}/api/blogs/public`);
+                const data = await fetchWithRetry<Blog[]>(`${API_BASE_URL}/api/blogs/public`, {}, 3, true);
                 const safeBlogs = Array.isArray(data) ? data : [];
+
+                console.log("Blogs API response:", data);
 
                 if (isActive) {
                     setBlogs(safeBlogs);
-                    saveCache(BLOGS_CACHE_KEY, safeBlogs);
+                    if (safeBlogs.length > 0) {
+                        saveCache(BLOGS_CACHE_KEY, safeBlogs);
+                    }
 				}
-            } catch {
-                const cached = getCache<Blog[]>(BLOGS_CACHE_KEY);
+            } catch (err: any) {
+                console.error("Blogs API error:", err);
+
+                let cached = getCache<Blog[]>(BLOGS_CACHE_KEY);
+
+                if (err instanceof EmptyResponseError) {
+                    console.warn("Blogs API returned empty array, checking cache");
+                } else {
+                    console.error("Blogs API failed, checking cache");
+                }
+
                 if (isActive) {
                     setBlogs(Array.isArray(cached) ? cached : []);
+
+                    if (initialLoad && !Array.isArray(cached)) {
+                        setError("Failed to load blogs. Please try again later.");
+                    }
 				}
             } finally {
                 if (initialLoad && isActive) {
@@ -102,7 +121,13 @@ const Blogs: React.FC = () => {
                 </div>
             )}
 
-            {!loading && blogs.length === 0 && (
+            {!loading && error && (
+                <div className="mx-auto max-w-2xl text-center text-red-600 bg-red-50 border border-red-200 rounded-2xl py-4 px-6">
+                    {error}
+                </div>
+            )}
+
+            {!loading && !error && blogs.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     No blogs found.
                 </div>

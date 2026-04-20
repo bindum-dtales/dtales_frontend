@@ -20,9 +20,12 @@ const AdminCaseStudiesManage: React.FC = () => {
   const fetchCases = async () => {
     setError(null);
     try {
+      console.log("Admin: Fetching case studies...");
       const data = await apiFetch<CaseStudy[]>("/api/case-studies");
-      setCases(data);
+      console.log("Admin: Case Studies API response:", data);
+      setCases(Array.isArray(data) ? data : []);
     } catch (e: any) {
+      console.error("Admin: Failed to load case studies:", e);
       setError(e.message || "Failed to load case studies");
     } finally {
       setLoading(false);
@@ -32,9 +35,12 @@ const AdminCaseStudiesManage: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this case study?")) return;
     try {
+      console.log("Admin: Deleting case study:", id);
       await apiDelete(`/api/case-studies/${id}`);
+      console.log("Admin: Case study deleted successfully");
       fetchCases();
     } catch (e: any) {
+      console.error("Admin: Failed to delete case study:", e);
       setError(e.message || "Failed to delete case study");
     }
   };
@@ -107,5 +113,7 @@ const AdminCaseStudiesManage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminCaseStudiesManage;
 
 export default AdminCaseStudiesManage;

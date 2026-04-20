@@ -21,10 +21,13 @@ const PortfolioManagePage: React.FC = () => {
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
+        console.log("Admin: Fetching portfolio items...");
         setError(null);
         const data = await getAllPortfolio();
-        setPortfolioItems(data);
+        console.log("Admin: Portfolio API response:", data);
+        setPortfolioItems(Array.isArray(data) ? data : []);
       } catch (err: any) {
+        console.error("Admin: Failed to load portfolio items:", err);
         setError(err.message || "Failed to load portfolio items");
       } finally {
         setLoading(false);
@@ -37,10 +40,13 @@ const PortfolioManagePage: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (deleteConfirm === id) {
       try {
+        console.log("Admin: Deleting portfolio item:", id);
         await deletePortfolio(id);
+        console.log("Admin: Portfolio item deleted successfully");
         setPortfolioItems((prev) => prev.filter((item) => item.id !== id));
         setDeleteConfirm(null);
       } catch (err: any) {
+        console.error("Admin: Failed to delete portfolio item:", err);
         setError(err.message || "Failed to delete portfolio item");
       }
     } else {

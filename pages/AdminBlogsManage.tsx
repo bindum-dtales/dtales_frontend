@@ -20,9 +20,12 @@ const AdminBlogsManage: React.FC = () => {
   const fetchBlogs = async () => {
     setError(null);
     try {
+      console.log("Admin: Fetching blogs...");
       const data = await apiFetch<Blog[]>("/api/blogs");
-      setBlogs(data);
+      console.log("Admin: Blogs API response:", data);
+      setBlogs(Array.isArray(data) ? data : []);
     } catch (e: any) {
+      console.error("Admin: Failed to load blogs:", e);
       setError(e.message || "Failed to load blogs");
     } finally {
       setLoading(false);
@@ -32,9 +35,12 @@ const AdminBlogsManage: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this blog?")) return;
     try {
+      console.log("Admin: Deleting blog:", id);
       await apiDelete(`/api/blogs/${id}`);
+      console.log("Admin: Blog deleted successfully");
       fetchBlogs();
     } catch (e: any) {
+      console.error("Admin: Failed to delete blog:", e);
       setError(e.message || "Failed to delete blog");
     }
   };

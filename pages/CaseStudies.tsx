@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { API_BASE_URL } from "../src/config/api";
-import { fetchWithRetry } from "../src/lib/fetchWithRetry";
+import { fetchWithRetry, EmptyResponseError } from "../src/lib/fetchWithRetry";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
@@ -27,6 +27,7 @@ const CASE_STUDIES_CACHE_KEY = "case_studies_cache";
 const CaseStudies: React.FC = () => {
 	const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
         let isActive = true;
@@ -34,6 +35,7 @@ const CaseStudies: React.FC = () => {
         const fetchCaseStudies = async (initialLoad = false) => {
             if (initialLoad) {
                 setLoading(true);
+			setError(null);
             }
 
             if (!API_BASE_URL) {
@@ -46,17 +48,34 @@ const CaseStudies: React.FC = () => {
             }
 
 			try {
-                const data = await fetchWithRetry<CaseStudy[]>(`${API_BASE_URL}/api/case-studies/public`);
+                const data = await fetchWithRetry<CaseStudy[]>(`${API_BASE_URL}/api/case-studies/public`, {}, 3, true);
                 const safeCaseStudies = Array.isArray(data) ? data : [];
+
+                console.log("Case Studies API response:", data);
 
                 if (isActive) {
                     setCaseStudies(safeCaseStudies);
-                    saveCache(CASE_STUDIES_CACHE_KEY, safeCaseStudies);
+                    if (safeCaseStudies.length > 0) {
+                        saveCache(CASE_STUDIES_CACHE_KEY, safeCaseStudies);
+                    }
 				}
-            } catch {
-                const cached = getCache<CaseStudy[]>(CASE_STUDIES_CACHE_KEY);
+            } catch (err: any) {
+                console.error("Case Studies API error:", err);
+
+                let cached = getCache<CaseStudy[]>(CASE_STUDIES_CACHE_KEY);
+
+                if (err instanceof EmptyResponseError) {
+                    console.warn("Case Studies API returned empty array, checking cache");
+                } else {
+                    console.error("Case Studies API failed, checking cache");
+                }
+
                 if (isActive) {
                     setCaseStudies(Array.isArray(cached) ? cached : []);
+
+                    if (initialLoad && !Array.isArray(cached)) {
+                        setError("Failed to load case studies. Please try again later.");
+                    }
 				}
             } finally {
                 if (initialLoad && isActive) {
@@ -102,7 +121,13 @@ const CaseStudies: React.FC = () => {
                 </div>
             )}
 
-            {!loading && caseStudies.length === 0 && (
+            {!loading && error && (
+                <div className="mx-auto max-w-2xl text-center text-red-600 bg-red-50 border border-red-200 rounded-2xl py-4 px-6">
+                    {error}
+                </div>
+            )}
+
+            {!loading && !error && caseStudies.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     No case studies found.
                 </div>

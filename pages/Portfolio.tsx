@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { getProxiedImageUrl } from '../src/utils/imageProxy';
 import { API_BASE_URL } from '../src/config/api';
-import { fetchWithRetry } from '../src/lib/fetchWithRetry';
+import { fetchWithRetry, EmptyResponseError } from '../src/lib/fetchWithRetry';
 import { getCache, saveCache } from '../src/lib/cache';
 import backgroundImage1 from '../src/assets/1.png';
 import backgroundImage2 from '../src/assets/2.png';
@@ -31,6 +31,7 @@ export default function Portfolio() {
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const projectsPerPage = 10;
   const gridRef = useRef<HTMLDivElement>(null);
   
@@ -44,6 +45,7 @@ export default function Portfolio() {
     const fetchPortfolio = async (initialLoad = false) => {
       if (initialLoad) {
         setLoading(true);
+        setError(null);
       }
 
       if (!API_BASE_URL) {
@@ -56,7 +58,7 @@ export default function Portfolio() {
       }
 
       try {
-        const data = await fetchWithRetry<any[]>(`${API_BASE_URL}/api/portfolio`);
+        const data = await fetchWithRetry<any[]>(`${API_BASE_URL}/api/portfolio`, {}, 3, true);
         const mappedData: PortfolioItem[] = Array.isArray(data)
           ? data.map((item: any) => ({
               id: item.id,
@@ -67,14 +69,31 @@ export default function Portfolio() {
             }))
           : [];
 
+        console.log("Portfolio API response:", data);
+
         if (isActive) {
           setPortfolioItems(mappedData);
-          saveCache(PORTFOLIO_CACHE_KEY, mappedData);
+          if (mappedData.length > 0) {
+            saveCache(PORTFOLIO_CACHE_KEY, mappedData);
+          }
         }
-      } catch {
-        const cached = getCache<PortfolioItem[]>(PORTFOLIO_CACHE_KEY);
+      } catch (err: any) {
+        console.error("Portfolio API error:", err);
+
+        let cached = getCache<PortfolioItem[]>(PORTFOLIO_CACHE_KEY);
+
+        if (err instanceof EmptyResponseError) {
+          console.warn("Portfolio API returned empty array, checking cache");
+        } else {
+          console.error("Portfolio API failed, checking cache");
+        }
+
         if (isActive) {
           setPortfolioItems(Array.isArray(cached) ? cached : []);
+
+          if (initialLoad && !Array.isArray(cached)) {
+            setError("Failed to load portfolio. Please try again later.");
+          }
         }
       } finally {
         if (initialLoad && isActive) {
@@ -183,6 +202,12 @@ export default function Portfolio() {
           <div className="text-center">
             <div className="w-10 h-10 border-4 border-gray-300 border-t-gray-700 rounded-full animate-spin mx-auto mb-4" />
             <p className="text-xl text-gray-600">Loading portfolio...</p>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center min-h-screen px-4">
+          <div className="text-center max-w-md">
+            <p className="text-xl text-red-600">{error}</p>
           </div>
         </div>
       ) : portfolioItems.length === 0 ? (

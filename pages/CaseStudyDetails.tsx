@@ -21,9 +21,16 @@ const CaseStudyDetails: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+    console.log("Case Study Details API fetch:", `/api/case-studies/${id}`);
     apiFetch<CaseStudy>(`/api/case-studies/${id}`)
-      .then(setCaseStudy)
-      .catch((e) => setError(e.message || "Failed to load case study"))
+      .then((data) => {
+        console.log("Case Study Details API response:", data);
+        setCaseStudy(data);
+      })
+      .catch((e) => {
+        console.error("Case Study Details API error:", e);
+        setError(e.message || "Failed to load case study");
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
