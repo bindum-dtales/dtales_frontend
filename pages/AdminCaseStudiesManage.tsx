@@ -115,5 +115,3 @@ const AdminCaseStudiesManage: React.FC = () => {
 };
 
 export default AdminCaseStudiesManage;
-
-export default AdminCaseStudiesManage;
