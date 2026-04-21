@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API = import.meta.env.VITE_API_BASE_URL;
+import { apiFetch } from "../src/lib/api";
 
 export default function Portfolio() {
   const [data, setData] = useState<any[]>([]);
@@ -10,23 +9,7 @@ export default function Portfolio() {
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
-        const res = await fetch(`${API}/portfolio`, {
-          method: "GET",
-          mode: "cors",
-          cache: "no-store",
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0"
-          }
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed response");
-        }
-
-        const json = await res.json();
+        const json = await apiFetch<any[]>("portfolio");
 
         if (!Array.isArray(json)) {
           throw new Error("Invalid data format");

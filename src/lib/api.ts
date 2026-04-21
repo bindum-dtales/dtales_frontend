@@ -1,9 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://dtales.tech/api";
-
-function buildApiUrl(endpoint: string): string {
-  const normalizedEndpoint = endpoint.replace(/^\/+/, "");
-  return `${BASE_URL}/${normalizedEndpoint}`;
-}
+import { buildApiUrl } from "../config/api";
 
 async function parseJsonOrThrow<T>(res: Response, endpoint: string): Promise<T> {
   const raw = await res.text();
@@ -29,22 +24,15 @@ export async function apiFetch<T>(endpoint: string): Promise<T> {
     credentials: "omit",
     cache: "no-store",
     headers: {
-      Accept: "application/json",
       "Content-Type": "application/json",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
     },
   });
 
   if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(errText || `API error: ${res.status}`);
+    throw new Error(`API error: ${res.status}`);
   }
 
-  const result = await parseJsonOrThrow<T>(res, endpoint);
-  console.log(`API response for ${endpoint}:`, result);
-  return result;
+  return res.json();
 }
 
 export async function apiPost<T>(endpoint: string, data: any): Promise<T> {
@@ -111,6 +99,7 @@ export async function apiDelete(endpoint: string): Promise<void> {
     credentials: "omit",
     cache: "no-store",
     headers: {
+      "Content-Type": "application/json",
       "Cache-Control": "no-cache, no-store, must-revalidate",
       Pragma: "no-cache",
       Expires: "0",
