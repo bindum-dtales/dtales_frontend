@@ -1,4 +1,4 @@
-import { apiDelete, apiFetch, apiPost, apiPut } from "./api";
+import { apiDelete, apiPost, apiPut } from "./api";
 import { uploadImage } from "./uploads";
 
 export interface PortfolioItem {
@@ -34,8 +34,39 @@ export async function createPortfolio(data: {
  * @returns Array of portfolio items
  */
 export async function getAllPortfolio(): Promise<PortfolioItem[]> {
-  const data = await apiFetch<PortfolioItem[]>("portfolio");
+  const data = await getPortfolio();
   return Array.isArray(data) ? data : [];
+}
+
+export async function getPortfolio() {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/portfolio`);
+
+    if (!res.ok) {
+      console.error("API ERROR:", res.status);
+      return [];
+    }
+
+    const text = await res.text();
+
+    if (!text) {
+      console.warn("Empty response");
+      return [];
+    }
+
+    const data = JSON.parse(text);
+
+    // Handle all possible backend formats
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.data)) return data.data;
+    if (Array.isArray(data.items)) return data.items;
+
+    console.warn("Unknown format:", data);
+    return [];
+  } catch (err) {
+    console.error("Portfolio fetch failed:", err);
+    return [];
+  }
 }
 
 /**

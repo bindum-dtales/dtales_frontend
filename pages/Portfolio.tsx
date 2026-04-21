@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react";
-import { apiFetch } from "../src/lib/api";
+import { getPortfolio } from "../src/lib/portfolioApi";
 
 export default function Portfolio() {
-  const [data, setData] = useState<any[]>([]);
-  const [error, setError] = useState(false);
+  const [portfolio, setPortfolio] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
-        const json = await apiFetch<any[]>("portfolio");
+        const data = await getPortfolio();
+        console.log("Portfolio DATA:", data);
 
-        if (!Array.isArray(json)) {
-          throw new Error("Invalid data format");
+        if (!data || data.length === 0) {
+          setPortfolio([]);
+          return;
         }
 
-        setData(json);
+        setPortfolio(data);
       } catch (err) {
         console.error("Portfolio error:", err);
-        setError(true);
+        setPortfolio([]);
       } finally {
         setLoading(false);
       }
@@ -28,11 +29,10 @@ export default function Portfolio() {
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: "red" }}>Failed to load portfolio.</p>;
 
   return (
     <div>
-      {data.map((item: any) => (
+      {portfolio.map((item: any) => (
         <div key={item.id}>
           <h3>{item.title}</h3>
         </div>
