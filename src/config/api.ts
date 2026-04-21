@@ -7,5 +7,5 @@ export function buildApiUrl(endpoint: string): string {
 	return `${BASE_URL}/${cleanEndpoint}`;
 }
 
-// Keep host-only export for non-API assets like /media.
+// Media proxy uses the host without /api suffix
 export const API_BASE_URL = BASE_URL.replace(/\/api$/, "");

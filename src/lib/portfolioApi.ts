@@ -1,4 +1,5 @@
 import { apiDelete, apiPost, apiPut } from "./api";
+import { buildApiUrl } from "../config/api";
 import { uploadImage } from "./uploads";
 
 export interface PortfolioItem {
@@ -40,7 +41,17 @@ export async function getAllPortfolio(): Promise<PortfolioItem[]> {
 
 export async function getPortfolio() {
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/portfolio`);
+    const url = buildApiUrl("portfolio");
+    console.log("Portfolio API URL:", url);
+    const res = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      credentials: "omit",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (!res.ok) {
       console.error("API ERROR:", res.status);
