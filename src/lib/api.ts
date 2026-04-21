@@ -1,8 +1,8 @@
-const API = (import.meta.env.VITE_API_BASE_URL || "https://dtales.tech/api").replace(/\/$/, "");
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://dtales.tech/api";
 
 function buildApiUrl(endpoint: string): string {
-  const normalizedEndpoint = endpoint.replace(/^\/+/, "").replace(/^api\//, "");
-  return `${API}/${normalizedEndpoint}`;
+  const normalizedEndpoint = endpoint.replace(/^\/+/, "");
+  return `${BASE_URL}/${normalizedEndpoint}`;
 }
 
 async function parseJsonOrThrow<T>(res: Response, endpoint: string): Promise<T> {
@@ -21,6 +21,7 @@ async function parseJsonOrThrow<T>(res: Response, endpoint: string): Promise<T> 
 
 export async function apiFetch<T>(endpoint: string): Promise<T> {
   const url = buildApiUrl(endpoint);
+  console.log("API CALL:", url);
 
   const res = await fetch(url, {
     method: "GET",
@@ -48,6 +49,7 @@ export async function apiFetch<T>(endpoint: string): Promise<T> {
 
 export async function apiPost<T>(endpoint: string, data: any): Promise<T> {
   const url = buildApiUrl(endpoint);
+  console.log("API CALL:", url);
 
   const res = await fetch(url, {
     method: "POST",
@@ -74,6 +76,7 @@ export async function apiPost<T>(endpoint: string, data: any): Promise<T> {
 
 export async function apiPut<T>(endpoint: string, data: any): Promise<T> {
   const url = buildApiUrl(endpoint);
+  console.log("API CALL:", url);
 
   const res = await fetch(url, {
     method: "PUT",
@@ -100,6 +103,7 @@ export async function apiPut<T>(endpoint: string, data: any): Promise<T> {
 
 export async function apiDelete(endpoint: string): Promise<void> {
   const url = buildApiUrl(endpoint);
+  console.log("API CALL:", url);
 
   const res = await fetch(url, {
     method: "DELETE",
@@ -120,6 +124,7 @@ export async function apiDelete(endpoint: string): Promise<void> {
 
 export async function apiUpload<T>(endpoint: string, formData: FormData): Promise<T> {
   const url = buildApiUrl(endpoint);
+  console.log("API CALL:", url);
 
   const res = await fetch(url, {
     method: "POST",
