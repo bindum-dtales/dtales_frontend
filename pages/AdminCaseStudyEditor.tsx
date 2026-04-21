@@ -59,7 +59,7 @@ const AdminCaseStudyEditor: React.FC = () => {
           title: string;
           slug: string;
           cover_image_url?: string | null;
-        }>(`/api/case-studies/${id}`);
+        }>(`case-studies/${id}`);
         setTitle(data.title || "");
         setCoverImageUrl(data.cover_image_url || "");
       } catch (e: any) {
@@ -146,9 +146,9 @@ const AdminCaseStudyEditor: React.FC = () => {
       }
 
       if (isEdit && id) {
-        await apiPut(`/api/case-studies/${id}`, payload);
+        await apiPut(`case-studies/${id}`, payload);
       } else {
-        await apiPost("/api/case-studies", payload);
+        await apiPost("case-studies", payload);
       }
     } catch (e: any) {
       setError(e.message || "An unexpected error occurred");
@@ -188,9 +188,9 @@ const AdminCaseStudyEditor: React.FC = () => {
       console.log("Publishing case study with payload:", JSON.stringify(payload, null, 2));
 
       if (isEdit && id) {
-        await apiPut(`/api/case-studies/${id}`, payload);
+        await apiPut(`case-studies/${id}`, payload);
       } else {
-        await apiPost("/api/case-studies", payload);
+        await apiPost("case-studies", payload);
       }
 
       navigate("/admin/dashboard");

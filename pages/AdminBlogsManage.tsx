@@ -21,7 +21,7 @@ const AdminBlogsManage: React.FC = () => {
     setError(null);
     try {
       console.log("Admin: Fetching blogs...");
-      const data = await apiFetch<Blog[]>("/api/blogs");
+      const data = await apiFetch<Blog[]>("blogs");
       console.log("Admin: Blogs API response:", data);
       setBlogs(Array.isArray(data) ? data : []);
     } catch (e: any) {
@@ -36,7 +36,7 @@ const AdminBlogsManage: React.FC = () => {
     if (!confirm("Delete this blog?")) return;
     try {
       console.log("Admin: Deleting blog:", id);
-      await apiDelete(`/api/blogs/${id}`);
+      await apiDelete(`blogs/${id}`);
       console.log("Admin: Blog deleted successfully");
       fetchBlogs();
     } catch (e: any) {

@@ -20,7 +20,7 @@ export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const data = await apiUpload<{ url?: string }>("/api/uploads/image", formData);
+  const data = await apiUpload<{ url?: string }>("uploads/image", formData);
   if (!data?.url) {
     throw new Error("Image upload returned empty response");
   }
@@ -48,7 +48,7 @@ export async function uploadDocx(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const data = await apiUpload<{ url?: string }>("/api/uploads/docx", formData);
+  const data = await apiUpload<{ url?: string }>("uploads/docx", formData);
   if (!data?.url) {
     throw new Error("DOCX upload returned empty response");
   }

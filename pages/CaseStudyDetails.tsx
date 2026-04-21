@@ -21,8 +21,8 @@ const CaseStudyDetails: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
-    console.log("Case Study Details API fetch:", `/api/case-studies/${id}`);
-    apiFetch<CaseStudy>(`/api/case-studies/${id}`)
+    console.log("Case Study Details API fetch:", `case-studies/${id}`);
+    apiFetch<CaseStudy>(`case-studies/${id}`)
       .then((data) => {
         console.log("Case Study Details API response:", data);
         setCaseStudy(data);

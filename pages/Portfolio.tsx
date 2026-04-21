@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "https://dtales.tech/api/portfolio";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function Portfolio() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
-        const res = await fetch(API_URL, {
+        const res = await fetch(`${API}/portfolio`, {
           method: "GET",
           mode: "cors",
+          cache: "no-store",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0"
           }
         });
 

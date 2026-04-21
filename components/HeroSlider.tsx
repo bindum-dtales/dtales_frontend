@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { HERO_SLIDES } from '../constants';
 
 // TODO: Replace HERO_SLIDES with API call when backend endpoint is ready
-// const slides = await apiFetch<HeroSlide[]>("/api/hero-slides");
+// const slides = await apiFetch<HeroSlide[]>("hero-slides");
 
 const HeroSlider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);

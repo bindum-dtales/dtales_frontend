@@ -38,7 +38,7 @@ const CaseStudies: React.FC = () => {
             }
 
 			try {
-                const data = await apiFetch<CaseStudy[]>("/api/case-studies/public");
+                const data = await apiFetch<CaseStudy[]>("case-studies/public");
                 const safeCaseStudies = Array.isArray(data) ? data : [];
 
                 console.log("Case Studies API response:", data);

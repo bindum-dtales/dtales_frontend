@@ -24,7 +24,7 @@ export async function createPortfolio(data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const result = await apiPost<PortfolioItem>("/api/portfolio", data);
+  const result = await apiPost<PortfolioItem>("portfolio", data);
   console.log("Portfolio API create response:", result);
   return result;
 }
@@ -34,7 +34,7 @@ export async function createPortfolio(data: {
  * @returns Array of portfolio items
  */
 export async function getAllPortfolio(): Promise<PortfolioItem[]> {
-  const data = await apiFetch<PortfolioItem[]>("/api/portfolio");
+  const data = await apiFetch<PortfolioItem[]>("portfolio");
   return Array.isArray(data) ? data : [];
 }
 
@@ -51,7 +51,7 @@ export async function updatePortfolio(id: number, data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const result = await apiPut<PortfolioItem>(`/api/portfolio/${id}`, data);
+  const result = await apiPut<PortfolioItem>(`portfolio/${id}`, data);
   console.log("Portfolio API update response:", result);
   return result;
 }
@@ -61,7 +61,7 @@ export async function updatePortfolio(id: number, data: {
  * @param id Portfolio item ID
  */
 export async function deletePortfolio(id: number): Promise<void> {
-  await apiDelete(`/api/portfolio/${id}`);
+  await apiDelete(`portfolio/${id}`);
 
   console.log("Portfolio API delete success");
 }

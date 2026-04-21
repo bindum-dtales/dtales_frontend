@@ -18,7 +18,7 @@ const Testimonials: React.FC = () => {
 
   useEffect(() => {
     // TODO: Replace with API call when backend endpoint is ready
-    // apiFetch<Testimonial[]>("/api/testimonials").then(setTestimonials).finally(() => setLoading(false));
+    // apiFetch<Testimonial[]>("testimonials").then(setTestimonials).finally(() => setLoading(false));
     
     // Temporary fallback
     const fallbackData: Testimonial[] = [

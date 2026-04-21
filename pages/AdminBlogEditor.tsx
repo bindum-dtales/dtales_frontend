@@ -114,7 +114,7 @@ export default function AdminBlogEditor() {
       
       console.log("Publishing blog with payload:", JSON.stringify(payload, null, 2));
       
-      const responseData = await apiPost<any>("/api/blogs", payload);
+      const responseData = await apiPost<any>("blogs", payload);
       console.log("Publish response:", responseData);
 
       navigate("/admin/dashboard");
