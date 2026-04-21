@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API_BASE_URL } from '../config/api';
+import { uploadImage as uploadImageApi } from '../lib/uploads';
 
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
@@ -12,25 +12,7 @@ export const useImageUpload = () => {
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch(`${API_BASE_URL}/api/uploads/image`, {
-        method: "POST",
-        cache: "no-store",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text);
-      }
-
-      const data = await response.json();
-      return data.url as string;
+      return await uploadImageApi(file);
     } catch (err: any) {
       const errorMessage = err.message || "Failed to upload image";
       setError(errorMessage);

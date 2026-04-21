@@ -3,7 +3,7 @@
  * Used consistently across all admin editors (Blogs, Case Studies).
  */
 
-import { API_BASE_URL } from '../config/api';
+import { apiUpload } from './api';
 
 /**
  * Upload an image to Supabase Storage via the backend.
@@ -20,21 +20,10 @@ export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const res = await fetch(`${API_BASE_URL}/api/uploads/image`, {
-    method: "POST",
-    cache: "no-store",
-    headers: {
-      "Cache-Control": "no-cache",
-    },
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
+  const data = await apiUpload<{ url?: string }>("/api/uploads/image", formData);
+  if (!data?.url) {
+    throw new Error("Image upload returned empty response");
   }
-
-  const data = await res.json();
   return data.url as string;
 }
 
@@ -59,20 +48,9 @@ export async function uploadDocx(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(`${API_BASE_URL}/api/uploads/docx`, {
-    method: "POST",
-    cache: "no-store",
-    headers: {
-      "Cache-Control": "no-cache",
-    },
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
+  const data = await apiUpload<{ url?: string }>("/api/uploads/docx", formData);
+  if (!data?.url) {
+    throw new Error("DOCX upload returned empty response");
   }
-
-  const data = await res.json();
   return data.url as string;
 }

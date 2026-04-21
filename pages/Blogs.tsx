@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { API_BASE_URL } from "../src/config/api";
-import { fetchWithRetry, EmptyResponseError } from "../src/lib/fetchWithRetry";
+import { apiFetch } from "../src/lib/api";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
@@ -38,17 +37,8 @@ const Blogs: React.FC = () => {
 			setError(null);
             }
 
-            if (!API_BASE_URL) {
-                const cached = getCache<Blog[]>(BLOGS_CACHE_KEY);
-                if (isActive) {
-                    setBlogs(Array.isArray(cached) ? cached : []);
-                    setLoading(false);
-                }
-                return;
-            }
-
 			try {
-                const data = await fetchWithRetry<Blog[]>(`${API_BASE_URL}/api/blogs/public`, {}, 3, true);
+                const data = await apiFetch<Blog[]>("/api/blogs/public");
                 const safeBlogs = Array.isArray(data) ? data : [];
 
                 console.log("Blogs API response:", data);
@@ -64,11 +54,7 @@ const Blogs: React.FC = () => {
 
                 let cached = getCache<Blog[]>(BLOGS_CACHE_KEY);
 
-                if (err instanceof EmptyResponseError) {
-                    console.warn("Blogs API returned empty array, checking cache");
-                } else {
-                    console.error("Blogs API failed, checking cache");
-                }
+                console.error("Blogs API failed, checking cache");
 
                 if (isActive) {
                     setBlogs(Array.isArray(cached) ? cached : []);

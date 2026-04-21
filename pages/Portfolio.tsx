@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { getProxiedImageUrl } from '../src/utils/imageProxy';
-import { API_BASE_URL } from '../src/config/api';
-import { fetchWithRetry, EmptyResponseError } from '../src/lib/fetchWithRetry';
+import { apiFetch } from '../src/lib/api';
 import { getCache, saveCache } from '../src/lib/cache';
 import backgroundImage1 from '../src/assets/1.png';
 import backgroundImage2 from '../src/assets/2.png';
@@ -48,17 +47,8 @@ export default function Portfolio() {
         setError(null);
       }
 
-      if (!API_BASE_URL) {
-        const cached = getCache<PortfolioItem[]>(PORTFOLIO_CACHE_KEY);
-        if (isActive) {
-          setPortfolioItems(Array.isArray(cached) ? cached : []);
-          setLoading(false);
-        }
-        return;
-      }
-
       try {
-        const data = await fetchWithRetry<any[]>(`${API_BASE_URL}/api/portfolio`, {}, 3, true);
+        const data = await apiFetch<any[]>("/api/portfolio");
         const mappedData: PortfolioItem[] = Array.isArray(data)
           ? data.map((item: any) => ({
               id: item.id,
@@ -82,11 +72,7 @@ export default function Portfolio() {
 
         let cached = getCache<PortfolioItem[]>(PORTFOLIO_CACHE_KEY);
 
-        if (err instanceof EmptyResponseError) {
-          console.warn("Portfolio API returned empty array, checking cache");
-        } else {
-          console.error("Portfolio API failed, checking cache");
-        }
+        console.error("Portfolio API failed, checking cache");
 
         if (isActive) {
           setPortfolioItems(Array.isArray(cached) ? cached : []);

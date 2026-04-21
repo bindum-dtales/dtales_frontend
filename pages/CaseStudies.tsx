@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { API_BASE_URL } from "../src/config/api";
-import { fetchWithRetry, EmptyResponseError } from "../src/lib/fetchWithRetry";
+import { apiFetch } from "../src/lib/api";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
@@ -38,17 +37,8 @@ const CaseStudies: React.FC = () => {
 			setError(null);
             }
 
-            if (!API_BASE_URL) {
-                const cached = getCache<CaseStudy[]>(CASE_STUDIES_CACHE_KEY);
-                if (isActive) {
-                    setCaseStudies(Array.isArray(cached) ? cached : []);
-                    setLoading(false);
-                }
-                return;
-            }
-
 			try {
-                const data = await fetchWithRetry<CaseStudy[]>(`${API_BASE_URL}/api/case-studies/public`, {}, 3, true);
+                const data = await apiFetch<CaseStudy[]>("/api/case-studies/public");
                 const safeCaseStudies = Array.isArray(data) ? data : [];
 
                 console.log("Case Studies API response:", data);
@@ -64,11 +54,7 @@ const CaseStudies: React.FC = () => {
 
                 let cached = getCache<CaseStudy[]>(CASE_STUDIES_CACHE_KEY);
 
-                if (err instanceof EmptyResponseError) {
-                    console.warn("Case Studies API returned empty array, checking cache");
-                } else {
-                    console.error("Case Studies API failed, checking cache");
-                }
+                console.error("Case Studies API failed, checking cache");
 
                 if (isActive) {
                     setCaseStudies(Array.isArray(cached) ? cached : []);

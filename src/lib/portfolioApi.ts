@@ -1,5 +1,5 @@
-import { API_BASE_URL } from "../config/api";
-import { fetchWithRetry, EmptyResponseError } from "./fetchWithRetry";
+import { apiDelete, apiFetch, apiPost, apiPut } from "./api";
+import { uploadImage } from "./uploads";
 
 export interface PortfolioItem {
   id: number;
@@ -24,26 +24,7 @@ export async function createPortfolio(data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const res = await fetch(`${API_BASE_URL}/api/portfolio?t=${Date.now()}`, {
-    method: "POST",
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
-    },
-    mode: "cors",
-    credentials: "omit",
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || `Failed to create portfolio item (${res.status})`);
-  }
-
-  const result = await res.json();
+  const result = await apiPost<PortfolioItem>("/api/portfolio", data);
   console.log("Portfolio API create response:", result);
   return result;
 }
@@ -53,34 +34,8 @@ export async function createPortfolio(data: {
  * @returns Array of portfolio items
  */
 export async function getAllPortfolio(): Promise<PortfolioItem[]> {
-  try {
-    const data = await fetchWithRetry<PortfolioItem[]>(
-      `${API_BASE_URL}/api/portfolio`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        credentials: "omit",
-      },
-      3,
-      true
-    );
-
-    console.log("Portfolio API response:", data);
-
-    if (!data) {
-      throw new Error("Failed to fetch portfolio items after retries");
-    }
-
-    return data;
-  } catch (error) {
-    if (error instanceof EmptyResponseError) {
-      console.error("Portfolio API returned empty array");
-      throw new Error("No portfolio items available");
-    }
-    throw error;
-  }
+  const data = await apiFetch<PortfolioItem[]>("/api/portfolio");
+  return Array.isArray(data) ? data : [];
 }
 
 /**
@@ -96,26 +51,7 @@ export async function updatePortfolio(id: number, data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const res = await fetch(`${API_BASE_URL}/api/portfolio/${id}?t=${Date.now()}`, {
-    method: "PUT",
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
-    },
-    mode: "cors",
-    credentials: "omit",
-    body: JSON.stringify(data),
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || `Failed to update portfolio item (${res.status})`);
-  }
-
-  const result = await res.json();
+  const result = await apiPut<PortfolioItem>(`/api/portfolio/${id}`, data);
   console.log("Portfolio API update response:", result);
   return result;
 }
@@ -125,22 +61,7 @@ export async function updatePortfolio(id: number, data: {
  * @param id Portfolio item ID
  */
 export async function deletePortfolio(id: number): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/api/portfolio/${id}?t=${Date.now()}`, {
-    method: "DELETE",
-    cache: "no-store",
-    headers: {
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
-    },
-    mode: "cors",
-    credentials: "omit",
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || `Failed to delete portfolio item (${res.status})`);
-  }
+  await apiDelete(`/api/portfolio/${id}`);
 
   console.log("Portfolio API delete success");
 }
@@ -155,28 +76,7 @@ export async function uploadPortfolioImage(file: File): Promise<string> {
     throw new Error("No file provided");
   }
 
-  const formData = new FormData();
-  formData.append("image", file);
-
-  const res = await fetch(`${API_BASE_URL}/api/uploads/image?t=${Date.now()}`, {
-    method: "POST",
-    cache: "no-store",
-    headers: {
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
-    },
-    mode: "cors",
-    credentials: "omit",
-    body: formData,
-  });
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || `Failed to upload image (${res.status})`);
-  }
-
-  const data = await res.json();
-  console.log("Portfolio API image upload response:", data);
-  return data.url as string;
+  const imageUrl = await uploadImage(file);
+  console.log("Portfolio API image upload response:", imageUrl);
+  return imageUrl;
 }

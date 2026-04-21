@@ -11,12 +11,38 @@ export class EmptyResponseError extends Error {
   }
 }
 
+async function parseJsonResponse<T>(response: Response, url: string): Promise<T> {
+  const rawBody = await response.text();
+
+  if (!rawBody || !rawBody.trim()) {
+    throw new EmptyResponseError(`API returned empty response body for ${url}`);
+  }
+
+  try {
+    return JSON.parse(rawBody) as T;
+  } catch {
+    throw new Error(`API returned invalid JSON for ${url}`);
+  }
+}
+
 export async function fetchWithRetry<T = unknown>(
   url: string,
-  options: RequestInit = {},
-  retries: number = DEFAULT_RETRIES,
-  retryOnEmpty: boolean = true
+  optionsOrRetries: RequestInit | number = {},
+  retriesOrRetryOnEmpty: number | boolean = DEFAULT_RETRIES,
+  retryOnEmptyParam: boolean = true
 ): Promise<T> {
+  const options = typeof optionsOrRetries === "number" ? {} : optionsOrRetries;
+  const retries =
+    typeof optionsOrRetries === "number"
+      ? optionsOrRetries
+      : typeof retriesOrRetryOnEmpty === "number"
+      ? retriesOrRetryOnEmpty
+      : DEFAULT_RETRIES;
+  const retryOnEmpty =
+    typeof retriesOrRetryOnEmpty === "boolean"
+      ? retriesOrRetryOnEmpty
+      : retryOnEmptyParam;
+
   let lastError: unknown;
   let isEmptyError = false;
 
@@ -32,8 +58,12 @@ export async function fetchWithRetry<T = unknown>(
       const response = await fetch(bustedUrl, {
         ...options,
         cache: "no-store",
+        mode: "cors",
+        credentials: "omit",
         signal: controller.signal,
         headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
           ...options.headers,
           "Cache-Control": "no-cache, no-store, must-revalidate",
           Pragma: "no-cache",
@@ -45,7 +75,7 @@ export async function fetchWithRetry<T = unknown>(
         throw new Error(`API failed: Server responded with status ${response.status}`);
       }
 
-      const data = (await response.json()) as T;
+      const data = await parseJsonResponse<T>(response, bustedUrl);
 
       // Check for empty array
       if (retryOnEmpty && Array.isArray(data) && data.length === 0) {
