@@ -1,5 +1,4 @@
 import { API_BASE_URL } from '../config/api';
-import { fetchWithRetry, EmptyResponseError } from './fetchWithRetry';
 
 async function parseJsonOrThrow<T>(res: Response, endpoint: string): Promise<T> {
   const raw = await res.text();
@@ -16,24 +15,28 @@ async function parseJsonOrThrow<T>(res: Response, endpoint: string): Promise<T> 
 }
 
 export async function apiFetch<T>(endpoint: string): Promise<T> {
-  try {
-    const data = await fetchWithRetry<T>(`${API_BASE_URL}${endpoint}`, {}, 3, true);
-    console.log(`API response for ${endpoint}:`, data);
-    if (!data) {
-      throw new Error(`API error: No data received for ${endpoint}`);
-    }
-    return data;
-  } catch (error) {
-    if (error instanceof EmptyResponseError) {
-      console.error(`API returned empty for ${endpoint}`);
-      throw new Error(`No data available for ${endpoint}`);
-    }
-    throw error;
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "GET",
+    mode: "cors",
+    credentials: "omit",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(errText || `API error: ${res.status}`);
   }
+
+  const result = await parseJsonOrThrow<T>(res, endpoint);
+  console.log(`API response for ${endpoint}:`, result);
+  return result;
 }
 
 export async function apiPost<T>(endpoint: string, data: any): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${endpoint}?t=${Date.now()}`, {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: "POST",
     mode: "cors",
     credentials: "omit",
@@ -57,7 +60,7 @@ export async function apiPost<T>(endpoint: string, data: any): Promise<T> {
 }
 
 export async function apiPut<T>(endpoint: string, data: any): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${endpoint}?t=${Date.now()}`, {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: "PUT",
     mode: "cors",
     credentials: "omit",
@@ -81,7 +84,7 @@ export async function apiPut<T>(endpoint: string, data: any): Promise<T> {
 }
 
 export async function apiDelete(endpoint: string): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}${endpoint}?t=${Date.now()}`, {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: "DELETE",
     mode: "cors",
     credentials: "omit",
@@ -99,7 +102,7 @@ export async function apiDelete(endpoint: string): Promise<void> {
 }
 
 export async function apiUpload<T>(endpoint: string, formData: FormData): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${endpoint}?t=${Date.now()}`, {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: "POST",
     mode: "cors",
     credentials: "omit",
