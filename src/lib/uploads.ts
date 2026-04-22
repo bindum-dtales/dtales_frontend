@@ -3,7 +3,7 @@
  * Used consistently across all admin editors (Blogs, Case Studies).
  */
 
-import { apiUpload } from './api';
+import { apiFetch } from './api';
 
 /**
  * Upload an image to Supabase Storage via the backend.
@@ -20,7 +20,11 @@ export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const data = await apiUpload<{ url?: string }>("uploads/image", formData);
+  const data = await apiFetch<{ url?: string }>("/uploads/image", {
+    method: "POST",
+    headers: {},
+    body: formData,
+  });
   if (!data?.url) {
     throw new Error("Image upload returned empty response");
   }
@@ -48,7 +52,11 @@ export async function uploadDocx(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const data = await apiUpload<{ url?: string }>("uploads/docx", formData);
+  const data = await apiFetch<{ url?: string }>("/uploads/docx", {
+    method: "POST",
+    headers: {},
+    body: formData,
+  });
   if (!data?.url) {
     throw new Error("DOCX upload returned empty response");
   }

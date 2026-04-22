@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
-import { apiDelete, apiFetch } from "../src/lib/api";
+import { apiFetch } from "../src/lib/api";
 
 type CaseStudy = {
   id: string;
@@ -21,7 +21,7 @@ const AdminCaseStudiesManage: React.FC = () => {
     setError(null);
     try {
       console.log("Admin: Fetching case studies...");
-      const data = await apiFetch<CaseStudy[]>("case-studies");
+      const data = await apiFetch<CaseStudy[]>("/case-studies");
       console.log("Admin: Case Studies API response:", data);
       setCases(Array.isArray(data) ? data : []);
     } catch (e: any) {
@@ -36,7 +36,7 @@ const AdminCaseStudiesManage: React.FC = () => {
     if (!confirm("Delete this case study?")) return;
     try {
       console.log("Admin: Deleting case study:", id);
-      await apiDelete(`case-studies/${id}`);
+      await apiFetch<unknown>(`/case-studies/${id}`, { method: "DELETE" });
       console.log("Admin: Case study deleted successfully");
       fetchCases();
     } catch (e: any) {

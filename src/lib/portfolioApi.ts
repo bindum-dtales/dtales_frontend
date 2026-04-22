@@ -1,5 +1,4 @@
-import { apiDelete, apiPost, apiPut } from "./api";
-import { buildApiUrl } from "../config/api";
+import { apiFetch } from "./api";
 import { uploadImage } from "./uploads";
 
 export interface PortfolioItem {
@@ -25,7 +24,10 @@ export async function createPortfolio(data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const result = await apiPost<PortfolioItem>("portfolio", data);
+  const result = await apiFetch<PortfolioItem>("/portfolio", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
   console.log("Portfolio API create response:", result);
   return result;
 }
@@ -41,31 +43,7 @@ export async function getAllPortfolio(): Promise<PortfolioItem[]> {
 
 export async function getPortfolio() {
   try {
-    const url = buildApiUrl("portfolio");
-    console.log("Portfolio API URL:", url);
-    const res = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      credentials: "omit",
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      console.error("API ERROR:", res.status);
-      return [];
-    }
-
-    const text = await res.text();
-
-    if (!text) {
-      console.warn("Empty response");
-      return [];
-    }
-
-    const data = JSON.parse(text);
+    const data = await apiFetch<any>("/portfolio");
 
     // Handle all possible backend formats
     if (Array.isArray(data)) return data;
@@ -93,7 +71,10 @@ export async function updatePortfolio(id: number, data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const result = await apiPut<PortfolioItem>(`portfolio/${id}`, data);
+  const result = await apiFetch<PortfolioItem>(`/portfolio/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
   console.log("Portfolio API update response:", result);
   return result;
 }
@@ -103,7 +84,9 @@ export async function updatePortfolio(id: number, data: {
  * @param id Portfolio item ID
  */
 export async function deletePortfolio(id: number): Promise<void> {
-  await apiDelete(`portfolio/${id}`);
+  await apiFetch<unknown>(`/portfolio/${id}`, {
+    method: "DELETE",
+  });
 
   console.log("Portfolio API delete success");
 }

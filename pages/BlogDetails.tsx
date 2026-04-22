@@ -21,8 +21,8 @@ const BlogDetails: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
-    console.log("Blog Details API fetch:", `blogs/${id}`);
-    apiFetch<Blog>(`blogs/${id}`)
+    console.log("Blog Details API fetch:", `/blogs/${id}`);
+    apiFetch<Blog>(`/blogs/${id}`)
       .then((data) => {
         console.log("Blog Details API response:", data);
         setBlog(data);

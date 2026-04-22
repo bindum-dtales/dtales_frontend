@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { uploadImage } from "../src/lib/uploads";
-import { apiPost } from "../src/lib/api";
+import { apiFetch } from "../src/lib/api";
 import { parseDocxToHtml } from "../src/lib/docxParser";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
 
@@ -114,7 +114,10 @@ export default function AdminBlogEditor() {
       
       console.log("Publishing blog with payload:", JSON.stringify(payload, null, 2));
       
-      const responseData = await apiPost<any>("blogs", payload);
+      const responseData = await apiFetch<any>("/blogs", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       console.log("Publish response:", responseData);
 
       navigate("/admin/dashboard");

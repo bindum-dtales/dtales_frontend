@@ -38,7 +38,7 @@ const Blogs: React.FC = () => {
             }
 
 			try {
-                const data = await apiFetch<Blog[]>("blogs/public");
+                const data = await apiFetch<Blog[]>("/blogs/public");
                 const safeBlogs = Array.isArray(data) ? data : [];
 
                 console.log("Blogs API response:", data);

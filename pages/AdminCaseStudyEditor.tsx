@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { Upload, X } from "lucide-react";
-import { apiFetch, apiPost, apiPut } from "../src/lib/api";
+import { apiFetch } from "../src/lib/api";
 import { uploadImage } from "../src/lib/uploads";
 import { parseDocxToHtml } from "../src/lib/docxParser";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
@@ -59,7 +59,7 @@ const AdminCaseStudyEditor: React.FC = () => {
           title: string;
           slug: string;
           cover_image_url?: string | null;
-        }>(`case-studies/${id}`);
+        }>(`/case-studies/${id}`);
         setTitle(data.title || "");
         setCoverImageUrl(data.cover_image_url || "");
       } catch (e: any) {
@@ -146,9 +146,15 @@ const AdminCaseStudyEditor: React.FC = () => {
       }
 
       if (isEdit && id) {
-        await apiPut(`case-studies/${id}`, payload);
+        await apiFetch<unknown>(`/case-studies/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
       } else {
-        await apiPost("case-studies", payload);
+        await apiFetch<unknown>("/case-studies", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
       }
     } catch (e: any) {
       setError(e.message || "An unexpected error occurred");
@@ -188,9 +194,15 @@ const AdminCaseStudyEditor: React.FC = () => {
       console.log("Publishing case study with payload:", JSON.stringify(payload, null, 2));
 
       if (isEdit && id) {
-        await apiPut(`case-studies/${id}`, payload);
+        await apiFetch<unknown>(`/case-studies/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
       } else {
-        await apiPost("case-studies", payload);
+        await apiFetch<unknown>("/case-studies", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
       }
 
       navigate("/admin/dashboard");

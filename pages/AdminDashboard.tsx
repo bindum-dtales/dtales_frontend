@@ -34,7 +34,7 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     setBlogLoading(true);
-    apiFetch<Blog[]>("blogs")
+    apiFetch<Blog[]>("/blogs")
       .then(setBlogs)
       .catch((err) => setBlogError(err.message || "Failed to load blogs"))
       .finally(() => setBlogLoading(false));
@@ -42,7 +42,7 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     setCaseLoading(true);
-    apiFetch<CaseStudy[]>("case-studies")
+    apiFetch<CaseStudy[]>("/case-studies")
       .then(setCases)
       .catch((err) => setCaseError(err.message || "Failed to load case studies"))
       .finally(() => setCaseLoading(false));
@@ -50,7 +50,7 @@ const AdminDashboard: React.FC = () => {
 
   useEffect(() => {
     setPortfolioLoading(true);
-    apiFetch<Portfolio[]>("portfolio")
+    apiFetch<Portfolio[]>("/portfolio")
       .then(setPortfolio)
       .catch((err) => setPortfolioError(err.message || "Failed to load portfolio"))
       .finally(() => setPortfolioLoading(false));
