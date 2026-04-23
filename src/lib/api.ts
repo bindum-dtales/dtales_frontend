@@ -1,7 +1,4 @@
-const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
-
-// Temporary debug log to verify production env injection.
-console.log("API BASE:", import.meta.env.VITE_API_BASE_URL);
+const API_BASE = "https://api.dtales.tech";
 
 async function safeFetch(url: string, options?: RequestInit) {
   const res = await fetch(url, options);

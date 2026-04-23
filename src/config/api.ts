@@ -1,4 +1,4 @@
-export const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+export const BASE_URL = "https://api.dtales.tech";
 
 export function buildApiUrl(endpoint: string): string {
 	const cleanEndpoint = endpoint.startsWith("/api/")
