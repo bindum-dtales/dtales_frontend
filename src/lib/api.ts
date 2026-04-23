@@ -1,4 +1,7 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+
+// Temporary debug log to verify production env injection.
+console.log("API BASE:", import.meta.env.VITE_API_BASE_URL);
 
 async function safeFetch(url: string, options?: RequestInit) {
   const res = await fetch(url, options);
@@ -16,15 +19,15 @@ async function safeFetch(url: string, options?: RequestInit) {
 
 // BLOGS
 export const getBlogs = () =>
-  safeFetch(`${BASE_URL}/api/blogs`);
+  safeFetch(`${API_BASE}/api/blogs`);
 
 // CASE STUDIES
 export const getCaseStudies = () =>
-  safeFetch(`${BASE_URL}/api/case-studies`);
+  safeFetch(`${API_BASE}/api/case-studies`);
 
 // PORTFOLIO
 export const getPortfolio = () =>
-  safeFetch(`${BASE_URL}/api/portfolio`);
+  safeFetch(`${API_BASE}/api/portfolio`);
 
 function buildApiUrl(endpoint: string): string {
   if (/^https?:\/\//i.test(endpoint)) {
@@ -35,7 +38,7 @@ function buildApiUrl(endpoint: string): string {
     ? endpoint
     : `/api/${endpoint.replace(/^\//, "")}`;
 
-  return `${BASE_URL}${normalized}`;
+  return `${API_BASE}${normalized}`;
 }
 
 export async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
