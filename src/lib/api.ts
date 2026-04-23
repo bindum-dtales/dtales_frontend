@@ -12,10 +12,14 @@ export async function apiFetch<T>(endpoint: string, options?: RequestInit): Prom
 
   const text = await res.text();
 
+  if (!text.trim()) {
+    return undefined as T;
+  }
+
   try {
     return JSON.parse(text);
   } catch (err) {
-    console.error("API returned HTML instead of JSON:", text);
-    throw new Error(`Invalid JSON from ${url}`);
+    console.error("Invalid JSON:", text);
+    throw new Error("Backend returned non-JSON response");
   }
 }
