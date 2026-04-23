@@ -1,8 +1,7 @@
 /**
  * Image Proxy Helper - Converts Supabase URLs to backend proxy URLs
  * 
- * Extracts filename from Supabase URL and routes through backend proxy
- * Backend route: https://dtales-backend-gzlj.onrender.com/media/:filename
+ * Extracts filename from Supabase URL and routes through the backend media proxy
  */
 
 import { API_BASE_URL } from '../src/config/api';
@@ -13,7 +12,7 @@ const BACKEND_MEDIA_PROXY = `${API_BASE_URL}/media`;
 /**
  * Converts a Supabase image URL to a backend proxied URL
  * @param fullUrl - Full Supabase URL (e.g., https://upkfbtqljrnlufflknkv.supabase.co/storage/v1/object/public/dtales-media/images/filename.png)
- * @returns Backend proxy URL (e.g., https://dtales-backend-gzlj.onrender.com/media/filename.png) or original URL if not a Supabase URL
+ * @returns Backend proxy URL (e.g., /media/filename.png behind the configured API host) or original URL if not a Supabase URL
  */
 export function getProxiedImageUrl(fullUrl: string | null | undefined): string | null {
   if (!fullUrl) {

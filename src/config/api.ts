@@ -1,6 +1,4 @@
-export const BASE_URL =
-	import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ||
-	"https://dtales.tech/api";
+export const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 
 export function buildApiUrl(endpoint: string): string {
 	const cleanEndpoint = endpoint.replace(/^\//, "");

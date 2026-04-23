@@ -1,9 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://dtales.tech/api";
-
-export function buildApiUrl(endpoint: string): string {
-  const clean = endpoint.replace(/^\/+/, "");
-  return `${BASE_URL}/${clean}`;
-}
+import { buildApiUrl } from "../config/api";
 
 export async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = buildApiUrl(endpoint);

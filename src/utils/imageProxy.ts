@@ -2,7 +2,7 @@
  * Image Proxy Utility
  * Converts Supabase image URLs to backend proxy URLs
  * 
- * Backend proxy route: https://dtales-backend-gzlj.onrender.com/media/:filename
+ * Backend proxy route: backend media proxy /media/:filename
  */
 
 import { API_BASE_URL } from '../config/api';
