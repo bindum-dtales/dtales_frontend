@@ -59,7 +59,7 @@ const AdminCaseStudyEditor: React.FC = () => {
           title: string;
           slug: string;
           cover_image_url?: string | null;
-        }>(`/case-studies/${id}`);
+        }>(`/api/case-studies/${id}`);
         setTitle(data.title || "");
         setCoverImageUrl(data.cover_image_url || "");
       } catch (e: any) {
@@ -146,12 +146,12 @@ const AdminCaseStudyEditor: React.FC = () => {
       }
 
       if (isEdit && id) {
-        await apiFetch<unknown>(`/case-studies/${id}`, {
+        await apiFetch<unknown>(`/api/case-studies/${id}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
       } else {
-        await apiFetch<unknown>("/case-studies", {
+        await apiFetch<unknown>("/api/case-studies", {
           method: "POST",
           body: JSON.stringify(payload),
         });
@@ -194,12 +194,12 @@ const AdminCaseStudyEditor: React.FC = () => {
       console.log("Publishing case study with payload:", JSON.stringify(payload, null, 2));
 
       if (isEdit && id) {
-        await apiFetch<unknown>(`/case-studies/${id}`, {
+        await apiFetch<unknown>(`/api/case-studies/${id}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
       } else {
-        await apiFetch<unknown>("/case-studies", {
+        await apiFetch<unknown>("/api/case-studies", {
           method: "POST",
           body: JSON.stringify(payload),
         });

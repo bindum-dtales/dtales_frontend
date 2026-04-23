@@ -24,7 +24,7 @@ export async function createPortfolio(data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const result = await apiFetch<PortfolioItem>("/portfolio", {
+  const result = await apiFetch<PortfolioItem>("/api/portfolio", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -43,7 +43,7 @@ export async function getAllPortfolio(): Promise<PortfolioItem[]> {
 
 export async function getPortfolio() {
   try {
-    const data = await apiFetch<any>("/portfolio");
+    const data = await apiFetch<any>("/api/portfolio");
 
     // Handle all possible backend formats
     if (Array.isArray(data)) return data;
@@ -71,7 +71,7 @@ export async function updatePortfolio(id: number, data: {
   cover_image_url: string;
   published: boolean;
 }): Promise<PortfolioItem> {
-  const result = await apiFetch<PortfolioItem>(`/portfolio/${id}`, {
+  const result = await apiFetch<PortfolioItem>(`/api/portfolio/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),
   });
@@ -84,7 +84,7 @@ export async function updatePortfolio(id: number, data: {
  * @param id Portfolio item ID
  */
 export async function deletePortfolio(id: number): Promise<void> {
-  await apiFetch<unknown>(`/portfolio/${id}`, {
+  await apiFetch<unknown>(`/api/portfolio/${id}`, {
     method: "DELETE",
   });
 

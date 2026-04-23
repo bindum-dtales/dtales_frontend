@@ -20,7 +20,7 @@ export async function uploadImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const data = await apiFetch<{ url?: string }>("/uploads/image", {
+  const data = await apiFetch<{ url?: string }>("/api/uploads/image", {
     method: "POST",
     headers: {},
     body: formData,
@@ -52,7 +52,7 @@ export async function uploadDocx(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const data = await apiFetch<{ url?: string }>("/uploads/docx", {
+  const data = await apiFetch<{ url?: string }>("/api/uploads/docx", {
     method: "POST",
     headers: {},
     body: formData,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { apiFetch } from "../src/lib/api";
+import { getBlogs } from "@/lib/api";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
@@ -38,7 +38,7 @@ const Blogs: React.FC = () => {
             }
 
 			try {
-                const data = await apiFetch<Blog[]>("/blogs/public");
+                const data = await getBlogs();
                 const safeBlogs = Array.isArray(data) ? data : [];
 
                 console.log("Blogs API response:", data);
@@ -57,7 +57,9 @@ const Blogs: React.FC = () => {
                 console.error("Blogs API failed, checking cache");
 
                 if (isActive) {
-                    setBlogs(Array.isArray(cached) ? cached : []);
+                    if (Array.isArray(cached)) {
+                        setBlogs(cached);
+                    }
 
                     if (initialLoad && !Array.isArray(cached)) {
                         setError("Failed to load blogs. Please try again later.");

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { getPortfolio } from "../src/lib/portfolioApi";
+import { getPortfolio } from "@/lib/api";
 
 export default function Portfolio() {
   const [portfolio, setPortfolio] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPortfolio = async () => {
+    async function load() {
       try {
         const data = await getPortfolio();
 
@@ -15,7 +15,6 @@ export default function Portfolio() {
         // Accept empty array as valid
         if (!Array.isArray(data)) {
           console.error("Invalid response format:", data);
-          setPortfolio([]);
           return;
         }
 
@@ -23,13 +22,12 @@ export default function Portfolio() {
 
       } catch (err) {
         console.error("REAL ERROR:", err);
-        setPortfolio([]); // fallback instead of error UI
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    fetchPortfolio();
+    load();
   }, []);
 
   if (loading) return <p>Loading...</p>;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { apiFetch } from "../src/lib/api";
+import { getCaseStudies } from "@/lib/api";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
 
@@ -38,7 +38,7 @@ const CaseStudies: React.FC = () => {
             }
 
 			try {
-                const data = await apiFetch<CaseStudy[]>("/case-studies/public");
+                const data = await getCaseStudies();
                 const safeCaseStudies = Array.isArray(data) ? data : [];
 
                 console.log("Case Studies API response:", data);
@@ -57,7 +57,9 @@ const CaseStudies: React.FC = () => {
                 console.error("Case Studies API failed, checking cache");
 
                 if (isActive) {
-                    setCaseStudies(Array.isArray(cached) ? cached : []);
+                    if (Array.isArray(cached)) {
+                        setCaseStudies(cached);
+                    }
 
                     if (initialLoad && !Array.isArray(cached)) {
                         setError("Failed to load case studies. Please try again later.");

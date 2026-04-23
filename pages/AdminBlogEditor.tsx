@@ -114,7 +114,7 @@ export default function AdminBlogEditor() {
       
       console.log("Publishing blog with payload:", JSON.stringify(payload, null, 2));
       
-      const responseData = await apiFetch<any>("/blogs", {
+      const responseData = await apiFetch<any>("/api/blogs", {
         method: "POST",
         body: JSON.stringify(payload),
       });
