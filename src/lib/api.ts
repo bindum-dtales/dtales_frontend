@@ -1,4 +1,15 @@
-const API_BASE = "https://api.dtales.tech";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+function getApiBase(): string {
+  if (!API_BASE) {
+    console.error(
+      "[API CONFIG ERROR] VITE_API_BASE_URL is undefined. API requests cannot be constructed."
+    );
+    throw new Error("Missing VITE_API_BASE_URL");
+  }
+
+  return API_BASE.replace(/\/+$/, "");
+}
 
 async function safeFetch(url: string, options?: RequestInit) {
   const res = await fetch(url, options);
@@ -16,15 +27,15 @@ async function safeFetch(url: string, options?: RequestInit) {
 
 // BLOGS
 export const getBlogs = () =>
-  safeFetch(`${API_BASE}/api/blogs`);
+  safeFetch(`${getApiBase()}/api/blogs`);
 
 // CASE STUDIES
 export const getCaseStudies = () =>
-  safeFetch(`${API_BASE}/api/case-studies`);
+  safeFetch(`${getApiBase()}/api/case-studies`);
 
 // PORTFOLIO
 export const getPortfolio = () =>
-  safeFetch(`${API_BASE}/api/portfolio`);
+  safeFetch(`${getApiBase()}/api/portfolio`);
 
 function buildApiUrl(endpoint: string): string {
   if (/^https?:\/\//i.test(endpoint)) {
@@ -35,7 +46,7 @@ function buildApiUrl(endpoint: string): string {
     ? endpoint
     : `/api/${endpoint.replace(/^\//, "")}`;
 
-  return `${API_BASE}${normalized}`;
+  return `${getApiBase()}${normalized}`;
 }
 
 export async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
