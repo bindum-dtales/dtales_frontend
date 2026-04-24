@@ -32,3 +32,16 @@ All uploads now use **Supabase Storage** for permanent, reliable storage.
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Chrome Stale Cache Fix (Server/CDN)
+
+If Chrome keeps loading old JS/CSS after deploy, use deployment-side cache control instead of app logic changes.
+
+1. Configure Nginx to disable caching for `index.html`.
+2. Keep hashed build filenames for static assets (already configured in `vite.config.ts`).
+3. In Hostinger, clear both site cache and CDN cache.
+4. Force a clean deploy by removing old files in `public_html` (or app folder), then upload fresh `dist/` files.
+5. Test with a cache-bypass URL like `https://dtales.tech/?v=2`.
+6. Restart Nginx if you manage a VPS: `sudo systemctl restart nginx`.
+
+Use `nginx-cache-control.conf` in this repository as the baseline config snippet.
