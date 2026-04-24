@@ -11,14 +11,17 @@ export default function Portfolio() {
         const data = await getPortfolio();
 
         console.log("Portfolio DATA:", data);
+        const portfolioData = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : null;
 
-        // Accept empty array as valid
-        if (!Array.isArray(data)) {
+        if (!portfolioData) {
           console.error("Invalid response format:", data);
-          return;
         }
 
-        setPortfolio(data);
+        setPortfolio(portfolioData || []);
 
       } catch (err) {
         console.error("REAL ERROR:", err);
@@ -34,14 +37,14 @@ export default function Portfolio() {
 
   return (
     <div>
-      {portfolio.length === 0 ? (
-        <p>No portfolio items available</p>
-      ) : (
+      {portfolio && portfolio.length > 0 ? (
         portfolio.map((item: any) => (
           <div key={item.id}>
             <h3>{item.title}</h3>
           </div>
         ))
+      ) : (
+        <p>No portfolio items available</p>
       )}
     </div>
   );
