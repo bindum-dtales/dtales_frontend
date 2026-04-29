@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import heroOne from "@/src/assets/1.png";
 import heroTwo from "@/src/assets/2.png";
 import heroThree from "@/src/assets/3.png";
@@ -18,6 +19,7 @@ type PortfolioItem = {
   category: string;
   cover_image_url: string;
   link?: string;
+  slug?: string;
 };
 
 const heroSlides = [heroOne, heroTwo, heroThree, heroFour];
@@ -146,9 +148,31 @@ type PortfolioCardProps = {
 
 export function PortfolioCard({ item }: PortfolioCardProps) {
   const categoryLabel = formatCategory(item.category);
+  const navigate = useNavigate();
+
+  const handleProjectClick = () => {
+    if (item.link) {
+      window.open(item.link, "_blank", "noopener,noreferrer");
+    } else if (item.slug) {
+      navigate(`/portfolio/${item.slug}`);
+    } else {
+      console.warn("No link or slug found for project:", item);
+    }
+  };
 
   return (
-    <article className="group relative overflow-hidden rounded-3xl bg-neutral-900 shadow-[0_16px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01]">
+    <article
+      onClick={handleProjectClick}
+      className="group relative cursor-pointer overflow-hidden rounded-3xl bg-neutral-900 shadow-[0_16px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01]"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleProjectClick();
+        }
+      }}
+    >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={item.cover_image_url}
