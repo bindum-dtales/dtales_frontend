@@ -1,13 +1,10 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://api.dtales.tech";
+
+if (!import.meta.env.VITE_API_BASE_URL) {
+  console.warn("VITE_API_BASE_URL not found, using fallback API");
+}
 
 function getApiBase(): string {
-  if (!API_BASE) {
-    console.error(
-      "[API CONFIG ERROR] VITE_API_BASE_URL is undefined. API requests cannot be constructed."
-    );
-    throw new Error("Missing VITE_API_BASE_URL");
-  }
-
   return API_BASE.replace(/\/+$/, "");
 }
 
