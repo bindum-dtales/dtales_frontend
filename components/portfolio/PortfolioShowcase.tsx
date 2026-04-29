@@ -1,35 +1,47 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import heroOne from "@/src/assets/1.png";
 import heroTwo from "@/src/assets/2.png";
 import heroThree from "@/src/assets/3.png";
 import heroFour from "@/src/assets/4.png";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://api.dtales.tech";
+
+if (!import.meta.env.VITE_API_BASE_URL) {
+  console.warn("VITE_API_BASE_URL not found, using fallback API");
+}
+
 type PortfolioCategory = "All" | "Web" | "Video" | "Branding";
+
 type PortfolioItem = {
-  id: number;
+  id: number | string;
   title: string;
-  category: Exclude<PortfolioCategory, "All">;
-  image: string;
+  category: string;
+  cover_image_url: string;
+  link?: string;
 };
 
 const heroSlides = [heroOne, heroTwo, heroThree, heroFour];
+const filters: PortfolioCategory[] = ["All", "Web", "Video", "Branding"];
 
-const portfolioItems: PortfolioItem[] = [
-  { id: 1, title: "Project Name", category: "Web", image: heroOne },
-  { id: 2, title: "Project Name", category: "Video", image: heroTwo },
-  { id: 3, title: "Project Name", category: "Branding", image: heroThree },
-  { id: 4, title: "Project Name", category: "Web", image: heroFour },
-  { id: 5, title: "Project Name", category: "Video", image: heroOne },
-  { id: 6, title: "Project Name", category: "Branding", image: heroTwo },
-  { id: 7, title: "Project Name", category: "Web", image: heroThree },
-  { id: 8, title: "Project Name", category: "Branding", image: heroFour },
-];
+const normalizeCategory = (value: string) => value.trim().toLowerCase();
+
+const formatCategory = (value: string) => {
+  const cleaned = value.trim();
+  if (!cleaned) return "Project";
+  return cleaned
+    .split(/[_\s-]+/)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
 
 export function HeroSlider() {
   const [trackIndex, setTrackIndex] = useState(1);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    setLoaded(true);
+
     const interval = window.setInterval(() => {
       setTrackIndex((prev) => prev - 1);
     }, 2800);
@@ -76,18 +88,19 @@ export function HeroSlider() {
 
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.10),transparent_35%)]" />
 
-        <div className="absolute inset-0 flex items-end">
-          <div className="mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 lg:px-8 lg:pb-12">
-            <div className="max-w-xl rounded-3xl border border-white/10 bg-black/25 p-5 shadow-2xl shadow-black/20 backdrop-blur-md sm:p-6">
-              <p className="text-[11px] uppercase tracking-[0.35em] text-white/70">Selected Work</p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-                Portfolio
-              </h1>
-              <p className="mt-3 max-w-lg text-sm leading-6 text-white/80 sm:text-base">
-                A curated showcase of web, video, and branding projects presented with a clean,
-                modern layout.
-              </p>
-            </div>
+        <div className="absolute inset-0 flex items-center justify-center px-4">
+          <div
+            className={`max-w-3xl rounded-3xl border border-white/10 bg-black/25 px-6 py-8 text-center shadow-2xl shadow-black/20 backdrop-blur-md sm:px-10 sm:py-12 transition-all duration-700 ease-out ${
+              loaded ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+            }`}
+          >
+            <p className="text-[11px] uppercase tracking-[0.4em] text-white/70">Selected Work</p>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Portfolio
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/80 sm:text-base">
+              A curated showcase of web, video, and branding projects.
+            </p>
           </div>
         </div>
       </div>
@@ -101,8 +114,6 @@ type FilterBarProps = {
 };
 
 export function FilterBar({ activeFilter, onChange }: FilterBarProps) {
-  const filters: PortfolioCategory[] = ["All", "Web", "Video", "Branding"];
-
   return (
     <div className="flex w-full justify-center px-4 pt-8 sm:px-6 lg:px-8">
       <div className="inline-flex flex-wrap items-center justify-center gap-3 rounded-full border border-neutral-200 bg-white/90 p-2 shadow-sm backdrop-blur">
@@ -134,11 +145,13 @@ type PortfolioCardProps = {
 };
 
 export function PortfolioCard({ item }: PortfolioCardProps) {
+  const categoryLabel = formatCategory(item.category);
+
   return (
     <article className="group relative overflow-hidden rounded-3xl bg-neutral-900 shadow-[0_16px_40px_rgba(0,0,0,0.08)] ring-1 ring-black/5 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01]">
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
-          src={item.image}
+          src={item.cover_image_url}
           alt={item.title}
           className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
@@ -147,7 +160,7 @@ export function PortfolioCard({ item }: PortfolioCardProps) {
 
         <div className="absolute inset-x-0 bottom-0 p-5">
           <div className="translate-y-6 opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/70">{item.category}</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/70">{categoryLabel}</p>
             <h3 className="mt-2 text-xl font-semibold tracking-tight text-white sm:text-2xl">
               {item.title}
             </h3>
@@ -181,18 +194,70 @@ export function PortfolioGrid({ items }: PortfolioGridProps) {
 }
 
 export function PortfolioShowcase() {
+  const [projects, setProjects] = useState<PortfolioItem[]>([]);
   const [activeFilter, setActiveFilter] = useState<PortfolioCategory>("All");
+  const [loading, setLoading] = useState(true);
 
-  const filteredItems =
-    activeFilter === "All"
-      ? portfolioItems
-      : portfolioItems.filter((item) => item.category === activeFilter);
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProjects = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/portfolio`);
+        const data = await response.json();
+        const safeProjects = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.items)
+              ? data.items
+              : [];
+
+        if (isMounted) {
+          setProjects(safeProjects);
+        }
+      } catch (error) {
+        console.error("Failed to load portfolio projects:", error);
+        if (isMounted) {
+          setProjects([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadProjects();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredItems = useMemo(() => {
+    if (activeFilter === "All") {
+      return projects;
+    }
+
+    return projects.filter(
+      (item) => normalizeCategory(item.category) === normalizeCategory(activeFilter)
+    );
+  }, [activeFilter, projects]);
 
   return (
     <main className="min-h-screen bg-[#f4f4f2] text-neutral-950">
       <HeroSlider />
       <FilterBar activeFilter={activeFilter} onChange={setActiveFilter} />
-      <PortfolioGrid items={filteredItems} />
+      {loading ? (
+        <div className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border border-neutral-200 bg-white px-6 py-10 text-center text-neutral-600 shadow-sm">
+            Loading portfolio...
+          </div>
+        </div>
+      ) : (
+        <PortfolioGrid items={filteredItems} />
+      )}
     </main>
   );
 }
