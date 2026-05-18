@@ -9,7 +9,14 @@ function getApiBase(): string {
 }
 
 async function safeFetch(url: string, options?: RequestInit) {
-  const res = await fetch(url, options);
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+    ...options,
+  });
 
   const text = await res.text();
 
@@ -24,11 +31,17 @@ async function safeFetch(url: string, options?: RequestInit) {
 
 // BLOGS
 export const getBlogs = () =>
-  safeFetch(`${getApiBase()}/api/blogs`);
+  safeFetch(`${getApiBase()}/api/blogs`).catch((err) => {
+    console.error("Blog fetch failed:", err);
+    throw err;
+  });
 
 // CASE STUDIES
 export const getCaseStudies = () =>
-  safeFetch(`${getApiBase()}/api/case-studies`);
+  safeFetch(`${getApiBase()}/api/case-studies`).catch((err) => {
+    console.error("Case studies fetch failed:", err);
+    throw err;
+  });
 
 // PORTFOLIO
 export const getPortfolio = () =>
