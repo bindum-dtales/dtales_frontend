@@ -3,6 +3,9 @@ export interface TeamMember {
   role: string;
   image: string;
   bio: string;
+  linkedin?: string;
+  email?: string;
+  reverse?: boolean;
 }
 
 export interface Testimonial {

@@ -32,7 +32,6 @@ const Team: React.FC = () => {
       <section className="py-24 px-6 bg-[#F5F5F7]">
         <div className="max-w-7xl mx-auto space-y-24">
           {TEAM_MEMBERS.map((member, index) => {
-            const isYashas = member.name.toLowerCase() === 'yashas niranjana';
             return (
               <motion.div
                 key={member.name}
@@ -65,10 +64,10 @@ const Team: React.FC = () => {
                   </p>
                   
                   <div className="flex gap-6">
-                    {isYashas ? (
+                    {member.linkedin && member.email ? (
                       <>
                         <a
-                          href="https://www.linkedin.com/in/yash017?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+                          href={member.linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 text-lg font-semibold text-black hover:text-blue-600 transition-colors group"
@@ -76,41 +75,7 @@ const Team: React.FC = () => {
                           <Linkedin size={24} /> <span className="group-hover:underline">LinkedIn</span>
                         </a>
                         <a
-                          href="mailto:contact@dtales.tech"
-                          className="flex items-center gap-2 text-lg font-semibold text-black hover:text-blue-600 transition-colors group"
-                        >
-                          <Mail size={24} /> <span className="group-hover:underline">Get in touch</span>
-                        </a>
-                      </>
-                    ) : member.name === "Bindu Mohan" ? (
-                      <>
-                        <a
-                          href="https://www.linkedin.com/in/bindu-mohan-54201438/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-lg font-semibold text-black hover:text-blue-600 transition-colors group"
-                        >
-                          <Linkedin size={24} /> <span className="group-hover:underline">LinkedIn</span>
-                        </a>
-                        <a
-                          href="mailto:contact@dtales.tech"
-                          className="flex items-center gap-2 text-lg font-semibold text-black hover:text-blue-600 transition-colors group"
-                        >
-                          <Mail size={24} /> <span className="group-hover:underline">Get in touch</span>
-                        </a>
-                      </>
-                    ) : member.name === "Sneha Peri" ? (
-                      <>
-                        <a
-                          href="https://www.linkedin.com/in/snehaperi/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-lg font-semibold text-black hover:text-blue-600 transition-colors group"
-                        >
-                          <Linkedin size={24} /> <span className="group-hover:underline">LinkedIn</span>
-                        </a>
-                        <a
-                          href="mailto:contact@dtales.tech"
+                          href={`mailto:${member.email}`}
                           className="flex items-center gap-2 text-lg font-semibold text-black hover:text-blue-600 transition-colors group"
                         >
                           <Mail size={24} /> <span className="group-hover:underline">Get in touch</span>

@@ -7,6 +7,7 @@ import {
 import { Menu, X, ChevronDown } from "lucide-react";
 import dtalesLogo from "../src/assets/dtales-logo.png";
 
+const SHOW_ARTICLES = false;
 
 const Navbar: React.FC = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -118,49 +119,50 @@ const Navbar: React.FC = () => {
             Our Team
           </Link>
 
-          {/* Dropdown — Articles */}
-          <div
-            className="relative"
-            onMouseEnter={() => setActiveDropdown("articles")}
-            onMouseLeave={() => setActiveDropdown(null)}
-          >
-            <button className="flex items-center gap-1 text-sm font-medium text-white hover:opacity-70 transition">
-              Articles
-              <ChevronDown
-                size={14}
-                className={`transition-transform duration-300 ${
-                  activeDropdown === "articles" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+          {SHOW_ARTICLES && (
+            <div
+              className="relative"
+              onMouseEnter={() => setActiveDropdown("articles")}
+              onMouseLeave={() => setActiveDropdown(null)}
+            >
+              <button className="flex items-center gap-1 text-sm font-medium text-white hover:opacity-70 transition">
+                Articles
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform duration-300 ${
+                    activeDropdown === "articles" ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
 
-            <AnimatePresence>
-              {activeDropdown === "articles" && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-xl shadow-2xl overflow-hidden"
-                >
-                  <div className="p-1">
-                    <Link
-                      to="/blogs"
-                      className="block px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg"
-                    >
-                      Blogs
-                    </Link>
-                    <Link
-                      to="/case-studies"
-                      className="block px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg"
-                    >
-                      Case Studies
-                    </Link>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+              <AnimatePresence>
+                {activeDropdown === "articles" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-black/90 backdrop-blur-2xl border border-white/20 rounded-xl shadow-2xl overflow-hidden"
+                  >
+                    <div className="p-1">
+                      <Link
+                        to="/blogs"
+                        className="block px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg"
+                      >
+                        Blogs
+                      </Link>
+                      <Link
+                        to="/case-studies"
+                        className="block px-4 py-3 text-sm text-white hover:bg-white/10 rounded-lg"
+                      >
+                        Case Studies
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
 
           <button 
             onClick={() => navigate('/contact')}
@@ -223,25 +225,27 @@ const Navbar: React.FC = () => {
               >
                 Our Team
               </Link>
-              <div className="py-3">
-                <span className="block text-base font-semibold text-white/80 mb-2">Articles</span>
-                <div className="flex flex-col gap-2 pl-2">
-                  <Link
-                    to="/blogs"
-                    className="text-sm text-white transition-colors duration-200 hover:text-white/80"
-                    onClick={() => setIsMobileOpen(false)}
-                  >
-                    Blogs
-                  </Link>
-                  <Link
-                    to="/case-studies"
-                    className="text-sm text-white transition-colors duration-200 hover:text-white/80"
-                    onClick={() => setIsMobileOpen(false)}
-                  >
-                    Case Studies
-                  </Link>
+              {SHOW_ARTICLES && (
+                <div className="py-3">
+                  <span className="block text-base font-semibold text-white/80 mb-2">Articles</span>
+                  <div className="flex flex-col gap-2 pl-2">
+                    <Link
+                      to="/blogs"
+                      className="text-sm text-white transition-colors duration-200 hover:text-white/80"
+                      onClick={() => setIsMobileOpen(false)}
+                    >
+                      Blogs
+                    </Link>
+                    <Link
+                      to="/case-studies"
+                      className="text-sm text-white transition-colors duration-200 hover:text-white/80"
+                      onClick={() => setIsMobileOpen(false)}
+                    >
+                      Case Studies
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="py-3">
                 <button
                   onClick={() => {

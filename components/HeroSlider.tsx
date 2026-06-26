@@ -92,7 +92,7 @@ const HeroSlider: React.FC = () => {
               transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
               className="overflow-hidden"
             >
-               <h1 className="text-5xl md:text-7xl lg:text-9xl font-bold tracking-tight text-white mb-6 drop-shadow-2xl">
+               <h1 className="text-5xl md:text-7xl lg:text-7xl font-bold tracking-tight text-white mb-6 drop-shadow-2xl">
                 {HERO_SLIDES[currentIndex].title}
               </h1>
             </motion.div>

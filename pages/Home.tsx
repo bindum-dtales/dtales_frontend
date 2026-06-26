@@ -56,7 +56,7 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
               >
-                DTALES Tech is your expert partner in Technical Storytelling and Market Enablement, committed to transforming complex innovation into market success by providing an end-to-end ecosystem of services. We go beyond traditional documentation, offering sophisticated strategy consulting, content process management, and toolchain optimization to build resilient knowledge base systems.
+                DTALES Tech is a fully-managed marketing and content agency. We own the entire content supply chain, from GTM strategy and product marketing to technical documentation and AI-era search visibility, so that your product and engineering teams never have to think about it.
               </motion.p>
               <motion.p
                 className="text-lg md:text-xl text-gray-600 leading-relaxed mt-6"
@@ -65,7 +65,25 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
               >
-                You can then enhance your market reach with specialized technical marketing content supported by professional creatives that articulate your value to technical buyers. Our agile approach ensures the consistent delivery of relevant, reliable product documentation and compelling market narratives, guaranteeing enhanced product understanding and experience with zero overhead for your product and engineering teams.
+                The content landscape changed when buyers started using LLMs to research vendors. A page that ranks on 2019-era Google does not get cited by an LLM. We build for both and have been doing it since before most agencies knew the difference.
+              </motion.p>
+              <motion.p
+                className="text-lg md:text-xl text-gray-600 leading-relaxed mt-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+              >
+                Every engagement runs on an AI-powered production model with human editorial oversight at every stage. We move faster than a traditional agency and ship content that is technically accurate, LLM-parseable, and built to convert.
+              </motion.p>
+              <motion.p
+                className="text-lg md:text-xl text-gray-600 leading-relaxed mt-6"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+              >
+                That’s Marketing &amp; Content engineered with Technology, for your growth!
               </motion.p>
             </div>
           </motion.div>
@@ -77,7 +95,7 @@ const Home: React.FC = () => {
          <div className="max-w-7xl mx-auto">
           <div className="mb-16 max-w-3xl mx-auto text-center">
            <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-black mb-6">
-             <TextColor text="What We Offer" />
+             <TextColor text="What we Do" />
            </h2>
            <p className="text-xl text-gray-500">
              Driving Market Impact with Information
@@ -97,9 +115,9 @@ const Home: React.FC = () => {
                 <div className="w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center mb-8">
                   <Lightbulb size={28} />
                 </div>
-                <h3 className="text-3xl font-bold mb-4">Strategy</h3>
+                <h3 className="text-3xl font-bold mb-4">Full Stack Product Marketing</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
-                  Define the architecture, process, and governance model for all technical communications, ensuring every piece of content is aligned to business goals.
+                  From first brief to sustained cadence, we own your GTM strategy, multi-channel campaign architecture, and social presence end-to-end with zero marketing overhead.
                 </p>
              </div>
              <div className="flex justify-end mt-8">
@@ -122,7 +140,7 @@ const Home: React.FC = () => {
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-8">
                   <img src={icon1} alt="Content icon" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="text-3xl font-bold mb-4">Content</h3>
+                <h3 className="text-3xl font-bold mb-4">Full Lifecycle Technical Content</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
                   We transform complex product information into crystal-clear, user-centric knowledge bases, APIs, and manuals that maximize product adoption and reduce support tickets.
                 </p>
@@ -147,9 +165,9 @@ const Home: React.FC = () => {
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-8">
                   <img src={icon2} alt="Creatives icon" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="text-3xl font-bold mb-4">Creatives</h3>
+                <h3 className="text-3xl font-bold mb-4">Search Visibility Structuring</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
-                  Design impactful infographics, explainer videos, and visual storytelling elements that simplify complex technical concepts and capture the attention of technical decision-makers.
+                  We build content that Perplexity, Gemini, and OpenAI Search cite when your buyers ask high-intent questions. 150% increase in AI citation inclusion within 180 days.
                 </p>
               </div>
               <div className="flex justify-end mt-8">
@@ -172,9 +190,9 @@ const Home: React.FC = () => {
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-8">
                   <img src={icon3} alt="Technology icon" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="text-3xl font-bold mb-4">Technology</h3>
+                <h3 className="text-3xl font-bold mb-4">Fully Managed AI-Powered Operations</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
-                  Implement, integrate, and manage next-generation Component Content Management Systems (CCMS) and AI-enabled documentation tools for maximum operational efficiency and future-proofing.
+                  AI handles research, formatting, and structure. Humans steer strategy, accuracy, and voice. DTALES Tech owns the entire content supply chain. 2,000-word technical article in under three hours, production cycle reduced from 14 days to 3.
                 </p>
               </div>
               <div className="flex justify-end mt-8">
