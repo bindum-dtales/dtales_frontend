@@ -1,258 +1,285 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FileText, 
-  BookOpen, 
-  Globe, 
-  Layout, 
-  Settings, 
-  Cpu, 
-  Video, 
-  BarChart, 
-  Users 
-} from 'lucide-react';
-import icon4 from '../src/assets/icon4.png';
 
-const Services: React.FC = () => {
-  const navigate = useNavigate();
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header with Background Image */}
-      <section className="relative py-40 text-center px-6 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 w-full h-full z-0">
-             <img 
-                src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
-                alt="Services Background"
-                className="w-full h-full object-cover opacity-50"
-             />
-             {/* Gradient overlay to blend with the content below */}
-             <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/80 to-white" />
-        </div>
-
-        <div className="max-w-4xl mx-auto relative z-10">
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="inline-block mb-6 px-5 py-2 rounded-full bg-white/50 backdrop-blur-md border border-blue-100 text-blue-600 font-semibold tracking-wide text-sm shadow-sm"
-            >
-                Expertise & Education
-            </motion.div>
-            <motion.h1
-                className="text-5xl md:text-7xl font-bold text-black mb-8 tracking-tighter"
-                initial={{ opacity: 0, y: -30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7 }}
-            >
-                Our Services
-            </motion.h1>
-            {/* Rewritten motion.p for clarity and to eliminate potential hidden issues */}
-            <motion.p
-                className="text-xl md:text-2xl text-gray-500 font-light leading-relaxed max-w-3xl mx-auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-            >
-                From comprehensive documentation strategies to future-ready training, we empower your product ecosystem
-            </motion.p>
-        </div>
-      </section>
-
-      {/* Technical Documentation Section */}
-      <section className="py-24 px-6 bg-[#F5F5F7]">
-        <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                {/* Left Content */}
-                <motion.div
-                    className="lg:col-span-5 relative lg:sticky lg:top-32"
-                    initial={{ opacity: 0, x: -30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                >
-                    <div className="w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center mb-8">
-                        <FileText size={28} />
-                    </div>
-                    <h2 className="text-4xl font-bold mb-6 text-dtales-navy tracking-tight">Technical Documentation</h2>
-                    <div className="w-20 h-1 bg-blue-500 mb-8"></div>
-                    <p className="text-lg text-gray-600 leading-relaxed mb-6">
-                        We transform complex product information into user-friendly and valuable content, now supercharged by the strategic integration of Intelligent Automation. 
-                    </p>
-                    <p className="text-lg text-gray-600 leading-relaxed">
-                         Our cutting-edge approach ensures your customers can effortlessly learn about and effectively use your products, significantly enhancing their overall experience through adaptive documentation.
-                    </p>
-                </motion.div>
-
-                {/* Right Grid */}
-                <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <ServiceCard 
-                        icon={<BarChart />}
-                        title="Pre-Sales & Marketing"
-                        description="Technical Pre-Sales and Marketing Collateral that bridges the gap between tech and business value."
-                        delay={0.1}
-                    />
-                    <ServiceCard 
-                        icon={<BookOpen />}
-                        title="User Manuals & API"
-                        description="Comprehensive User Manuals and detailed API Documentation for developers and end-users."
-                        delay={0.2}
-                    />
-                    <ServiceCard 
-                        icon={<Globe />}
-                        title="Online Help Systems"
-                        description="Interactive, searchable, and accessible online help systems for instant user support."
-                        delay={0.3}
-                    />
-                    <ServiceCard 
-                        icon={<Layout />}
-                        title="Information Portals"
-                        description="Centralized knowledge hubs organizing your product's entire information architecture."
-                        delay={0.4}
-                    />
-                    <ServiceCard 
-                        icon={<Settings />}
-                        title="Custom Solutions"
-                        description="Tailored documentation solutions designed specifically for your unique product requirements."
-                        delay={0.5}
-                    />
-                    <ServiceCard 
-                        iconImg={icon4}
-                        iconAlt="Social Media Management icon"
-                        title="Social Media Management"
-                        description="Creating and curating technical, platform-optimized content for LinkedIn and Instagram."
-                        delay={0.6}
-                    />
-                </div>
-            </div>
-        </div>
-      </section>
-
-      {/* Technical Writing Training Section */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start lg:flex-row-reverse">
-                {/* Right Content (Text) - Swapped for visual interest */}
-                <motion.div
-                    className="lg:col-span-5 lg:order-2 relative lg:sticky lg:top-32"
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                >
-                    <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-8">
-                        <Users size={28} />
-                    </div>
-                    <h2 className="text-4xl font-bold mb-6 text-dtales-navy tracking-tight">Technical Writing Training</h2>
-                    <div className="w-20 h-1 bg-black mb-8"></div>
-                    <p className="text-lg text-gray-600 leading-relaxed mb-6">
-                        Our technical writing training programs are designed to equip aspiring technical writers with the essential skills for the evolving landscape of technical documentation. 
-                    </p>
-                    <p className="text-lg text-gray-600 leading-relaxed mb-6">
-                        By understanding these emerging trends, our trainees will be prepared to produce highly engaging, accessible, and user-centric documentation that leverages cutting-edge technologies.
-                    </p>
-                </motion.div>
-
-                {/* Left Grid (Cards) */}
-                <div className="lg:col-span-7 lg:order-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <ServiceCard 
-                        icon={<Cpu />}
-                        title="AI-Powered Content"
-                        description="Proficiency in leveraging Artificial Intelligence for efficient and scalable content creation."
-                        delay={0.1}
-                        bg="bg-blue-50"
-                        iconColor="text-blue-600"
-                    />
-                    <ServiceCard 
-                        icon={<Video />}
-                        title="Interactive Multimedia"
-                        description="Developing engaging content including video, interactive graphics, and dynamic tutorials."
-                        delay={0.2}
-                        bg="bg-purple-50"
-                        iconColor="text-purple-600"
-                    />
-                    <ServiceCard 
-                        icon={<BarChart />}
-                        title="Data-Driven Personalization"
-                        description="Using user data to create personalized documentation experiences that adapt to user needs."
-                        delay={0.3}
-                        bg="bg-green-50"
-                        iconColor="text-green-600"
-                    />
-                    <ServiceCard 
-                        icon={<Users />}
-                        title="Collaborative Platforms"
-                        description="Mastering modern collaborative authoring tools for seamless team workflows."
-                        delay={0.4}
-                        bg="bg-orange-50"
-                        iconColor="text-orange-600"
-                    />
-                </div>
-            </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-32 bg-dtales-navy text-white text-center">
-        <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8">Enhance your documentation today.</h2>
-            <p className="text-xl text-blue-200 mb-10">
-                Whether you need expert services or professional training, DTALES is your partner in excellence.
-            </p>
-                        <button
-                            className="bg-white text-dtales-navy px-10 py-4 rounded-full text-lg font-bold hover:scale-105 transition-all shadow-lg hover:shadow-white/20"
-                            onClick={() => navigate('/contact')}
-                            aria-label="Get in Touch"
-                        >
-                            Get in Touch
-                        </button>
-        </div>
-      </section>
-    </div>
-  );
+type ServiceSection = {
+    number: string;
+    category: string;
+    heading: string;
+    description: string;
+    bullets: string[];
+    outcomeLabel: string;
+    outcomes: Array<{ metric: string; text: string }>;
+    testimonial: {
+        quote: string;
+        author: string;
+        role: string;
+    };
 };
 
-// Helper Component for Cards
-const ServiceCard = ({ 
-    icon, 
-    iconImg,
-    iconAlt,
-    title, 
-    description, 
-    delay, 
-    fullWidth = false,
-    bg = "bg-white",
-    iconColor = "text-black"
-}: { 
-    icon?: React.ReactNode, 
-    iconImg?: string,
-    iconAlt?: string,
-    title: string, 
-    description: string, 
-    delay: number, 
-    fullWidth?: boolean,
-    bg?: string, 
-    iconColor?: string
-}) => (
-    <motion.div
-        className={`${bg} p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 ${fullWidth ? 'md:col-span-2' : ''}`}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay }}
-    >
-        <div className={`w-12 h-12 rounded-xl bg-gray-100/50 ${iconColor} flex items-center justify-center mb-6`}>
-            {iconImg ? (
-                <img src={iconImg} alt={iconAlt} className="w-full h-full object-contain" />
-            ) : (
-                React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<{ size?: number }>, { size: 24 }) : icon
-            )}
+const HERO_STATS = [
+    { value: '70%', label: 'Faster campaign deployment' },
+    { value: '3×', label: 'Content velocity, same budget' },
+    { value: '150%', label: 'Increase in AI citation within 180 days' },
+    { value: '14→3', label: 'Days production cycle' }
+];
+
+const SERVICE_SECTIONS: ServiceSection[] = [
+    {
+        number: '01',
+        category: 'STRATEGY · CAMPAIGNS · SOCIAL',
+        heading: 'Full Stack Product Marketing',
+        description:
+            'Your entire marketing function, without the headcount. From GTM strategy to launch execution to sustained social presence, DTALES Tech owns every deliverable from brief to distribution. When you share a product brief, we take it from there.',
+        bullets: [
+            'GTM strategy and multi-channel campaign architecture',
+            'Complete launch kit (email, blog, landing page, social) in 24 hours',
+            'Monthly social content calendar, derived from your technical assets (never manufactured from scratch)',
+            'Ongoing account management: LinkedIn, newsletters, and beyond',
+            'Technical and business track segmentation. Never cross-contaminated.'
+        ],
+        outcomeLabel: 'MEASURED OUTCOMES',
+        outcomes: [
+            { metric: '70%', text: 'Reduction in campaign deployment timelines' },
+            { metric: '4×', text: 'Distribution footprint per asset, no added headcount' },
+            { metric: '30%', text: 'Faster MQL to Closed-Won progression' }
+        ],
+        testimonial: {
+            quote:
+                'We went from a 3 week launch cycle to 4 days. DTALES handled us a complete, channel-ready kit the morning after our product brief call. Our sales team had collateral before the product was even announced internally.',
+            author: 'Head of Marketing',
+            role: 'Series B SaaS Company'
+        }
+    },
+    {
+        number: '02',
+        category: 'MARKETING COPY · DEVELOPER DOCS · API REFERENCE',
+        heading: 'Full Lifecycle Technical Content',
+        description:
+            'We bridge the gap between content that converts and documentation that retains. From whitepapers and battle cards to SDK guides and API references, written by people who can read the code. Every code block is tested before it’s published. No exceptions.',
+        bullets: [
+            'Technical whitepapers, solution briefs, and competitive battle cards',
+            'Getting Started guides, SDK documentation, and API reference',
+            'Code validation before any writing begins. Every snippet runs.',
+            'Docs-as-Code CI/CD pipeline with GitHub-based linting',
+            'TTFHW benchmark: new user achieves first successful API call in under 5 minutes'
+        ],
+        outcomeLabel: 'MEASURED OUTCOMES',
+        outcomes: [
+            { metric: '50%', text: 'Reduction in Time-to-First-Hello-World' },
+            { metric: '35%', text: 'Drop in developer support ticket volume' },
+            { metric: '25%', text: 'Faster enterprise deal closure via self-validating technical champions' }
+        ],
+        testimonial: {
+            quote:
+                'Our support queue dropped by a third within two months of the new docs going live. Devs were onboarding themselves. That\'s never happened before.',
+            author: 'VP of Engineering',
+            role: 'Network Infrastructure Management Platform'
+        }
+    },
+    {
+        number: '03',
+        category: 'SEO · GEO · AEO',
+        heading: 'AI-Era Search Visibility',
+        description:
+            "If an LLM can't find you, your buyers won't consider you. We write for Perplexity, Gemini, and OpenAI Search. Not 2019-era Google keywords. Your brand gets cited, recommended, and surfaced when high-intent buyers are actively comparing solutions.",
+        bullets: [
+            'Entity mapping and Knowledge Graph alignment',
+            'Semantic content architecture optimized for LLM retrieval',
+            'Prompt-response simulation across OpenAI, Claude, and Gemini APIs',
+            'Programmatic JSON-LD schema deployment (Product, TechArticle, FAQ, SoftwareApplication)',
+            'Weekly Citation Share of Voice reporting. A drop triggers immediate content injection.'
+        ],
+        outcomeLabel: 'MEASURED OUTCOMES',
+        outcomes: [
+            { metric: '150%', text: 'Increase in AI citation inclusion within 180 days' },
+            { metric: '40%+', text: 'Increase in qualified inbound demos' },
+            { metric: '0', text: 'Traffic dependency on zero-click search. Fully resilient.' }
+        ],
+        testimonial: {
+            quote:
+                "We asked Perplexity who the best vendors were in our space. We weren't on the list. Six months later, we're cited in the top three. That shift directly correlated with a 38% jump in demo requests.",
+            author: 'CEO',
+            role: 'Series B SaaS Company'
+        }
+    },
+    {
+        number: '04',
+        category: 'EDITORIAL STRATEGY · PRODUCTION · PUBLISHING',
+        heading: 'Fully-Managed Content Operations',
+        description:
+            "We take complete ownership of your content supply chain: from editorial planning through production, QA, and publishing. AI handles the structural heavy-lifting. Human editors ensure nothing goes out that isn't right. You get a live dashboard, not a status email.",
+        bullets: [
+            '90-day editorial roadmaps aligned to your product calendar and GEO/SEO targets',
+            'Bi-weekly production sprints with a live client dashboard (briefed → in production → in review → published)',
+            'AI-agent outlining + human-guided drafting with proprietary interview data injected',
+            'Automated brand and technical linting: fact cross-reference, style compliance, hallucination flagging',
+            'Human SME sign-off before every publish. No direct-from-LLM output, ever.'
+        ],
+        outcomeLabel: 'MEASURED OUTCOMES',
+        outcomes: [
+            { metric: '14→3', text: 'Days per production cycle' },
+            { metric: '4×', text: 'Content velocity without budget increase' },
+            { metric: '65%+', text: 'Internal gross margin. Operational efficiency built in.' }
+        ],
+        testimonial: {
+            quote:
+                "I stopped attending content review calls. Not because I didn't care, but because I didn't need to. The dashboard told me everything, and nothing shipped without passing the bar we set at the start.",
+            author: 'Marketing Manager',
+            role: 'Enterprise SaaS'
+        }
+    }
+];
+
+const Services: React.FC = () => {
+    const navigate = useNavigate();
+
+    return (
+        <div className="bg-white pt-24">
+            <section className="px-6 py-20 md:px-10 md:py-24 lg:px-14 lg:py-28">
+                <div className="mx-auto max-w-[1200px]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">What We Do</p>
+                    <h1 className="mt-6 max-w-5xl text-[clamp(2.2rem,5.4vw,5rem)] font-bold leading-[1.05] tracking-tight text-black">
+                        Marketing & Content. Built on Tech.
+                    </h1>
+                    <p className="mt-8 max-w-3xl text-base leading-[1.8] text-gray-600 md:text-lg">
+                        We run your entire content and marketing operation: Strategy, Execution, and Distribution, powered by AI,
+                        governed by human judgment. No coordination overhead. No dark months.
+                    </p>
+
+                    <div className="mt-16 border-t border-gray-200" />
+
+                    <div className="mt-10 grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-10">
+                        {HERO_STATS.map((stat) => (
+                            <div key={stat.label}>
+                                <p className="text-3xl font-bold leading-none text-black md:text-4xl">{stat.value}</p>
+                                <p className="mt-3 max-w-[14ch] text-sm leading-relaxed text-gray-500">{stat.label}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            <section className="px-6 pb-20 md:px-10 md:pb-24 lg:px-14 lg:pb-28">
+                <div className="mx-auto max-w-[1200px]">
+                    {SERVICE_SECTIONS.map((section, index) => {
+                        const reverse = index % 2 === 1;
+
+                        return (
+                            <div key={section.number}>
+                                {index > 0 ? <div className="mb-14 border-t border-gray-200 pt-14 md:mb-16 md:pt-16" /> : null}
+
+                                <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
+                                    <div className={reverse ? 'lg:order-2' : ''}>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-sm font-bold text-blue-600">{section.number}</span>
+                                            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">
+                                                {section.category}
+                                            </span>
+                                        </div>
+                                        <h2 className="mt-6 max-w-xl text-3xl font-bold leading-tight tracking-tight text-black md:text-4xl">
+                                            {section.heading}
+                                        </h2>
+                                        <p className="mt-6 max-w-xl text-base leading-[1.8] text-gray-600 md:text-lg">{section.description}</p>
+
+                                        <ul className="mt-8 space-y-4">
+                                            {section.bullets.map((bullet) => (
+                                                <li key={bullet} className="flex items-start gap-3 text-base leading-[1.8] text-gray-700 md:text-lg">
+                                                    <span className="mt-3 inline-block h-px w-4 shrink-0 bg-blue-600" aria-hidden="true" />
+                                                    <span>{bullet}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className={`space-y-6 ${reverse ? 'lg:order-1' : ''}`}>
+                                        <div className="rounded-2xl bg-gray-50 p-7 md:p-8">
+                                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{section.outcomeLabel}</p>
+                                            <div className="mt-7 space-y-6">
+                                                {section.outcomes.map((outcome) => (
+                                                    <div key={outcome.metric} className="grid grid-cols-[92px_1fr] gap-4 md:grid-cols-[110px_1fr]">
+                                                        <p className="text-2xl font-bold leading-none text-black md:text-3xl">{outcome.metric}</p>
+                                                        <p className="text-sm leading-[1.7] text-gray-600 md:text-base">{outcome.text}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="rounded-2xl border border-gray-200 bg-white p-7 md:p-8">
+                                            <p className="text-base italic leading-[1.9] text-gray-700 md:text-lg">“{section.testimonial.quote}”</p>
+                                            <p className="mt-6 text-sm font-semibold uppercase tracking-[0.14em] text-black">
+                                                {section.testimonial.author}
+                                            </p>
+                                            <p className="mt-2 text-sm text-gray-500">{section.testimonial.role}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+
+            <section className="bg-black px-6 py-20 text-center text-white md:px-10 md:py-24 lg:px-14 lg:py-28">
+                <div className="mx-auto max-w-3xl">
+                    <h3 className="text-3xl font-bold tracking-tight md:text-4xl">
+                        AI is the engine. Humans are the steering wheel. We're the driver.
+                    </h3>
+                    <p className="mx-auto mt-6 max-w-2xl text-base leading-[1.8] text-gray-300 md:text-lg">
+                        Every deliverable that leaves DTALES Tech has been reviewed, tested, and signed off by a human. We use AI to
+                        move faster. Not to lower the bar.
+                    </p>
+                </div>
+            </section>
+
+            <section className="px-6 py-20 md:px-10 md:py-24 lg:px-14 lg:py-28">
+                <div className="mx-auto max-w-[1200px] rounded-3xl border border-gray-200 bg-white p-8 md:p-12">
+                    <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+                        <div>
+                            <h3 className="text-3xl font-bold tracking-tight text-black md:text-4xl">Not sure where to start?</h3>
+                            <p className="mt-6 max-w-2xl text-base leading-[1.8] text-gray-600 md:text-lg">
+                                Most clients begin with a 30-minute Content Audit call. We look at what you have, where you're invisible to
+                                AI search, and what's worth fixing first. No pitch. Just a clear picture of where you stand.
+                            </p>
+                        </div>
+
+                        <div>
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end lg:flex-col lg:items-stretch">
+                                <button
+                                    className="w-full rounded-full bg-black px-8 py-4 text-sm font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-gray-800"
+                                    onClick={() => navigate('/contact')}
+                                    aria-label="Get in Touch"
+                                >
+                                    Book a Call
+                                </button>
+                                <button
+                                    className="w-full rounded-full border border-gray-300 px-8 py-4 text-sm font-semibold uppercase tracking-[0.08em] text-black transition-colors hover:bg-gray-100"
+                                    onClick={() => navigate('/portfolio')}
+                                    aria-label="View Work"
+                                >
+                                    View Our Work
+                                </button>
+                            </div>
+                            <p className="mt-4 text-center text-xs uppercase tracking-[0.14em] text-gray-500 lg:text-right">
+                                Typically responds within one business day
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="border-t border-gray-200 px-6 py-10 md:px-10 lg:px-14">
+                <div className="mx-auto max-w-[1200px]">
+                    <div className="flex flex-col gap-4 text-sm text-gray-600 md:flex-row md:items-center md:justify-between">
+                        <p>© 2026 DTALES Tech. All rights reserved.</p>
+                        <a href="mailto:contact@dtales.tech" className="hover:text-black">
+                            contact@dtales.tech
+                        </a>
+                    </div>
+                </div>
+            </section>
         </div>
-        <h3 className="text-xl font-bold mb-3 text-black">{title}</h3>
-        <p className="text-gray-500 leading-relaxed">
-            {description}
-        </p>
-    </motion.div>
-);
+    );
+};
 
 export default Services;
