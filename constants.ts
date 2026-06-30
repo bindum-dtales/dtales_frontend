@@ -35,7 +35,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Sakshi Agarwal",
     role: "Strategy Lead",
     image: agarwalImage,
-    bio: "Sakshi Agarwal is a Strategy Lead at DTALES Tech, focused on helping organizations build clear, scalable content and documentation strategies. She works closely with clients to align business objectives with structured communication, ensuring documentation supports long-term growth and operational excellence. Her expertise spans strategic planning, content governance, and process optimization.",
+    bio: "A marketing generalist with a talent for clear communication and a strong conviction for client brands. With a background spanning education, systems building, and cross-functional operations, Sakshi brings an unusual lens to marketing, one shaped less by ad campaigns and more by the real work of helping people understand things. At DTALES Tech, she supports the complete marketing operations, from content distribution and outreach to pipeline management and audience engagement. Her experience leading multi-team initiatives at Teach For India and building marketing infrastructure from the ground up at Vivitsa World School means she can hold complexity without losing focus, which, in a fully-managed content agency, is exactly the skill that matters.",
     linkedin: "https://www.linkedin.com/in/sakshi739/",
     email: "sakshia@dtales.tech"
   }
