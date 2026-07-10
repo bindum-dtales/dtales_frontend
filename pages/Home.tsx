@@ -1,6 +1,5 @@
 import React from 'react';
-// Fix: Import 'Variants' as a type to resolve the 'no exported member' error.
-import { motion, type Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import HeroSlider from '../components/HeroSlider';
 import Testimonials from '../components/Testimonials';
 import { useNavigate } from 'react-router-dom';
@@ -8,26 +7,28 @@ import { TextColor } from '../components/ui/text-color';
 import icon1 from '../src/assets/icon1.png';
 import icon2 from '../src/assets/icon2.png';
 import icon3 from '../src/assets/icon3.png';
-import { 
-  ArrowUpRight, 
-  Lightbulb, 
-  FileText, 
-  Database, 
-  Award, 
-  Sliders, 
-  Layers, 
-  Zap 
-} from 'lucide-react';
+import { ArrowUpRight, Lightbulb } from 'lucide-react';
+import SEO from '../components/seo/SEO';
+import AboutPageSchema from '../components/seo/AboutPageSchema';
+import { SITE_DEFAULT_IMAGE, buildRouteUrl } from '../src/config/site';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  // Helper for icon animation
-  const iconVariants: Variants = {
-    hover: { scale: 1.1, rotate: 5, transition: { type: "spring", stiffness: 400, damping: 10 } }
-  };
 
   return (
     <main className="bg-[#F5F5F7]"> {/* Apple-like light gray background */}
+      <SEO
+        title="DTALES Tech | Technical Marketing and Content"
+        description="DTALES Tech is a fully-managed marketing and content agency for B2B technology teams, combining GTM strategy, technical documentation, and AI-era search visibility."
+        image={SITE_DEFAULT_IMAGE}
+        breadcrumbs={[{ name: 'Home', url: buildRouteUrl('/') }]}
+      >
+        <AboutPageSchema
+          path="/"
+          name="About DTALES Tech"
+          description="DTALES Tech is a fully-managed marketing and content agency that owns the entire content supply chain for B2B technology teams."
+        />
+      </SEO>
       <HeroSlider />
       
       {/* About DTALES Tech Section - Styled as Card */}

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
+import SEO from '../components/seo/SEO';
+import ContactPageSchema from '../components/seo/ContactPageSchema';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -64,6 +66,20 @@ const Contact: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-28 pb-24 px-4">
+      <SEO
+        title="Contact | DTALES Tech"
+        description="Contact DTALES Tech to discuss product marketing, technical content, or AI-era search visibility for your B2B technology team."
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Contact', url: '/contact' },
+        ]}
+      >
+        <ContactPageSchema
+          path="/contact"
+          name="Contact DTALES Tech"
+          description="Contact DTALES Tech to start a project, book a consultation, or discuss content and marketing operations."
+        />
+      </SEO>
       <div className="max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

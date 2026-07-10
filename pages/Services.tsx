@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../components/seo/SEO';
+import ServiceSchema from '../components/seo/ServiceSchema';
 
 type ServiceSection = {
     number: string;
@@ -133,9 +135,26 @@ const SERVICE_SECTIONS: ServiceSection[] = [
 
 const Services: React.FC = () => {
     const navigate = useNavigate();
+    const schemaServices = SERVICE_SECTIONS.map((section) => ({
+        serviceType: section.heading,
+        description: section.description,
+        audience: 'B2B technology teams',
+        areaServed: 'Global',
+        path: '/services',
+    }));
 
     return (
         <div className="bg-white pt-24">
+            <SEO
+                title="Services | DTALES Tech"
+                description="Explore DTALES Tech services for product marketing, technical content, AI-era search visibility, and fully-managed content operations."
+                breadcrumbs={[
+                    { name: 'Home', url: '/' },
+                    { name: 'Services', url: '/services' },
+                ]}
+            >
+                <ServiceSchema services={schemaServices} />
+            </SEO>
             <section className="px-6 py-20 md:px-10 md:py-24 lg:px-14 lg:py-28">
                 <div className="mx-auto max-w-[1200px]">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">What We Do</p>

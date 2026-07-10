@@ -2,10 +2,30 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TEAM_MEMBERS } from '../constants';
 import { Linkedin, Mail, ArrowRight } from 'lucide-react';
+import SEO from '../components/seo/SEO';
+import PersonSchema from '../components/seo/PersonSchema';
 
 const Team: React.FC = () => {
   return (
     <div className="pt-24 min-h-screen bg-white">
+      <SEO
+        title="Team | DTALES Tech"
+        description="Meet the DTALES Tech team leading technical content, product marketing, creative strategy, and operational execution."
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Team', url: '/team' },
+        ]}
+      >
+        <PersonSchema
+          people={TEAM_MEMBERS.map((member) => ({
+            name: member.name,
+            jobTitle: member.role,
+            image: member.image,
+            sameAs: member.linkedin ? [member.linkedin] : undefined,
+            worksFor: '/team',
+          }))}
+        />
+      </SEO>
       {/* Header */}
       <section className="py-24 text-center px-6 border-b border-gray-100">
         <div className="max-w-4xl mx-auto">

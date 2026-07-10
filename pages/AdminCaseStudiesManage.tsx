@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
 import { apiFetch } from "../src/lib/api";
+import SEO from '../components/seo/SEO';
 
 type CaseStudy = {
   id: string;
@@ -51,6 +52,7 @@ const AdminCaseStudiesManage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16 px-6">
+      <SEO title="Manage Case Studies | DTALES Tech" description="Manage DTALES Tech case studies." noindex />
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Manage Case Studies</h1>

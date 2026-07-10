@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { apiFetch } from "../src/lib/api";
 import CoverImage from "../components/CoverImage";
+import SEO from '../components/seo/SEO';
+import ArticleSchema from '../components/seo/ArticleSchema';
+import { buildRouteUrl } from '../src/config/site';
 
 type Blog = {
   id: string;
@@ -37,6 +40,40 @@ const BlogDetails: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F5F5F7] pt-28 pb-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
+        {blog ? (
+          <SEO
+            title={`${blog.title} | DTALES Tech`}
+            description={blog.content ? blog.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155) : 'Read the latest DTALES Tech blog article.'}
+            image={blog.cover_image_url || undefined}
+            ogType="article"
+            breadcrumbs={[
+              { name: 'Home', url: buildRouteUrl('/') },
+              { name: 'Blogs', url: buildRouteUrl('/blogs') },
+              { name: blog.title, url: buildRouteUrl(`/blogs/${id}`) },
+            ]}
+            publishedTime={blog.created_at}
+            modifiedTime={blog.created_at}
+          >
+            <ArticleSchema
+              path={`/blogs/${id}`}
+              headline={blog.title}
+              bodyHtml={blog.content}
+              image={blog.cover_image_url}
+              datePublished={blog.created_at}
+              dateModified={blog.created_at}
+              schemaType="BlogPosting"
+            />
+          </SEO>
+        ) : (
+          <SEO
+            title="Blog Details | DTALES Tech"
+            description="Read DTALES Tech blog details and technical content insights."
+            breadcrumbs={[
+              { name: 'Home', url: buildRouteUrl('/') },
+              { name: 'Blogs', url: buildRouteUrl('/blogs') },
+            ]}
+          />
+        )}
         {/* Back Button */}
         <Link 
           to="/blogs" 

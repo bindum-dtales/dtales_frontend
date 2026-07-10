@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import { getBlogs } from "@/lib/api";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
+import SEO from '../components/seo/SEO';
+import CollectionPageSchema from '../components/seo/CollectionPageSchema';
 
 type Blog = {
 	id: string;
@@ -27,6 +30,8 @@ const Blogs: React.FC = () => {
 	const [blogs, setBlogs] = useState<Blog[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
+    const location = useLocation();
+    const searchTerm = new URLSearchParams(location.search).get('search')?.trim().toLowerCase() || '';
 
 	useEffect(() => {
         let isActive = true;
@@ -83,8 +88,35 @@ const Blogs: React.FC = () => {
         };
 	}, []);
 
+	const filteredBlogs = searchTerm
+		? blogs.filter((blog) => {
+			const haystack = `${blog.title} ${blog.excerpt || ''} ${blog.content || ''}`.toLowerCase();
+			return haystack.includes(searchTerm);
+		})
+		: blogs;
+
     return (
         <div className="min-h-screen bg-gray-50 px-4 pb-20 pt-24">
+            <SEO
+                title="Blogs | DTALES Tech"
+                description="Read insights from DTALES Tech on technical content, product marketing, documentation strategy, and AI-era search visibility."
+                breadcrumbs={[
+                    { name: 'Home', url: '/' },
+                    { name: 'Blogs', url: '/blogs' },
+                ]}
+            >
+                <CollectionPageSchema
+                    path="/blogs"
+                    name="Blogs"
+                    description="Insights from DTALES Tech on technical content, product marketing, and documentation strategy."
+                    items={filteredBlogs.map((blog) => ({
+                        name: blog.title,
+                        url: `/blogs/${blog.id}`,
+                        image: blog.cover_image_url || undefined,
+                        description: blog.excerpt || getExcerpt(blog.content),
+                    }))}
+                />
+            </SEO>
             <div className="mx-auto max-w-5xl text-center mb-16">
                 <motion.h1
                     className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight"
@@ -115,14 +147,14 @@ const Blogs: React.FC = () => {
                 </div>
             )}
 
-            {!loading && !error && blogs.length === 0 && (
+            {!loading && !error && filteredBlogs.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     No blogs found.
                 </div>
             )}
 
             <div className="mx-auto max-w-7xl grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3">
-                {blogs.map((blog) => (
+                {filteredBlogs.map((blog) => (
                     <ContentCard
                         key={blog.id}
                         title={blog.title}

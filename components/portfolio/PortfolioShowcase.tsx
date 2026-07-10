@@ -4,6 +4,8 @@ import heroOne from "@/src/assets/1.png";
 import heroTwo from "@/src/assets/2.png";
 import heroThree from "@/src/assets/3.png";
 import heroFour from "@/src/assets/4.png";
+import SEO from '../seo/SEO';
+import CollectionPageSchema from '../seo/CollectionPageSchema';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://api.dtales.tech";
 
@@ -271,6 +273,26 @@ export function PortfolioShowcase() {
 
   return (
     <main className="min-h-screen bg-[#f4f4f2] text-neutral-950">
+      <SEO
+        title="Portfolio | DTALES Tech"
+        description="Explore selected portfolio work from DTALES Tech across web, video, and branding projects."
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Portfolio', url: '/portfolio' },
+        ]}
+      >
+        <CollectionPageSchema
+          path="/portfolio"
+          name="Portfolio"
+          description="A curated showcase of web, video, and branding projects."
+          items={filteredItems.map((item) => ({
+            name: item.title,
+            url: item.link || `/portfolio#${item.id}`,
+            image: item.cover_image_url,
+            description: item.category,
+          }))}
+        />
+      </SEO>
       <HeroSlider />
       <FilterBar activeFilter={activeFilter} onChange={setActiveFilter} />
       {loading ? (

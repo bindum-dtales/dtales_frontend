@@ -6,6 +6,7 @@ import { apiFetch } from "../src/lib/api";
 import { uploadImage } from "../src/lib/uploads";
 import { parseDocxToHtml } from "../src/lib/docxParser";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
+import SEO from '../components/seo/SEO';
 
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve) => {
@@ -216,6 +217,11 @@ const AdminCaseStudyEditor: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16 px-4">
+      <SEO
+        title={isEdit ? 'Edit Case Study | DTALES Tech' : 'New Case Study | DTALES Tech'}
+        description="Create or edit a DTALES Tech case study."
+        noindex
+      />
       <div className="max-w-5xl mx-auto">
         <motion.h1 className="text-3xl font-bold text-gray-900 mb-6">
           {isEdit ? "Edit Case Study" : "New Case Study"}

@@ -8,6 +8,7 @@ import {
   PortfolioItem,
 } from "../src/lib/portfolioApi";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
+import SEO from '../components/seo/SEO';
 
 const PortfolioManagePage: React.FC = () => {
   const navigate = useNavigate();
@@ -74,6 +75,7 @@ const PortfolioManagePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+      <SEO title="Manage Portfolio | DTALES Tech" description="Manage DTALES Tech portfolio items." noindex />
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

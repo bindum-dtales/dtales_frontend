@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Lock, ArrowRight, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SEO from '../components/seo/SEO';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -23,6 +24,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-[#0020BF] to-black px-6">
+      <SEO title="Admin Login | DTALES Tech" description="Authorized admin login for DTALES Tech." noindex />
       {/* Animated background blur circles */}
       <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" />

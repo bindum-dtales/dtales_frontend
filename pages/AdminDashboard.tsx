@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Shield, LogOut, FileText, Layers, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../src/lib/api";
+import SEO from '../components/seo/SEO';
 
 type Blog = {
   id: string;
@@ -78,6 +79,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+      <SEO title="Admin Dashboard | DTALES Tech" description="DTALES Tech admin dashboard." noindex />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div

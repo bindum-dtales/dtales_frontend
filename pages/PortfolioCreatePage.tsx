@@ -8,6 +8,7 @@ import {
   uploadPortfolioImage,
   PortfolioItem,
 } from "../src/lib/portfolioApi";
+import SEO from '../components/seo/SEO';
 
 // Image upload constraints
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -157,6 +158,11 @@ export default function PortfolioCreatePage() {
 
   return (
     <div className="min-h-screen bg-white pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+      <SEO
+        title={isEditing ? 'Edit Portfolio Item | DTALES Tech' : 'Create Portfolio Item | DTALES Tech'}
+        description="Create or edit a DTALES Tech portfolio item."
+        noindex
+      />
       <div className="max-w-2xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

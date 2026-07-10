@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { apiFetch } from "../src/lib/api";
 import CoverImage from "../components/CoverImage";
+import SEO from '../components/seo/SEO';
+import ArticleSchema from '../components/seo/ArticleSchema';
+import { buildRouteUrl } from '../src/config/site';
 
 type CaseStudy = {
   id: string;
@@ -37,6 +40,40 @@ const CaseStudyDetails: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F5F5F7] pt-28 pb-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
+        {caseStudy ? (
+          <SEO
+            title={`${caseStudy.title} | DTALES Tech`}
+            description={caseStudy.content ? caseStudy.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155) : 'Read the latest DTALES Tech case study.'}
+            image={caseStudy.cover_image_url || undefined}
+            ogType="article"
+            breadcrumbs={[
+              { name: 'Home', url: buildRouteUrl('/') },
+              { name: 'Case Studies', url: buildRouteUrl('/case-studies') },
+              { name: caseStudy.title, url: buildRouteUrl(`/case-studies/${id}`) },
+            ]}
+            publishedTime={caseStudy.created_at}
+            modifiedTime={caseStudy.created_at}
+          >
+            <ArticleSchema
+              path={`/case-studies/${id}`}
+              headline={caseStudy.title}
+              bodyHtml={caseStudy.content}
+              image={caseStudy.cover_image_url}
+              datePublished={caseStudy.created_at}
+              dateModified={caseStudy.created_at}
+              schemaType="Article"
+            />
+          </SEO>
+        ) : (
+          <SEO
+            title="Case Study Details | DTALES Tech"
+            description="Read DTALES Tech case study details and client outcomes."
+            breadcrumbs={[
+              { name: 'Home', url: buildRouteUrl('/') },
+              { name: 'Case Studies', url: buildRouteUrl('/case-studies') },
+            ]}
+          />
+        )}
         {/* Back Button */}
         <Link 
           to="/case-studies" 

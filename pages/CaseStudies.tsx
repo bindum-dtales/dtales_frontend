@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import { getCaseStudies } from "@/lib/api";
 import { getCache, saveCache } from "../src/lib/cache";
 import ContentCard from "../components/ContentCard";
+import SEO from '../components/seo/SEO';
+import CollectionPageSchema from '../components/seo/CollectionPageSchema';
 
 type CaseStudy = {
 	id: string;
@@ -27,6 +30,8 @@ const CaseStudies: React.FC = () => {
 	const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
+    const location = useLocation();
+    const searchTerm = new URLSearchParams(location.search).get('search')?.trim().toLowerCase() || '';
 
 	useEffect(() => {
         let isActive = true;
@@ -83,8 +88,35 @@ const CaseStudies: React.FC = () => {
         };
 	}, []);
 
+	const filteredCaseStudies = searchTerm
+		? caseStudies.filter((caseStudy) => {
+			const haystack = `${caseStudy.title} ${caseStudy.excerpt || ''} ${caseStudy.content || ''}`.toLowerCase();
+			return haystack.includes(searchTerm);
+		})
+		: caseStudies;
+
     return (
         <div className="min-h-screen bg-gray-50 px-4 pb-20 pt-24">
+            <SEO
+                title="Case Studies | DTALES Tech"
+                description="Explore DTALES Tech case studies and documentation-led transformations for B2B technology teams."
+                breadcrumbs={[
+                    { name: 'Home', url: '/' },
+                    { name: 'Case Studies', url: '/case-studies' },
+                ]}
+            >
+                <CollectionPageSchema
+                    path="/case-studies"
+                    name="Case Studies"
+                    description="Documentation-led transformations and outcomes from DTALES Tech clients."
+                    items={filteredCaseStudies.map((caseStudy) => ({
+                        name: caseStudy.title,
+                        url: `/case-studies/${caseStudy.id}`,
+                        image: caseStudy.cover_image_url || undefined,
+                        description: caseStudy.excerpt || getExcerpt(caseStudy.content),
+                    }))}
+                />
+            </SEO>
             <div className="mx-auto max-w-5xl text-center mb-16">
                 <motion.h1
                     className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight"
@@ -115,14 +147,14 @@ const CaseStudies: React.FC = () => {
                 </div>
             )}
 
-            {!loading && !error && caseStudies.length === 0 && (
+            {!loading && !error && filteredCaseStudies.length === 0 && (
                 <div className="mx-auto max-w-2xl text-center text-gray-600 bg-white border border-gray-200 rounded-2xl py-4 px-6">
                     No case studies found.
                 </div>
             )}
 
             <div className="mx-auto max-w-7xl grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3">
-                {caseStudies.map((caseStudy) => (
+                {filteredCaseStudies.map((caseStudy) => (
                     <ContentCard
                         key={caseStudy.id}
                         title={caseStudy.title}

@@ -6,6 +6,7 @@ import { uploadImage } from "../src/lib/uploads";
 import { apiFetch } from "../src/lib/api";
 import { parseDocxToHtml } from "../src/lib/docxParser";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
+import SEO from '../components/seo/SEO';
 
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve) => {
@@ -131,6 +132,7 @@ export default function AdminBlogEditor() {
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16 px-4">
+      <SEO title="New Blog | DTALES Tech" description="Create a new DTALES Tech blog post." noindex />
       <div className="max-w-5xl mx-auto">
         <motion.h1 className="text-3xl font-bold text-white mb-6">
           New Blog
