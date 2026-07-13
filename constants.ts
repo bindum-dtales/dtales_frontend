@@ -24,7 +24,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     reverse: true
   },
   {
-    name: "Yashas Niranjana",
+    name: "Yashas Niranjan",
     role: "Creatives Lead",
     image: yashImage,
     bio: "A creative strategist and graphic designer with an MA from Coventry University, Yashas Niranjana specializes in building modern brands through impactful visuals and clean, minimalist design. He works closely with startups and creators to transform abstract ideas into fresh, authentic digital content and effective brand identities. By combining advanced design theory with a results-driven approach, Yashas is focused on delivering solutions that foster a genuine connection between brands and their audiences.",
