@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
@@ -20,6 +20,9 @@ import AdminCaseStudyEditor from './pages/AdminCaseStudyEditor';
 import AdminCaseStudiesManage from './pages/AdminCaseStudiesManage';
 import PortfolioCreatePage from './pages/PortfolioCreatePage';
 import PortfolioManagePage from './pages/PortfolioManagePage';
+
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -50,6 +53,22 @@ const App: React.FC = () => {
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blogs/:id" element={<BlogDetails />} />
+            <Route
+              path="/terms"
+              element={
+                <Suspense fallback={<div className="min-h-[50vh] bg-[#0B0B0B]" />}>
+                  <Terms />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/privacy"
+              element={
+                <Suspense fallback={<div className="min-h-[50vh] bg-[#0B0B0B]" />}>
+                  <Privacy />
+                </Suspense>
+              }
+            />
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/case-studies/:id" element={<CaseStudyDetails />} />
             <Route path="/contact" element={<Contact />} />
