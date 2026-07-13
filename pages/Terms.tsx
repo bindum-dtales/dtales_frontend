@@ -18,14 +18,6 @@ const Terms: React.FC = () => {
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#111111]">
           TERMS AND CONDITIONS
         </h1>
-        <section aria-labelledby="terms-last-updated" className="rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:p-6">
-          <h2 id="terms-last-updated" className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0020BF]">
-            Last Updated
-          </h2>
-          <p className="mt-3 text-sm sm:text-base text-gray-700">
-            Not specified in the supplied document.
-          </p>
-        </section>
       </header>
 
       <ol className="space-y-10" aria-label="Terms and Conditions clauses">
