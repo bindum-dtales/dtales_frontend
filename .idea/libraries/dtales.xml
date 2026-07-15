@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="dtales">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dtales.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
