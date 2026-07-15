@@ -27,6 +27,8 @@ const BREADCRUMB_LABELS: Record<string, string> = {
   '/portfolio': 'Portfolio',
   '/team': 'Team',
   '/contact': 'Contact',
+  '/terms': 'Terms & Conditions',
+  '/privacy': 'Privacy Policy',
   '/blogs': 'Blogs',
   '/case-studies': 'Case Studies',
   '/admin': 'Admin',

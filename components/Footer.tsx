@@ -65,8 +65,23 @@ const Footer: React.FC = () => {
 
         </div>
 
-        <div className="border-t border-white/10 pt-8 text-gray-500 text-sm flex justify-between">
-          <p>© {new Date().getFullYear()} DTALES Tech. All rights reserved.</p>
+        <div className="border-t border-white/10 pt-8 text-sm flex flex-col items-center gap-4 text-center">
+          <nav aria-label="Legal links" className="flex items-center justify-center gap-3 text-gray-400">
+            <Link
+              to="/terms"
+              className="transition-colors duration-300 hover:text-[#0020BF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0020BF] focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+            >
+              Terms &amp; Conditions
+            </Link>
+            <span aria-hidden="true" className="text-gray-600">|</span>
+            <Link
+              to="/privacy"
+              className="transition-colors duration-300 hover:text-[#0020BF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0020BF] focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+            >
+              Privacy Policy
+            </Link>
+          </nav>
+          <p className="text-gray-500">© 2026 DTALES Tech. All rights reserved.</p>
         </div>
 
       </div>
