@@ -71,8 +71,8 @@ export const TESTIMONIALS: Testimonial[] = [
 export const HERO_SLIDES: SlideData[] = [
   {
     id: 1,
-    title: "Marketing & Content. Built with Tech",
-    subtitle: "For AI Search Engines to Recommend you and for your Buyers to find you",
+    title: "Marketing & Content, Built with Tech",
+    subtitle: "For AI Search Engines to Recommend you and for your Buyers to Find you",
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop", // Strategy/Planning/Clarity image
     cta: "Learn More"
   },
@@ -86,7 +86,7 @@ export const HERO_SLIDES: SlideData[] = [
   {
     id: 3,
     title: "Unlocking Growth Potential",
-    subtitle: "With Precision Content & Knowledge Systems",
+    subtitle: "With Precision Strategy & Content Systems",
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920&auto=format&fit=crop",
     cta: "View Portfolio"
   },

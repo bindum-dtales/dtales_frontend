@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
             </Link>
 
             <p className="text-gray-400 max-w-md text-lg">
-              Technical Storytelling. Reimagined
+              Marketing & Content, Built with Tech
             </p>
           </div>
 
