@@ -319,7 +319,7 @@ const Home: React.FC = () => {
                 onClick={() => navigate('/contact')}
                 aria-label="Start a Project"
               >
-                Start a Project
+                Book An Audit
               </button>
           </motion.div>
         </div>

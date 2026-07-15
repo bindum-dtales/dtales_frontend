@@ -68,7 +68,7 @@ const Contact: React.FC = () => {
     <div className="min-h-screen bg-white pt-28 pb-24 px-4">
       <SEO
         title="Contact | DTALES Tech"
-        description="Contact DTALES Tech to discuss product marketing, technical content, or AI-era search visibility for your B2B technology team."
+        description="Contact DTALES Tech to discuss product marketing, technical content, or AI-era search visibility for your team."
         breadcrumbs={[
           { name: 'Home', url: '/' },
           { name: 'Contact', url: '/contact' },
@@ -91,7 +91,7 @@ const Contact: React.FC = () => {
             Let's work together
           </h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Interested in working together? Please fill out the form below to book a free consultation
+            Please fill out the form below to book a free consultation
           </p>
         </motion.div>
 
