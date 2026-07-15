@@ -146,10 +146,10 @@ const Terms: React.FC = () => {
           <h2 className="text-2xl sm:text-3xl font-semibold text-[#0020BF] tracking-tight">15. CONTACT INFORMATION</h2>
           <p className="text-gray-700 leading-relaxed">For questions regarding these Terms or our services, you may contact us at:</p>
           <ul className="list-disc space-y-2 pl-6 text-gray-700">
-            <li>Email:</li>
-            <li>Website:</li>
-            <li>Phone:</li>
-            <li>Address:</li>
+            <li>Email: contact@dtales.tech</li>
+            <li>Website: www.dtales.tech</li>
+            <li>Phone: 91-9901071102</li>
+            <li>Address: 1st Floor, 296, 15th A Cross Rd, Sector A, Chikka Bommasandra, Yelahanka New Town, Bengaluru, Karnataka 560064 </li>
           </ul>
         </li>
       </ol>

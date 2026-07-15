@@ -164,7 +164,7 @@ const Home: React.FC = () => {
            >
               <div>
                 <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-8">
-                  <img src={icon2} alt="Creatives icon" className="w-7 h-7 object-contain" />
+                  <img src={icon} alt="Creatives icon" className="w-7 h-7 object-contain" />
                 </div>
                 <h3 className="text-3xl font-bold mb-4">AI Search Visibility (SEO, GEO & AEO)</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
