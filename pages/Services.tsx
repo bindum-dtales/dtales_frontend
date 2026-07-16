@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/seo/SEO';
 import ServiceSchema from '../components/seo/ServiceSchema';
+import servicePricingImage from '../src/assets/ser.png';
 
 type ServiceSection = {
     number: string;
@@ -25,6 +26,9 @@ const HERO_STATS = [
     { value: '150%', label: 'Increase in AI citation within 180 days' },
     { value: '14→3', label: 'Days production cycle' }
 ];
+
+const SERVICE_OUTCOME_CARD_CLASS =
+    "relative isolate overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.14)] bg-[rgba(59,130,246,0.20)] p-7 shadow-[0_10px_40px_rgba(0,32,191,0.18),0_2px_12px_rgba(0,0,0,0.08)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-[rgba(255,255,255,0.22)] hover:shadow-[0_14px_48px_rgba(0,32,191,0.22),0_4px_16px_rgba(0,0,0,0.1)] before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[rgba(255,255,255,0.10)] before:opacity-35 before:content-[''] md:p-8";
 
 const SERVICE_SECTIONS: ServiceSection[] = [
     {
@@ -212,13 +216,19 @@ const Services: React.FC = () => {
                                     </div>
 
                                     <div className={`space-y-6 ${reverse ? 'lg:order-1' : ''}`}>
-                                        <div className="rounded-2xl bg-gray-50 p-7 md:p-8">
-                                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">{section.outcomeLabel}</p>
+                                        <div className={SERVICE_OUTCOME_CARD_CLASS}>
+                                            <p className="relative text-xs font-semibold uppercase tracking-[0.18em] text-white/72">
+                                                {section.outcomeLabel}
+                                            </p>
                                             <div className="mt-7 space-y-6">
                                                 {section.outcomes.map((outcome) => (
                                                     <div key={outcome.metric} className="grid grid-cols-[92px_1fr] gap-4 md:grid-cols-[110px_1fr]">
-                                                        <p className="text-2xl font-bold leading-none text-black md:text-3xl">{outcome.metric}</p>
-                                                        <p className="text-sm leading-[1.7] text-gray-600 md:text-base">{outcome.text}</p>
+                                                        <p className="relative text-2xl font-bold leading-none text-white md:text-3xl">
+                                                            {outcome.metric}
+                                                        </p>
+                                                        <p className="relative text-sm leading-[1.7] text-white/76 md:text-base">
+                                                            {outcome.text}
+                                                        </p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -248,6 +258,16 @@ const Services: React.FC = () => {
                         Every deliverable that leaves DTALES Tech has been reviewed, tested, and signed off by a human. We use AI to
                         move faster. Not to lower the bar.
                     </p>
+                </div>
+            </section>
+
+            <section className="px-6 py-20 md:px-10 md:py-24 lg:px-14 lg:py-28">
+                <div className="mx-auto max-w-[1400px]">
+                    <img
+                        src={servicePricingImage}
+                        alt="Service pricing"
+                        className="h-auto w-full"
+                    />
                 </div>
             </section>
 
