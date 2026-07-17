@@ -223,7 +223,7 @@ const Services: React.FC = () => {
                                             <div className="mt-7 space-y-6">
                                                 {section.outcomes.map((outcome) => (
                                                     <div key={outcome.metric} className="grid grid-cols-[92px_1fr] gap-4 md:grid-cols-[110px_1fr]">
-                                                        <p className="relative text-2xl font-bold leading-none text-white md:text-3xl">
+                                                        <p className="relative text-2xl font-bold leading-none text-black md:text-3xl">
                                                             {outcome.metric}
                                                         </p>
                                                         <p className="relative text-sm leading-[1.7] text-white/76 md:text-base">
