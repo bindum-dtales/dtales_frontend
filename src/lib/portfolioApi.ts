@@ -45,10 +45,12 @@ export async function getPortfolio() {
   try {
     const data = await apiFetch<any>("/api/portfolio");
 
+    if (!data) return [];
+
     // Handle all possible backend formats
     if (Array.isArray(data)) return data;
-    if (Array.isArray(data.data)) return data.data;
-    if (Array.isArray(data.items)) return data.items;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.items)) return data.items;
 
     console.warn("Unknown format:", data);
     return [];

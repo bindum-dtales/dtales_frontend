@@ -4,14 +4,9 @@ import heroOne from "@/src/assets/1.png";
 import heroTwo from "@/src/assets/2.png";
 import heroThree from "@/src/assets/3.png";
 import heroFour from "@/src/assets/4.png";
+import { getPortfolio } from "@/src/lib/portfolioApi";
 import SEO from '../seo/SEO';
 import CollectionPageSchema from '../seo/CollectionPageSchema';
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://api.dtales.tech";
-
-if (!import.meta.env.VITE_API_BASE_URL) {
-  console.warn("VITE_API_BASE_URL not found, using fallback API");
-}
 
 type PortfolioCategory = "All" | "Web" | "Video" | "Branding";
 
@@ -229,17 +224,10 @@ export function PortfolioShowcase() {
 
     const loadProjects = async () => {
       try {
-        const response = await fetch(`${API_BASE}/api/portfolio`);
-        const data = await response.json();
-        const safeProjects = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.data)
-            ? data.data
-            : Array.isArray(data?.items)
-              ? data.items
-              : [];
+        const safeProjects = await getPortfolio();
 
         if (isMounted) {
+          console.debug("Portfolio projects received:", safeProjects.length);
           setProjects(safeProjects);
         }
       } catch (error) {
@@ -270,6 +258,13 @@ export function PortfolioShowcase() {
       (item) => normalizeCategory(item.category) === normalizeCategory(activeFilter)
     );
   }, [activeFilter, projects]);
+
+  useEffect(() => {
+    console.debug("Portfolio filter state:", {
+      selectedFilter: activeFilter,
+      filteredProjectCount: filteredItems.length,
+    });
+  }, [activeFilter, filteredItems.length]);
 
   return (
     <main className="min-h-screen bg-[#f4f4f2] text-neutral-950">
