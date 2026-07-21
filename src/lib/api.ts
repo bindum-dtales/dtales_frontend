@@ -18,14 +18,24 @@ async function safeFetch(url: string, options?: RequestInit) {
     ...options,
   });
 
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "");
+    const details = errorText.trim() ? `: ${errorText.trim()}` : "";
+    throw new Error(`Request failed with status ${res.status}${details}`);
+  }
+
   const text = await res.text();
+
+  if (!text.trim()) {
+    return null;
+  }
 
   try {
     return JSON.parse(text);
   } catch (err) {
     console.error("❌ NON-JSON RESPONSE FROM:", url);
     console.error(text);
-    throw new Error("Backend returned non-JSON response");
+    throw new Error("Backend returned invalid JSON response");
   }
 }
 
