@@ -71,8 +71,8 @@ export const TESTIMONIALS: Testimonial[] = [
 export const HERO_SLIDES: SlideData[] = [
   {
     id: 1,
-    title: "Marketing & Content, Built with Tech",
-    subtitle: "For AI Search Engines to Recommend you and for your Buyers to Find you",
+    title: "AI-Native Marketing & Content",
+    subtitle: "Built with Tech, For your Tech",
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop", // Strategy/Planning/Clarity image
     cta: "Learn More"
   },
