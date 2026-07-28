@@ -18,15 +18,15 @@ const Home: React.FC = () => {
   return (
     <main className="bg-[#F5F5F7]"> {/* Apple-like light gray background */}
       <SEO
-        title="AI-Native Marketing and Content Agency | DTALES Tech"
-        description="DTALES Tech is a fully-managed, AI-native content agency for tech companies. We build technical content that ranks on Google and gets cited by LLMs."
+        title="Premier Marketing and Content Agency | DTALES Tech"
+        description="DTALES Tech is an AI-native Marketing and Content partner for B2B tech companies, delivering end-to-end GTM strategy, technical content, and AI-era search visibility that helps prospects find you, sales teams pitch you, and users understand your value."
         image={SITE_DEFAULT_IMAGE}
         breadcrumbs={[{ name: 'Home', url: buildRouteUrl('/') }]}
       >
         <AboutPageSchema
           path="/"
           name="About DTALES Tech"
-          description="DTALES Tech is a fully-managed, AI-native content agency for tech companies. We build technical content that ranks on Google and gets cited by LLMs."
+          description="DTALES Tech is an AI-native Marketing and Content partner for B2B tech companies, delivering end-to-end GTM strategy, technical content, and AI-era search visibility that helps prospects find you, sales teams pitch you, and users understand your value."
         />
       </SEO>
       <HeroSlider />
@@ -57,7 +57,7 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
               >
-                  DTALES Tech is a fully-managed marketing and content agency. We own the content supply chain end to end, from GTM strategy and product marketing through technical documentation and AI-era search visibility.
+                  DTALES Tech is an AI-native Marketing and Content partner for Technology Companies.
               </motion.p>
               <motion.p
                 className="text-lg md:text-xl text-gray-600 leading-relaxed mt-6"
@@ -66,7 +66,7 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
               >
-                The content landscape changed when buyers started using LLMs to research vendors. A page that ranks on 2019-era Google does not get cited by an ChatGPT, Gemini, or Perplexity. We build for both and have been doing it since before most agencies knew the difference.
+                  Marketing for B2B Tech is complex. We understand technology and are experts at building Technical Content backed by strong Marketing Strategy. We simplify and present your ideas and concepts, for your prospects to find you, your sales team to pitch you, and your users to fully understand your value.
               </motion.p>
               <motion.p
                 className="text-lg md:text-xl text-gray-600 leading-relaxed mt-6"
@@ -75,7 +75,7 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
               >
-                Every engagement runs on an AI-powered production model with human editorial oversight at every stage. We move faster than a traditional agency and ship content that is technically accurate, LLM-parseable, and built to convert.
+                  We own the entire content supply chain, end-to-end. From GTM Strategy and Product Marketing to Product Documentation and AI-era Search Visibility. Combining technical writing, strategic marketing, and modern design tools, we move faster than traditional agencies to deliver content that is technically accurate, LLM-parseable, and built to convert.
               </motion.p>
               <motion.p
                 className="text-lg md:text-xl text-gray-600 leading-relaxed mt-6"
@@ -96,7 +96,7 @@ const Home: React.FC = () => {
          <div className="max-w-7xl mx-auto">
           <div className="mb-16 max-w-3xl mx-auto text-center">
            <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-black mb-6">
-             <TextColor text="What we Do" />
+             <TextColor text="What We Do" />
            </h2>
            <p className="text-xl text-gray-500">
              Marketing & Content, Built with Tech
@@ -118,7 +118,7 @@ const Home: React.FC = () => {
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Full-Stack Product Marketing</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
-                    Your entire marketing function, without the headcount. We own GTM strategy, campaign architecture, and social presence from brief to distribution.
+                    Your entire marketing function, without the headcount. We own the GTM Strategy, Campaign Planning, and Social Content from brief to distribution.
                 </p>
              </div>
              <div className="flex justify-end mt-8">
@@ -143,7 +143,7 @@ const Home: React.FC = () => {
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Full-Lifecycle Technical Content</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
-                    We bridge content that converts with documentation that retains. Every code block is tested before it publishes. No exceptions.
+                    We bridge content that converts, with documentation that retains. Every code block is tested before it publishes. No exceptions.
                 </p>
               </div>
               <div className="flex justify-end mt-8">
@@ -193,7 +193,7 @@ const Home: React.FC = () => {
                 </div>
                 <h3 className="text-3xl font-bold mb-4">Fully-Managed, AI-Powered Operations</h3>
                 <p className="text-lg text-gray-500 leading-relaxed">
-                    We own the content supply chain end to end: editorial planning, production, QA, and publishing.2,000-word technical article in under three hours, production cycle reduced from 14 days to 3.
+                    We own the content supply chain end-to-end: Planning, Production, QA, and Publishing. 2,000-word technical article in under three hours, production cycle reduced from 14 days to 3.
                 </p>
               </div>
               <div className="flex justify-end mt-8">
@@ -308,11 +308,11 @@ const Home: React.FC = () => {
           >
               <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">
                 <span className="bg-gradient-to-r from-[#0024ff] to-[#001cc3] bg-[length:200%_200%] animate-gradient-shift bg-clip-text text-transparent">
-                  Ready to tell your story?
+                  Find out where you stand
                 </span>
               </h2>
               <p className="text-xl text-gray-500 mb-10 max-w-xl mx-auto">
-                  Book a 30-minute audit. Leave with a content plan built for Google and AI search.
+                  Book a 30-minute audit. A gap analysis showing how your marketing and content are performing.
               </p>
               <button
                 className="bg-dtales-navy text-white px-12 py-5 rounded-full text-xl font-semibold transition-all hover:scale-105 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#001cc3]"

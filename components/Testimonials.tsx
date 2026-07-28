@@ -103,7 +103,7 @@ const Testimonials: React.FC = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            See how teams across industries describe their journey working with DTALES.
+            See how teams across industries describe their journey working with DTALES Tech
           </motion.p>
         </div>
 
