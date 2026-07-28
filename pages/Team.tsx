@@ -114,12 +114,12 @@ const Team: React.FC = () => {
       <section className="py-32 bg-black text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
         <div className="max-w-4xl mx-auto px-6 relative z-10">
-            <h2 className="text-5xl md:text-6xl font-bold mb-8">We are always hiring.</h2>
+            <h2 className="text-5xl md:text-6xl font-bold mb-8">We are always hiring</h2>
             <p className="text-xl text-gray-400 mb-12">
-                If you are passionate about storytelling and technology, we want to hear from you.
+                If you are passionate about storytelling and technology, we want to hear from you
             </p>
             <a href="mailto:career@dtales.tech" className="inline-flex items-center gap-3 bg-white text-black px-10 py-4 rounded-full text-lg font-bold hover:bg-gray-200 transition-colors">
-                View Open Positions <ArrowRight />
+                Write to Us <ArrowRight />
             </a>
         </div>
       </section>
