@@ -41,7 +41,7 @@ const SERVICE_SECTIONS: ServiceSection[] = [
             'GTM strategy and multi-channel campaign architecture',
             'Complete launch kit (email, blog, landing page, social) in 24 hours',
             'Monthly social content calendar, derived from your technical assets (never manufactured from scratch)',
-            'Ongoing account management: LinkedIn, newsletters, and beyond',
+            'Ongoing account management: LinkedIn, Newsletters, and beyond',
             'Technical and business track segmentation. Never cross-contaminated.'
         ],
         outcomeLabel: 'MEASURED OUTCOMES',
@@ -68,7 +68,7 @@ const SERVICE_SECTIONS: ServiceSection[] = [
             'Getting Started guides, SDK documentation, and API reference',
             'Code validation before any writing begins. Every snippet runs.',
             'Docs-as-Code CI/CD pipeline with GitHub-based linting',
-            'TTFHW benchmark: new user achieves first successful API call in under 5 minutes'
+            'TTFHW benchmark: New user achieves first successful API call in under 5 minutes'
         ],
         outcomeLabel: 'MEASURED OUTCOMES',
         outcomes: [
@@ -119,7 +119,7 @@ const SERVICE_SECTIONS: ServiceSection[] = [
             '90-day editorial roadmaps aligned to your product calendar and GEO/SEO targets',
             'Bi-weekly production sprints with a live client dashboard (briefed → in production → in review → published)',
             'AI-agent outlining + human-guided drafting with proprietary interview data injected',
-            'Automated brand and technical linting: fact cross-reference, style compliance, hallucination flagging',
+            'Automated brand and technical linting: Fact cross-reference, style compliance, hallucination flagging',
             'Human SME sign-off before every publish. No direct-from-LLM output, ever.'
         ],
         outcomeLabel: 'MEASURED OUTCOMES',
@@ -163,7 +163,8 @@ const Services: React.FC = () => {
                 <div className="mx-auto max-w-[1200px]">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">What We Do</p>
                     <h1 className="mt-6 max-w-5xl text-[clamp(2.2rem,5.4vw,5rem)] font-bold leading-[1.05] tracking-tight text-black">
-                        Marketing & Content. Built on Tech.
+                        <p>Marketing & Content. </p>
+                        <p>Built on Tech.</p>
                     </h1>
                     <p className="mt-8 max-w-3xl text-base leading-[1.8] text-gray-600 md:text-lg">
                         We run your entire content and marketing operation: Strategy, Execution, and Distribution, powered by AI,
@@ -252,7 +253,7 @@ const Services: React.FC = () => {
             <section className="bg-black px-6 py-20 text-center text-white md:px-10 md:py-24 lg:px-14 lg:py-28">
                 <div className="mx-auto max-w-3xl">
                     <h3 className="text-3xl font-bold tracking-tight md:text-4xl">
-                        AI is the engine. Humans are the steering wheel. We're the driver.
+                        AI, the engine. We, the driver.
                     </h3>
                     <p className="mx-auto mt-6 max-w-2xl text-base leading-[1.8] text-gray-300 md:text-lg">
                         Every deliverable that leaves DTALES Tech has been reviewed, tested, and signed off by a human. We use AI to

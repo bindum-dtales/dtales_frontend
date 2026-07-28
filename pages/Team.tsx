@@ -43,7 +43,7 @@ const Team: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
             >
-            Meet the people leading the change at DTALES
+            Meet the people leading the change at DTALES Tech
             </motion.p>
         </div>
       </section>
