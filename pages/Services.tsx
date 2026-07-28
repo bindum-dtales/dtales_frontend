@@ -164,7 +164,7 @@ const Services: React.FC = () => {
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">What We Do</p>
                     <h1 className="mt-6 max-w-5xl text-[clamp(2.2rem,5.4vw,5rem)] font-bold leading-[1.05] tracking-tight text-black">
                         <p>Marketing & Content. </p>
-                        <p>Built on Tech.</p>
+                        <p>Built with Tech.</p>
                     </h1>
                     <p className="mt-8 max-w-3xl text-base leading-[1.8] text-gray-600 md:text-lg">
                         We run your entire content and marketing operation: Strategy, Execution, and Distribution, powered by AI,
