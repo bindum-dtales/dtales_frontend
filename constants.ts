@@ -10,7 +10,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Bindu Mohan",
     role: "Founder & Principal",
     image: binduImage,
-    bio: "A seasoned technical documentation leader and consultant with almost two decades of experience in building and optimizing documentation processes and teams. Bindu's expertise spans the entire documentation lifecycle, from establishing foundational practices to leading complex content migrations and strategies. With a passion for empowering organizations with clean, effective, and user-centric documentation, Bindu leads her team at DTALES Tech in keeping pace with the evolving landscape of technical communication.",
+    bio: "A seasoned technical documentation leader and consultant with almost two decades of experience in building and optimizing content processes and teams. Bindu's expertise spans the entire content lifecycle, from establishing foundational practices to leading complex content migrations and strategies. With a passion for empowering organizations through user-centric documentation and integrated marketing content, Bindu leads her team at DTALES Tech in keeping pace with the evolving landscape of technical communication.",
     linkedin: "https://www.linkedin.com/in/bindu-mohan-54201438/",
     email: "contact@dtales.tech"
   },
