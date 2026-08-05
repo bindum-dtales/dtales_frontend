@@ -18,12 +18,12 @@ export default function Portfolio() {
         </section>
 
         {/* Capability Cards Section */}
-        <section className="py-16 sm:py-20 lg:py-24">
+        <section className="pt-16 sm:pt-20 lg:pt-24 pb-8 sm:pb-10 lg:pb-12">
           <CapabilityCards />
         </section>
 
         {/* Process Timeline Section */}
-        <section className="py-20 sm:py-24 lg:py-32">
+        <section className="pt-10 sm:pt-12 lg:pt-16 pb-20 sm:pb-24 lg:pb-32">
           <ProcessTimeline />
         </section>
       </div>

@@ -2,6 +2,18 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PORTFOLIO_CAPABILITIES } from "../../data/capabilities";
 
+// These titles otherwise stay on one line at wide desktop widths; capping
+// their width forces the same natural two-line wrap "Technical Documentation"
+// already gets. Left untouched: a shared cap can't fit both this set and
+// "Technical Documentation" (whose second word alone is wider than the full
+// "GTM Strategy" phrase), so the two card titles are handled separately.
+const TWO_LINE_TITLES = new Set([
+  "Product Marketing",
+  "Sales Enablement",
+  "Digital Experience",
+  "GTM Strategy",
+]);
+
 export function CapabilityCards() {
   return (
     <div>
@@ -25,7 +37,11 @@ export function CapabilityCards() {
             <span className="text-xs font-medium text-neutral-400">
               {number}
             </span>
-            <h3 className="mt-4 text-xl font-bold tracking-tight text-neutral-950">
+            <h3
+              className={`mt-4 text-xl font-bold tracking-tight text-neutral-950 ${
+                TWO_LINE_TITLES.has(title) ? "lg:max-w-[115px]" : ""
+              }`}
+            >
               {title}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-neutral-500">
