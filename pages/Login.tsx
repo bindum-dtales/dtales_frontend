@@ -3,22 +3,29 @@ import { motion } from "framer-motion";
 import { User, Lock, ArrowRight, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SEO from '../components/seo/SEO';
+import { loginAdmin } from "../src/lib/api";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
 
-    if (username === "Dtalestech" && password === "Dt@lestech2023") {
+    try {
+      const token = await loginAdmin(username, password);
+      sessionStorage.setItem('adminToken', token);
       sessionStorage.setItem('isAdminLoggedIn', 'true');
       navigate('/admin/dashboard');
-    } else {
-      setError("Invalid username or password. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid username or password. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -140,14 +147,15 @@ const Login: React.FC = () => {
             {/* Login Button */}
             <motion.button
               type="submit"
+              disabled={isSubmitting}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-[#0020BF] text-white py-3 rounded-xl font-semibold hover:bg-[#0A2CFF] transition-all shadow-lg hover:shadow-[0_0_30px_rgba(0,32,191,0.5)] flex items-center justify-center gap-2 group"
+              className="w-full bg-[#0020BF] text-white py-3 rounded-xl font-semibold hover:bg-[#0A2CFF] transition-all shadow-lg hover:shadow-[0_0_30px_rgba(0,32,191,0.5)] flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Login
+              {isSubmitting ? "Signing in..." : "Login"}
               <ArrowRight
                 size={20}
                 className="group-hover:translate-x-1 transition-transform"

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Shield, LogOut, FileText, Layers, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../src/lib/api";
+import { apiFetch, clearAdminSession } from "../src/lib/api";
 import SEO from '../components/seo/SEO';
 
 type Blog = {
@@ -73,7 +73,7 @@ const AdminDashboard: React.FC = () => {
   const isLoading = blogLoading || caseLoading || portfolioLoading;
 
   const handleLogout = () => {
-    sessionStorage.removeItem('isAdminLoggedIn');
+    clearAdminSession();
     navigate('/admin');
   };
 

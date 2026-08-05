@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, ExternalLink, ArrowLeft, Edit } from "lucide-react";
+import { Trash2, Plus, ExternalLink, FileText, ArrowLeft, Edit } from "lucide-react";
 import {
   getAllPortfolio,
   deletePortfolio,
@@ -168,23 +168,30 @@ const PortfolioManagePage: React.FC = () => {
                     <div className="mb-3">
                       <span
                         className={`text-xs font-medium px-2.5 py-1 rounded-full border ${getCategoryColor(
-                          item.category
+                          item.capability
                         )}`}
                       >
-                        {item.category}
+                        {item.capability}
                       </span>
                     </div>
 
-                    {/* Project Link */}
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-[#0020BF] hover:text-[#0b2be0] flex items-center gap-1 mb-4 break-all"
-                    >
-                      <ExternalLink size={12} />
-                      View Project
-                    </a>
+                    {/* Project Link or Document Indicator */}
+                    {item.link ? (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-[#0020BF] hover:text-[#0b2be0] flex items-center gap-1 mb-4 break-all"
+                      >
+                        <ExternalLink size={12} />
+                        View Project
+                      </a>
+                    ) : item.content ? (
+                      <span className="text-xs text-gray-500 flex items-center gap-1 mb-4">
+                        <FileText size={12} />
+                        Document
+                      </span>
+                    ) : null}
 
                     {/* Edit and Delete Buttons */}
                     <div className="flex gap-2">

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { uploadImage } from "../src/lib/uploads";
 import { apiFetch } from "../src/lib/api";
@@ -38,12 +38,17 @@ async function compressImage(file: File): Promise<File> {
 
 export default function AdminBlogEditor() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+
   const [title, setTitle] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(isEdit);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const docxInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,6 +57,29 @@ export default function AdminBlogEditor() {
       setError(null);
     }
   }, [coverImageUrl, htmlContent]);
+
+  useEffect(() => {
+    if (!isEdit) return;
+
+    const loadBlog = async () => {
+      try {
+        const data = await apiFetch<{
+          title: string;
+          cover_image_url?: string | null;
+          company_name?: string | null;
+        }>(`/api/blogs/${id}`);
+        setTitle(data.title || "");
+        setCoverImageUrl(data.cover_image_url || null);
+        setCompanyName(data.company_name || "");
+      } catch (err: any) {
+        setError(err.message || "Failed to load blog");
+      } finally {
+        setPageLoading(false);
+      }
+    };
+
+    loadBlog();
+  }, [id, isEdit]);
 
   // ---------------- IMAGE UPLOAD ----------------
   async function handleImageUpload(file: File) {
@@ -92,33 +120,48 @@ export default function AdminBlogEditor() {
       return;
     }
 
-    if (!htmlContent || !htmlContent.trim()) {
+    if (!companyName.trim()) {
+      setError("Company Name is required");
+      return;
+    }
+
+    if (!isEdit && (!htmlContent || !htmlContent.trim())) {
       setError("Please upload a .docx file with your content");
       return;
     }
 
-    if (!coverImageUrl) {
+    if (!isEdit && !coverImageUrl) {
       setError("Please upload a cover image");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       // Payload matches Supabase schema exactly: cover_image_url (text), content (text/HTML)
-      const payload = {
+      const payload: any = {
         title: title.trim(),
+        company_name: companyName.trim(),
         cover_image_url: coverImageUrl,  // Supabase column name
-        content: htmlContent,            // Plain HTML string
         published: true,
       };
-      
+
+      // Only include content if it's being updated
+      if (htmlContent) {
+        payload.content = htmlContent;   // Plain HTML string
+      }
+
       console.log("Publishing blog with payload:", JSON.stringify(payload, null, 2));
-      
-      const responseData = await apiFetch<any>("/api/blogs", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+
+      const responseData = isEdit
+        ? await apiFetch<any>(`/api/blogs/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(payload),
+          })
+        : await apiFetch<any>("/api/blogs", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
       console.log("Publish response:", responseData);
 
       navigate("/admin/dashboard");
@@ -138,6 +181,12 @@ export default function AdminBlogEditor() {
           New Blog
         </motion.h1>
 
+        {pageLoading && (
+          <div className="mb-4 p-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 text-center">
+            Loading editor…
+          </div>
+        )}
+
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
             {error}
@@ -152,7 +201,14 @@ export default function AdminBlogEditor() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            
+
+            <input
+              className="bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF]"
+              placeholder="Company Name"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
+
             {/* Cover Image Upload */}
             <div className="md:col-span-2">
               <label className="block text-sm text-gray-700 mb-2">Cover Image</label>
@@ -222,6 +278,11 @@ export default function AdminBlogEditor() {
                 onChange={(e) => e.target.files && handleDocxUpload(e.target.files[0])}
                 className="hidden"
               />
+              {isEdit && !htmlContent && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Leave empty to keep existing content
+                </p>
+              )}
             </div>
           </div>
 

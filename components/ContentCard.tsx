@@ -4,6 +4,7 @@ import { getProxiedImageUrl } from "../src/utils/imageProxy";
 
 export type ContentCardProps = {
   title: string;
+  companyName?: string | null;
   excerpt?: string | null;
   coverImageUrl?: string | null;
   date?: string | null;
@@ -13,6 +14,7 @@ export type ContentCardProps = {
 
 const ContentCard: React.FC<ContentCardProps> = ({
   title,
+  companyName,
   excerpt,
   coverImageUrl,
   date,
@@ -59,6 +61,10 @@ const ContentCard: React.FC<ContentCardProps> = ({
           >
             {title}
           </h3>
+
+          {companyName ? (
+            <p className="text-sm text-gray-500">{companyName}</p>
+          ) : null}
 
           {excerpt ? (
             <p

@@ -42,6 +42,7 @@ const AdminCaseStudyEditor: React.FC = () => {
   const isEdit = Boolean(id);
 
   const [title, setTitle] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -60,9 +61,11 @@ const AdminCaseStudyEditor: React.FC = () => {
           title: string;
           slug: string;
           cover_image_url?: string | null;
+          company_name?: string | null;
         }>(`/api/case-studies/${id}`);
         setTitle(data.title || "");
         setCoverImageUrl(data.cover_image_url || "");
+        setCompanyName(data.company_name || "");
       } catch (e: any) {
         setError(e.message || "Failed to load case study");
       } finally {
@@ -128,6 +131,12 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
+      if (!companyName.trim()) {
+        setError("Company Name is required");
+        setSaving(false);
+        return;
+      }
+
       if (!isEdit && !htmlContent) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
@@ -137,6 +146,7 @@ const AdminCaseStudyEditor: React.FC = () => {
       // Payload matches Supabase schema: cover_image_url (text), content (text/HTML)
       const payload: any = {
         title: title.trim(),
+        company_name: companyName.trim(),
         cover_image_url: coverImageUrl,  // Supabase column name
         published: false,
       };
@@ -174,6 +184,12 @@ const AdminCaseStudyEditor: React.FC = () => {
         return;
       }
 
+      if (!companyName.trim()) {
+        setError("Company Name is required");
+        setSaving(false);
+        return;
+      }
+
       if (!isEdit && !htmlContent) {
         setError("Please upload a .docx file with your content");
         setSaving(false);
@@ -183,6 +199,7 @@ const AdminCaseStudyEditor: React.FC = () => {
       // Payload matches Supabase schema exactly: cover_image_url (text), content (text/HTML)
       const payload: any = {
         title: title.trim(),
+        company_name: companyName.trim(),
         cover_image_url: coverImageUrl,  // Supabase column name
         published: true,
       };
@@ -246,7 +263,14 @@ const AdminCaseStudyEditor: React.FC = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            
+
+            <input
+              className="bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 md:col-span-2 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF]"
+              placeholder="Company Name"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
+
             {/* Cover Image Upload */}
             <div className="md:col-span-2">
               <label className="block text-sm text-gray-700 mb-2">Cover Image</label>

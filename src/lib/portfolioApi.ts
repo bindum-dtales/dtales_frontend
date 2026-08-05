@@ -4,12 +4,17 @@ import { uploadImage } from "./uploads";
 export interface PortfolioItem {
   id: number;
   title: string;
-  link: string;
-  category: string;
+  link: string | null;
+  content?: string | null;
+  capability: string;
+  subcategory: string;
+  company_name: string;
+  description: string;
+  featured: boolean;
   cover_image_url: string;
-  published: boolean;
-  created_at: string;
-  updated_at: string;
+  published?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 /**
@@ -19,9 +24,14 @@ export interface PortfolioItem {
  */
 export async function createPortfolio(data: {
   title: string;
-  link: string;
-  category: string;
+  company_name: string;
+  description: string;
+  capability: string;
+  subcategory: string;
+  featured: boolean;
   cover_image_url: string;
+  link?: string | null;
+  content?: string | null;
   published: boolean;
 }): Promise<PortfolioItem> {
   const result = await apiFetch<PortfolioItem>("/api/portfolio", {
@@ -37,23 +47,12 @@ export async function createPortfolio(data: {
  * @returns Array of portfolio items
  */
 export async function getAllPortfolio(): Promise<PortfolioItem[]> {
-  const data = await getPortfolio();
-  return Array.isArray(data) ? data : [];
+  return getPortfolio();
 }
 
-export async function getPortfolio() {
+export async function getPortfolio(): Promise<PortfolioItem[]> {
   try {
-    const data = await apiFetch<any>("/api/portfolio");
-
-    if (!data) return [];
-
-    // Handle all possible backend formats
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.data)) return data.data;
-    if (Array.isArray(data?.items)) return data.items;
-
-    console.warn("Unknown format:", data);
-    return [];
+    return await apiFetch<PortfolioItem[]>("/api/portfolio");
   } catch (err) {
     console.error("Portfolio fetch failed:", err);
     return [];
@@ -68,9 +67,14 @@ export async function getPortfolio() {
  */
 export async function updatePortfolio(id: number, data: {
   title: string;
-  link: string;
-  category: string;
+  company_name: string;
+  description: string;
+  capability: string;
+  subcategory: string;
+  featured: boolean;
   cover_image_url: string;
+  link?: string | null;
+  content?: string | null;
   published: boolean;
 }): Promise<PortfolioItem> {
   const result = await apiFetch<PortfolioItem>(`/api/portfolio/${id}`, {

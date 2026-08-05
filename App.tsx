@@ -7,8 +7,15 @@ import Home from './pages/Home';
 import Team from './pages/Team';
 import Services from './pages/Services';
 import Portfolio from './pages/Portfolio';
+import ProductMarketing from './pages/ProductMarketing';
+import SalesEnablement from './pages/SalesEnablement';
+import TechnicalDocumentation from './pages/TechnicalDocumentation';
+import ProductExperience from './pages/ProductExperience';
+import DigitalExperience from './pages/DigitalExperience';
+import GtmStrategy from './pages/GtmStrategy';
 import Blogs from './pages/Blogs';
 import BlogDetails from './pages/BlogDetails';
+import PortfolioDetails from './pages/PortfolioDetails';
 import CaseStudies from './pages/CaseStudies';
 import CaseStudyDetails from './pages/CaseStudyDetails';
 import Contact from './pages/Contact';
@@ -51,6 +58,13 @@ const App: React.FC = () => {
             <Route path="/team" element={<Team />} />
             <Route path="/services" element={<Services />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/portfolio/:id" element={<PortfolioDetails />} />
+            <Route path="/work/product-marketing" element={<ProductMarketing />} />
+            <Route path="/work/sales-enablement" element={<SalesEnablement />} />
+            <Route path="/work/technical-documentation" element={<TechnicalDocumentation />} />
+            <Route path="/work/product-experience" element={<ProductExperience />} />
+            <Route path="/work/digital-experience" element={<DigitalExperience />} />
+            <Route path="/work/gtm-strategy" element={<GtmStrategy />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blogs/:id" element={<BlogDetails />} />
             <Route

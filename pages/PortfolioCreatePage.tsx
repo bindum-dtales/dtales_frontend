@@ -1,22 +1,43 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Upload, X, CheckCircle } from "lucide-react";
+import { Upload, X, CheckCircle, FileText } from "lucide-react";
 import {
   createPortfolio,
   updatePortfolio,
   uploadPortfolioImage,
   PortfolioItem,
 } from "../src/lib/portfolioApi";
+import { parseDocxToHtml } from "../src/lib/docxParser";
 import SEO from '../components/seo/SEO';
 
 // Image upload constraints
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
+// Temporary static data for the Capability / Subcategory fields.
+const CAPABILITIES = [
+  "Product Marketing",
+  "Sales Enablement",
+  "Technical Documentation",
+  "Product Experience",
+  "Digital Experience",
+  "GTM Strategy",
+] as const;
+
+const SUBCATEGORIES_BY_CAPABILITY: Record<string, string[]> = {
+  "Product Marketing": ["LinkedIn Posts", "IG Posts", "Campaigns", "LinkedIn Ads"],
+  "Sales Enablement": ["Slide Decks", "Brochures", "Flyers", "Service Profiles"],
+  "Technical Documentation": ["Integration Docs", "User Guides", "API Guides", "Docs Portal"],
+  "Product Experience": ["Ad Videos", "Product Demos", "Feature Demos"],
+  "Digital Experience": ["Product Webpages", "Prototypes", "Brand Systems", "Campaign"],
+  "GTM Strategy": ["Messaging", "Positioning", "Content Strategy", "Campaign Planning"],
+};
+
 interface PortfolioFormData {
   title: string;
+  companyName: string;
+  description: string;
   projectLink: string;
-  category: "video" | "web" | "branding" | "featured_project" | "";
   coverImage: File | null;
   previewUrl: string | null;
 }
@@ -29,8 +50,9 @@ export default function PortfolioCreatePage() {
 
   const [formData, setFormData] = useState<PortfolioFormData>({
     title: editingItem?.title || "",
+    companyName: editingItem?.company_name || "",
+    description: editingItem?.description || "",
     projectLink: editingItem?.link || "",
-    category: (editingItem?.category.toLowerCase() as any) || "",
     coverImage: null,
     previewUrl: editingItem?.cover_image_url || null,
   });
@@ -39,6 +61,28 @@ export default function PortfolioCreatePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const docxInputRef = useRef<HTMLInputElement>(null);
+
+  const [capability, setCapability] = useState("");
+  const [subcategory, setSubcategory] = useState("");
+  const [featured, setFeatured] = useState(editingItem?.featured ?? false);
+
+  const [documentHtml, setDocumentHtml] = useState<string | null>(
+    editingItem?.content || null
+  );
+  const [docxUploading, setDocxUploading] = useState(false);
+
+  const hasProjectLink = formData.projectLink.trim().length > 0;
+  const hasDocument = !!documentHtml;
+
+  const handleCapabilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCapability(e.target.value);
+    setSubcategory("");
+  };
+
+  const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSubcategory(e.target.value);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -49,10 +93,11 @@ export default function PortfolioCreatePage() {
     setError(null);
   };
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      category: e.target.value as "video" | "web" | "branding" | "featured_project" | "",
+      [name]: value,
     }));
     setError(null);
   };
@@ -93,6 +138,32 @@ export default function PortfolioCreatePage() {
     }
   };
 
+  const handleDocxUpload = async (file: File | null) => {
+    if (!file) return;
+    setError(null);
+    setDocxUploading(true);
+
+    try {
+      const html = await parseDocxToHtml(file);
+      if (html && html.trim()) {
+        setDocumentHtml(html);
+      } else {
+        setError("Failed to parse .docx file: no content extracted");
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to parse .docx file");
+    } finally {
+      setDocxUploading(false);
+      if (docxInputRef.current) {
+        docxInputRef.current.value = "";
+      }
+    }
+  };
+
+  const removeDocument = () => {
+    setDocumentHtml(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -103,13 +174,18 @@ export default function PortfolioCreatePage() {
       return;
     }
 
-    if (!formData.projectLink.trim()) {
-      setError("Project Link is required");
+    if (!formData.projectLink.trim() && !documentHtml) {
+      setError("Provide a Project Link or upload a document");
       return;
     }
 
-    if (!formData.category) {
-      setError("Category is required");
+    if (!capability) {
+      setError("Capability is required");
+      return;
+    }
+
+    if (!subcategory) {
+      setError("Subcategory is required");
       return;
     }
 
@@ -131,9 +207,14 @@ export default function PortfolioCreatePage() {
 
       const portfolioData = {
         title: formData.title,
-        link: formData.projectLink,
-        category: formData.category,
+        company_name: formData.companyName,
+        description: formData.description,
+        capability,
+        subcategory,
+        featured,
         cover_image_url: imageUrl!,
+        link: formData.projectLink.trim() ? formData.projectLink.trim() : null,
+        content: documentHtml || null,
         published: true,
       };
 
@@ -223,6 +304,21 @@ export default function PortfolioCreatePage() {
               />
             </div>
 
+            {/* Company Name Field */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Company Name
+              </label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleInputChange}
+                placeholder="Enter company name"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-[#0020BF] transition-colors"
+              />
+            </div>
+
             {/* Project Link Field */}
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
@@ -234,27 +330,149 @@ export default function PortfolioCreatePage() {
                 value={formData.projectLink}
                 onChange={handleInputChange}
                 placeholder="https://example.com"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-[#0020BF] transition-colors"
+                disabled={hasDocument}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-[#0020BF] transition-colors disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+              />
+              {hasDocument && (
+                <p className="text-xs text-gray-500 mt-1.5">
+                  Remove the document to use an external project link.
+                </p>
+              )}
+            </div>
+
+            {/* Document Upload */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Document Upload
+              </label>
+
+              {documentHtml ? (
+                <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-xl bg-gray-50">
+                  <FileText className="text-[#0020BF] flex-shrink-0" size={20} />
+                  <span className="flex-1 text-sm font-medium text-gray-900">
+                    Document Uploaded
+                  </span>
+                  <button
+                    type="button"
+                    onClick={removeDocument}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => docxInputRef.current?.click()}
+                  disabled={hasProjectLink || docxUploading}
+                  className="w-full py-3 px-4 border border-gray-200 rounded-xl text-gray-900 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Upload size={18} />
+                  {docxUploading ? "Parsing..." : "Choose .docx File"}
+                </button>
+              )}
+
+              {hasProjectLink && !documentHtml && (
+                <p className="text-xs text-gray-500 mt-1.5">
+                  Clear the Project Link to upload a document.
+                </p>
+              )}
+
+              <input
+                ref={docxInputRef}
+                type="file"
+                accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={(e) => handleDocxUpload(e.target.files?.[0] || null)}
+                className="hidden"
               />
             </div>
 
-            {/* Category Dropdown */}
+            {/* Description Field */}
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Category
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleTextAreaChange}
+                placeholder="Enter project description"
+                rows={4}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-[#0020BF] transition-colors resize-none"
+              />
+            </div>
+
+            {/* Capability Dropdown */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Capability
               </label>
               <select
-                name="category"
-                value={formData.category}
-                onChange={handleCategoryChange}
+                name="capability"
+                value={capability}
+                onChange={handleCapabilityChange}
+                required
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 focus:outline-none focus:border-[#0020BF] transition-colors cursor-pointer"
               >
-                <option value="">Select a category</option>
-                <option value="video">Video</option>
-                <option value="web">Web</option>
-                <option value="branding">Branding</option>
-                <option value="featured_project">Featured Project</option>
+                <option value="">Select a capability</option>
+                {CAPABILITIES.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
               </select>
+            </div>
+
+            {/* Subcategory Dropdown */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Subcategory
+              </label>
+              <select
+                name="subcategory"
+                value={subcategory}
+                onChange={handleSubcategoryChange}
+                required
+                disabled={!capability}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-gray-900 focus:outline-none focus:border-[#0020BF] transition-colors cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {capability ? "Select a subcategory" : "Select a capability first"}
+                </option>
+                {capability &&
+                  SUBCATEGORIES_BY_CAPABILITY[capability].map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Featured Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">
+                  Featured
+                </label>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Show this project in the featured section
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={featured}
+                onClick={() => setFeatured((prev) => !prev)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  featured ? "bg-[#0020BF]" : "bg-gray-200"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    featured ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
             </div>
 
             {/* Cover Image Upload */}

@@ -1,0 +1,14 @@
+export const HERO_EYEBROW = "/ Work Library";
+
+export const HERO_HEADING = {
+  line1: "Purposeful content.",
+  highlight: "Measurable",
+  suffix: "impact.",
+};
+
+export const HERO_DESCRIPTION =
+  "Explore how we turn complex technology into content that drives awareness, builds trust and accelerates growth.";
+
+export const HERO_PRIMARY_CTA = "Explore Work Library";
+
+export const HERO_SECONDARY_CTA = "See how we work";
