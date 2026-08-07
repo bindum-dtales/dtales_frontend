@@ -8,17 +8,17 @@ export default function Portfolio() {
     <main className="min-h-screen bg-[#FCFCFD]">
       <div className="mx-auto w-full max-w-[96rem] px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <section className="pt-24 pb-16 sm:pb-20 lg:pb-24">
+        <section className="pt-24">
           <Hero />
         </section>
 
         {/* Stats Section */}
-        <section className="py-16 sm:py-20 lg:py-24">
+        <section className="pt-10 pb-10 sm:pt-14 sm:pb-14 lg:pt-20 lg:pb-20">
           <Stats />
         </section>
 
         {/* Capability Cards Section */}
-        <section className="pt-16 sm:pt-20 lg:pt-24 pb-8 sm:pb-10 lg:pb-12">
+        <section className="pb-8 sm:pb-10 lg:pb-12">
           <CapabilityCards />
         </section>
 
