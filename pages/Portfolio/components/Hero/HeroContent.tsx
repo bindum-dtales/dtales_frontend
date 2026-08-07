@@ -6,6 +6,7 @@ import {
   HERO_PRIMARY_CTA,
   HERO_PRIMARY_CTA_URL,
 } from "../../data/hero";
+import { Stats } from "../Stats";
 
 export function HeroContent() {
   return (
@@ -39,6 +40,11 @@ export function HeroContent() {
           {HERO_PRIMARY_CTA}
           <ArrowRight className="h-4 w-4" />
         </a>
+      </div>
+
+      {/* Stats */}
+      <div className="mt-8">
+        <Stats />
       </div>
     </div>
   );

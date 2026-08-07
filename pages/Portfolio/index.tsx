@@ -1,5 +1,4 @@
 import { Hero } from "./components/Hero";
-import { Stats } from "./components/Stats";
 import { CapabilityCards } from "./components/CapabilityCards";
 import { ProcessTimeline } from "./components/ProcessTimeline";
 
@@ -12,13 +11,8 @@ export default function Portfolio() {
           <Hero />
         </section>
 
-        {/* Stats Section */}
-        <section className="pt-6 pb-10 sm:pt-8 sm:pb-14 lg:pt-10 lg:pb-20">
-          <Stats />
-        </section>
-
         {/* Capability Cards Section */}
-        <section className="pb-8 sm:pb-10 lg:pb-12">
+        <section className="pt-10 pb-8 sm:pt-14 sm:pb-10 lg:pt-20 lg:pb-12">
           <CapabilityCards />
         </section>
 
