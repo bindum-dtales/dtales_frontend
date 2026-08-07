@@ -1,14 +1,17 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Upload, X, CheckCircle, FileText } from "lucide-react";
+import { Upload, X, CheckCircle, FileText, FileSpreadsheet, FileType } from "lucide-react";
 import {
   createPortfolio,
   updatePortfolio,
   uploadPortfolioImage,
   PortfolioItem,
 } from "../src/lib/portfolioApi";
-import { parseDocxToHtml } from "../src/lib/docxParser";
+import {
+  buildAttachmentPreview,
+  AttachmentPreview,
+} from "../src/lib/attachmentParser";
 import SEO from '../components/seo/SEO';
 
 // Image upload constraints
@@ -61,19 +64,28 @@ export default function PortfolioCreatePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
-  const docxInputRef = useRef<HTMLInputElement>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
 
   const [capability, setCapability] = useState("");
   const [subcategory, setSubcategory] = useState("");
   const [featured, setFeatured] = useState(editingItem?.featured ?? false);
 
-  const [documentHtml, setDocumentHtml] = useState<string | null>(
-    editingItem?.content || null
+  const [attachment, setAttachment] = useState<AttachmentPreview | null>(
+    editingItem?.content
+      ? {
+          attachmentType: "document",
+          previewType: "html",
+          previewContent: editingItem.content,
+          fileName: "Document",
+        }
+      : null
   );
-  const [docxUploading, setDocxUploading] = useState(false);
+  const [attachmentProcessing, setAttachmentProcessing] = useState(false);
 
   const hasProjectLink = formData.projectLink.trim().length > 0;
-  const hasDocument = !!documentHtml;
+  const hasDocument = !!attachment;
+  const documentHtml =
+    attachment?.previewType === "html" ? attachment.previewContent : null;
 
   const handleCapabilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCapability(e.target.value);
@@ -138,30 +150,33 @@ export default function PortfolioCreatePage() {
     }
   };
 
-  const handleDocxUpload = async (file: File | null) => {
+  const handleAttachmentUpload = async (file: File | null) => {
     if (!file) return;
     setError(null);
-    setDocxUploading(true);
+    setAttachmentProcessing(true);
 
     try {
-      const html = await parseDocxToHtml(file);
-      if (html && html.trim()) {
-        setDocumentHtml(html);
+      const preview = await buildAttachmentPreview(file);
+      if (preview.previewType === "html" && !preview.previewContent?.trim()) {
+        setError("Failed to parse file: no content extracted");
       } else {
-        setError("Failed to parse .docx file: no content extracted");
+        setAttachment(preview);
       }
     } catch (err: any) {
-      setError(err.message || "Failed to parse .docx file");
+      setError(err.message || "Failed to parse file");
     } finally {
-      setDocxUploading(false);
-      if (docxInputRef.current) {
-        docxInputRef.current.value = "";
+      setAttachmentProcessing(false);
+      if (attachmentInputRef.current) {
+        attachmentInputRef.current.value = "";
       }
     }
   };
 
   const removeDocument = () => {
-    setDocumentHtml(null);
+    if (attachment?.previewType === "image" && attachment.previewContent) {
+      URL.revokeObjectURL(attachment.previewContent);
+    }
+    setAttachment(null);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -174,7 +189,7 @@ export default function PortfolioCreatePage() {
       return;
     }
 
-    if (!formData.projectLink.trim() && !documentHtml) {
+    if (!formData.projectLink.trim() && !hasDocument) {
       setError("Provide a Project Link or upload a document");
       return;
     }
@@ -340,49 +355,97 @@ export default function PortfolioCreatePage() {
               )}
             </div>
 
-            {/* Document Upload */}
+            {/* Attachment Upload */}
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Document Upload
+                Attachment
               </label>
 
-              {documentHtml ? (
-                <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-xl bg-gray-50">
-                  <FileText className="text-[#0020BF] flex-shrink-0" size={20} />
-                  <span className="flex-1 text-sm font-medium text-gray-900">
-                    Document Uploaded
-                  </span>
-                  <button
-                    type="button"
-                    onClick={removeDocument}
-                    className="text-red-500 hover:text-red-600"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
+              {attachment ? (
+                attachment.previewType === "image" ? (
+                  <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+                    <img
+                      src={attachment.previewContent || ""}
+                      alt={attachment.fileName}
+                      className="w-full h-48 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeDocument}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : attachment.previewType === "html" ? (
+                  <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-xl bg-gray-50">
+                    <FileText className="text-[#0020BF] flex-shrink-0" size={20} />
+                    <span className="flex-1 text-sm font-medium text-gray-900">
+                      Document Uploaded
+                    </span>
+                    <button
+                      type="button"
+                      onClick={removeDocument}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-xl bg-gray-50">
+                    {attachment.attachmentType === "spreadsheet" ? (
+                      <FileSpreadsheet className="text-[#0020BF] flex-shrink-0" size={20} />
+                    ) : (
+                      <FileType className="text-[#0020BF] flex-shrink-0" size={20} />
+                    )}
+                    <span className="flex-1 min-w-0 text-sm font-medium text-gray-900">
+                      <span className="block">
+                        {attachment.attachmentType === "pdf"
+                          ? "PDF selected:"
+                          : attachment.attachmentType === "spreadsheet"
+                          ? "Spreadsheet selected:"
+                          : "Document selected:"}
+                      </span>
+                      <span className="block truncate text-gray-600 font-normal">
+                        {attachment.fileName}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={removeDocument}
+                      className="text-red-500 hover:text-red-600"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                )
               ) : (
                 <button
                   type="button"
-                  onClick={() => docxInputRef.current?.click()}
-                  disabled={hasProjectLink || docxUploading}
+                  onClick={() => attachmentInputRef.current?.click()}
+                  disabled={hasProjectLink || attachmentProcessing}
                   className="w-full py-3 px-4 border border-gray-200 rounded-xl text-gray-900 font-medium hover:bg-gray-50 transition-colors disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <Upload size={18} />
-                  {docxUploading ? "Parsing..." : "Choose .docx File"}
+                  {attachmentProcessing ? "Parsing..." : "Choose Attachment"}
                 </button>
               )}
 
-              {hasProjectLink && !documentHtml && (
+              {hasProjectLink && !attachment && (
                 <p className="text-xs text-gray-500 mt-1.5">
                   Clear the Project Link to upload a document.
                 </p>
               )}
 
+              <p className="text-xs text-gray-500 mt-1.5">
+                Supports DOCX, PDF, TXT, Markdown, Excel, CSV, RTF, ODT, and image files.
+              </p>
+
               <input
-                ref={docxInputRef}
+                ref={attachmentInputRef}
                 type="file"
-                accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                onChange={(e) => handleDocxUpload(e.target.files?.[0] || null)}
+                accept=".docx,.txt,.md,.pdf,.csv,.xls,.xlsx,.rtf,.odt,.jpg,.jpeg,.png,.webp,.svg,.bmp,.gif,.tif,.tiff"
+                onChange={(e) => handleAttachmentUpload(e.target.files?.[0] || null)}
                 className="hidden"
               />
             </div>
