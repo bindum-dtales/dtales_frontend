@@ -9,6 +9,6 @@ export const HERO_HEADING = {
 export const HERO_DESCRIPTION =
   "Explore how we turn complex technology into content that drives awareness, builds trust and accelerates growth.";
 
-export const HERO_PRIMARY_CTA = "Explore Work Library";
+export const HERO_PRIMARY_CTA = "See how we work";
 
-export const HERO_SECONDARY_CTA = "See how we work";
+export const HERO_PRIMARY_CTA_URL = "https://www.youtube.com/watch?v=URkNGufzfvI";

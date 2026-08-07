@@ -8,12 +8,12 @@ export default function Portfolio() {
     <main className="min-h-screen bg-[#FCFCFD]">
       <div className="mx-auto w-full max-w-[96rem] px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <section className="pt-24">
+        <section className="pt-10 sm:pt-14 lg:pt-16">
           <Hero />
         </section>
 
         {/* Stats Section */}
-        <section className="pt-10 pb-10 sm:pt-14 sm:pb-14 lg:pt-20 lg:pb-20">
+        <section className="pt-6 pb-10 sm:pt-8 sm:pb-14 lg:pt-10 lg:pb-20">
           <Stats />
         </section>
 

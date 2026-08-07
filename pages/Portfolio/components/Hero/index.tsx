@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <div className="bg-[#FCFCFD]">
       {/* Hero Grid */}
-      <div className="grid grid-cols-1 gap-8 pt-6 sm:pt-8 lg:grid-cols-12 lg:gap-12 lg:pt-10">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
         {/* Left: Hero Content */}
         <div className="flex items-center lg:col-span-5 lg:items-start">
           <HeroContent />

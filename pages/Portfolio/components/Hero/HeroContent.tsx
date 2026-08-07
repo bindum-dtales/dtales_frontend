@@ -1,10 +1,10 @@
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
   HERO_EYEBROW,
   HERO_HEADING,
   HERO_DESCRIPTION,
   HERO_PRIMARY_CTA,
-  HERO_SECONDARY_CTA,
+  HERO_PRIMARY_CTA_URL,
 } from "../../data/hero";
 
 export function HeroContent() {
@@ -30,23 +30,15 @@ export function HeroContent() {
 
       {/* CTAs */}
       <div className="mt-8 flex flex-wrap items-center gap-6">
-        <button
-          type="button"
+        <a
+          href={HERO_PRIMARY_CTA_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-full bg-[#0020BF] px-6 py-3 text-sm font-semibold text-white"
         >
           {HERO_PRIMARY_CTA}
           <ArrowRight className="h-4 w-4" />
-        </button>
-
-        <button
-          type="button"
-          className="inline-flex items-center gap-2 text-sm font-medium text-neutral-700"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-300">
-            <Play className="h-3.5 w-3.5" />
-          </span>
-          {HERO_SECONDARY_CTA}
-        </button>
+        </a>
       </div>
     </div>
   );
