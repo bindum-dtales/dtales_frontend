@@ -12,7 +12,7 @@ export default function Portfolio() {
         </section>
 
         {/* Capability Cards Section */}
-        <section className="pt-10 pb-8 sm:pt-14 sm:pb-10 lg:pt-20 lg:pb-12">
+        <section className="pt-2 pb-8 sm:pt-4 sm:pb-10 lg:pt-5 lg:pb-12">
           <CapabilityCards />
         </section>
 

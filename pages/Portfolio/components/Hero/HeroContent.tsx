@@ -6,11 +6,10 @@ import {
   HERO_PRIMARY_CTA,
   HERO_PRIMARY_CTA_URL,
 } from "../../data/hero";
-import { Stats } from "../Stats";
 
 export function HeroContent() {
   return (
-    <div className="max-w-xl [transform:translateX(-48px)]">
+    <div className="max-w-xl [transform:translateX(-16px)]">
       {/* Eyebrow */}
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0020BF]">
         {HERO_EYEBROW}
@@ -40,11 +39,6 @@ export function HeroContent() {
           {HERO_PRIMARY_CTA}
           <ArrowRight className="h-4 w-4" />
         </a>
-      </div>
-
-      {/* Stats */}
-      <div className="mt-8">
-        <Stats />
       </div>
     </div>
   );
