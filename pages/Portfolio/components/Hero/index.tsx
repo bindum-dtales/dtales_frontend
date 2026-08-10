@@ -7,9 +7,9 @@ export function Hero() {
   return (
     <div className="bg-[#FCFCFD]">
       {/* Hero Grid */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8">
         {/* Left: Hero Content + Illustration + Stats */}
-        <div className="lg:col-span-9">
+        <div className="lg:col-span-8">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-9 lg:gap-12">
             {/* Hero Content */}
             <div className="flex items-center lg:col-span-5 lg:items-start">
@@ -33,7 +33,7 @@ export function Hero() {
         </div>
 
         {/* Right: Featured Clients */}
-        <div className="lg:col-span-3 lg:border-l lg:border-neutral-200 lg:pl-8">
+        <div className="lg:col-span-4 lg:border-l lg:border-neutral-200 lg:pl-8">
           <FeaturedClients />
         </div>
       </div>

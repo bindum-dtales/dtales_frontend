@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* LOGO */}
-        <Link to="/" className="z-50 relative group flex items-center">
+        <Link to="/" className="z-50 relative group flex items-center -ml-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }} 
             animate={{ opacity: 1, scale: 1 }}

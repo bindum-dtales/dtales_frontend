@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import { PORTFOLIO_CAPABILITIES } from "../../data/capabilities";
 import tecbgImage from "@/src/assets/tecbg.jpeg";
 import probgImage from "@/src/assets/probg.png";
+import marbgImage from "@/src/assets/marbg.jpeg";
+import salbgImage from "@/src/assets/salbg.jpeg";
+import digbgImage from "@/src/assets/digbg.jpeg";
 
 // These titles otherwise stay on one line at wide desktop widths; capping
 // their width forces the same natural two-line wrap "Technical Documentation"
@@ -53,11 +56,20 @@ export function CapabilityCards() {
         {PORTFOLIO_CAPABILITIES.map(({ number, title, description, bullets, href }) => {
           const isTechnicalDocumentation = title === "Technical Documentation";
           const isProductExperience = href === "/work/product-experience";
+          const isProductMarketing = title === "Product Marketing";
+          const isSalesEnablement = title === "Sales Enablement";
+          const isDigitalExperience = title === "Digital Experience";
           const cardBgImage = isTechnicalDocumentation
             ? tecbgImage
             : isProductExperience
               ? probgImage
-              : undefined;
+              : isProductMarketing
+                ? marbgImage
+                : isSalesEnablement
+                  ? salbgImage
+                  : isDigitalExperience
+                    ? digbgImage
+                    : undefined;
           return (
           <Link
             key={number}

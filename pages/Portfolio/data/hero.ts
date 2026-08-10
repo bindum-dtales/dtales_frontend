@@ -1,4 +1,4 @@
-export const HERO_EYEBROW = "/ Work Library";
+export const HERO_EYEBROW = "Work Library";
 
 export const HERO_HEADING = {
   line1: "Purposeful content.",

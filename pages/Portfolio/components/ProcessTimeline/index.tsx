@@ -17,7 +17,7 @@ export function ProcessTimeline() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0020BF]">
           How We Approach
         </p>
-        <h2 className="mt-6 text-5xl font-bold leading-[1.1] tracking-tight text-neutral-950 sm:text-6xl">
+        <h2 className="mt-6 text-5xl font-bold leading-[1.1] tracking-tight text-neutral-950 sm:text-5xl">
           Engineered
           <br />
           for outcomes
