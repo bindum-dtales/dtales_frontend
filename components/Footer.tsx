@@ -56,9 +56,7 @@ const Footer: React.FC = () => {
             <div>
               <h4 className="font-semibold text-lg mb-2">Contact Us</h4>
               <p className="text-gray-400 text-sm">
-                <a href="mailto:contact@dtales.tech" className="hover:text-white transition-colors">
-                  Mail: contact@dtales.tech
-                </a>
+                296, 1st Floor, 15th A Cross Rd, Sector A, <br /> Yelahanka New Town, Bengaluru, Karnataka 560064 <br /> Ph: 91-9901071102
               </p>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+4import React from 'react';
 import SchemaScript from './SchemaScript';
 import { buildAbsoluteUrl, buildRouteUrl, SITE_NAME } from '../../src/config/site';
 
