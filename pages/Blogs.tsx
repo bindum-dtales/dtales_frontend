@@ -11,6 +11,7 @@ type Blog = {
 	id: string;
 	title: string;
 	slug: string;
+	company_name?: string | null;
 	cover_image_url?: string | null;
 	excerpt: string;
 	content?: string;
@@ -158,6 +159,7 @@ const Blogs: React.FC = () => {
                     <ContentCard
                         key={blog.id}
                         title={blog.title}
+                        companyName={blog.company_name}
                         excerpt={blog.excerpt || getExcerpt(blog.content)}
                         coverImageUrl={blog.cover_image_url || undefined}
                         date={blog.created_at}

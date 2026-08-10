@@ -68,3 +68,9 @@ coverage/
 # ===============================
 .render/
 
+# ===============================
+# Generated SEO files (regenerated on every `npm run build`)
+# ===============================
+public/sitemap.xml
+public/robots.txt
+

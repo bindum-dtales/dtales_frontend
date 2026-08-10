@@ -228,7 +228,13 @@ export function PortfolioShowcase() {
 
         if (isMounted) {
           console.debug("Portfolio projects received:", safeProjects.length);
-          setProjects(safeProjects);
+          setProjects(
+            safeProjects.map((item) => ({
+              ...item,
+              category: item.capability,
+              link: item.link ?? undefined,
+            }))
+          );
         }
       } catch (error) {
         console.error("Failed to load portfolio projects:", error);
