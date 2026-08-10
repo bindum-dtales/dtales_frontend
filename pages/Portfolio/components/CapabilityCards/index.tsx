@@ -1,35 +1,9 @@
 import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PORTFOLIO_CAPABILITIES } from "../../data/capabilities";
-import penImage from "@/src/assets/pen.png";
-import graphImage from "@/src/assets/graph.png";
-import bookImage from "@/src/assets/book.png";
-import cameraImage from "@/src/assets/camera.png";
-import laptopImage from "@/src/assets/laptop.png";
-
-const CARD_IMAGES: Record<string, string> = {
-  "Product Marketing": penImage,
-  "Sales Enablement": graphImage,
-  "Technical Documentation": bookImage,
-  "Product Experience": cameraImage,
-  "Digital Experience": laptopImage,
-};
-
-// Bounded by whichever dimension keeps each asset's own aspect ratio compact
-// (several are taller than they are wide), so a shared width/height cap can't
-// be used across all five. Each ramps down for tablet/mobile so it keeps
-// shrinking proportionally below the stated (desktop) maximum. Position is
-// per-title too: Sales Enablement and Technical Documentation sit ~12px
-// closer to the right edge than the rest; Product Experience and Digital
-// Experience sit further up from the bottom so their larger footprint
-// clears the arrow button instead of sitting behind it.
-const CARD_IMAGE_STYLE: Record<string, string> = {
-  "Product Marketing": "h-auto w-auto max-h-[67px] md:max-h-[81px] lg:max-h-[95px] bottom-[18px] right-[18px]",
-  "Sales Enablement": "h-auto w-auto max-w-[84px] md:max-w-[102px] lg:max-w-[120px] bottom-[18px] right-[3px]",
-  "Technical Documentation": "h-auto w-auto max-h-[88px] md:max-h-[107px] lg:max-h-[125px] bottom-[18px] right-[3px]",
-  "Product Experience": "h-auto w-auto max-h-[48px] md:max-h-[58px] lg:max-h-[68px] bottom-[68px] right-[18px]",
-  "Digital Experience": "h-auto w-auto max-w-[76px] md:max-w-[92px] lg:max-w-[108px] bottom-[68px] right-[18px]",
-};
+import tecbgImage from "@/src/assets/tecbg.jpeg";
+import probgImage from "@/src/assets/probg.png";
 
 // These titles otherwise stay on one line at wide desktop widths; capping
 // their width forces the same natural two-line wrap "Technical Documentation"
@@ -44,6 +18,25 @@ const TWO_LINE_TITLES = new Set([
 ]);
 
 export function CapabilityCards() {
+  // Tailwind's `hover:`/`group-hover:` variants only fire on devices whose
+  // primary input actually supports hover, so touch devices never get a
+  // "stuck" flip from a tap. This flag exists purely to give those devices
+  // an explicit tap-to-flip affordance instead: intercept the first tap to
+  // flip the card, then let the second tap follow the link normally.
+  const [canHover, setCanHover] = useState(true);
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setCanHover(mediaQuery.matches);
+  }, []);
+
+  const handleCardClick = (event: React.MouseEvent, number: string) => {
+    if (canHover || flippedCards.has(number)) return;
+    event.preventDefault();
+    setFlippedCards((prev) => new Set(prev).add(number));
+  };
+
   return (
     <div>
       {/* Eyebrow */}
@@ -57,50 +50,89 @@ export function CapabilityCards() {
       </h2>
 
       <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-6">
-        {PORTFOLIO_CAPABILITIES.map(({ number, title, description, bullets, href }) => (
+        {PORTFOLIO_CAPABILITIES.map(({ number, title, description, bullets, href }) => {
+          const isTechnicalDocumentation = title === "Technical Documentation";
+          const isProductExperience = href === "/work/product-experience";
+          const cardBgImage = isTechnicalDocumentation
+            ? tecbgImage
+            : isProductExperience
+              ? probgImage
+              : undefined;
+          return (
           <Link
             key={number}
             to={href}
-            className="relative flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white p-7 pb-14 shadow-sm"
+            onClick={(event) => handleCardClick(event, number)}
+            className="group block h-[340px] [perspective:1000px] sm:h-[360px] lg:h-[380px]"
           >
-            <span className="text-xs font-medium text-neutral-400">
-              {number}
-            </span>
-            <h3
-              className={`mt-4 text-xl font-bold tracking-tight text-neutral-950 ${
-                TWO_LINE_TITLES.has(title) ? "lg:max-w-[115px]" : ""
+            <div
+              className={`relative h-full w-full rounded-2xl transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] ${
+                flippedCards.has(number) ? "[transform:rotateY(180deg)]" : ""
               }`}
             >
-              {title}
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-              {description}
-            </p>
-            <ul className="mt-4 space-y-2.5">
-              {bullets.map((bullet) => (
-                <li key={bullet} className="text-xs text-neutral-500">
-                  • {bullet}
-                </li>
-              ))}
-            </ul>
+              {/* Front */}
+              <div
+                className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white bg-cover bg-center p-7 shadow-sm [backface-visibility:hidden]"
+                style={cardBgImage ? { backgroundImage: `url(${cardBgImage})` } : undefined}
+              >
+                {cardBgImage && (
+                  <div className="absolute inset-0 bg-white/55" aria-hidden="true" />
+                )}
+                <span className="relative text-xs font-medium text-neutral-400">
+                  {number}
+                </span>
+                <h3
+                  className={`relative mt-4 text-xl font-bold tracking-tight text-neutral-950 ${
+                    TWO_LINE_TITLES.has(title) ? "lg:max-w-[115px]" : ""
+                  }`}
+                >
+                  {title}
+                </h3>
+                <p className="relative mt-2 text-sm leading-relaxed text-neutral-500">
+                  {description}
+                </p>
 
-            {CARD_IMAGES[title] && (
-              <img
-                src={CARD_IMAGES[title]}
-                alt=""
-                aria-hidden="true"
-                className={`pointer-events-none absolute object-contain ${CARD_IMAGE_STYLE[title]}`}
-              />
-            )}
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-[#0020BF]"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
 
-            <span
-              aria-hidden="true"
-              className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-neutral-700"
-            >
-              <ArrowRight className="h-4 w-4" />
-            </span>
+              {/* Back */}
+              <div
+                className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white bg-cover bg-center p-7 shadow-sm [backface-visibility:hidden] [transform:rotateY(180deg)]"
+                style={cardBgImage ? { backgroundImage: `url(${cardBgImage})` } : undefined}
+              >
+                {cardBgImage && (
+                  <div className="absolute inset-0 bg-white/55" aria-hidden="true" />
+                )}
+                <span className="relative text-xs font-medium text-neutral-400">
+                  {number}
+                </span>
+                <h3 className="relative mt-4 text-xl font-bold tracking-tight text-neutral-950">
+                  {title}
+                </h3>
+                <ul className="relative mt-4 space-y-2.5">
+                  {bullets.map((bullet) => (
+                    <li key={bullet} className="text-xs text-neutral-500">
+                      • {bullet}
+                    </li>
+                  ))}
+                </ul>
+
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-[#0020BF] bg-[#0020BF] text-white"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </div>
           </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
