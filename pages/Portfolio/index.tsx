@@ -12,12 +12,12 @@ export default function Portfolio() {
         </section>
 
         {/* Capability Cards Section */}
-        <section className="pt-2 pb-8 sm:pt-4 sm:pb-10 lg:pt-5 lg:pb-12">
+        <section className="pt-2 pb-8 sm:pt-4 sm:pb-10 lg:pt-5 lg:pb-12 [transform:translateX(-16px)]">
           <CapabilityCards />
         </section>
 
         {/* Process Timeline Section */}
-        <section className="pt-10 sm:pt-12 lg:pt-16 pb-20 sm:pb-24 lg:pb-32">
+        <section className="pt-10 sm:pt-12 lg:pt-16 pb-20 sm:pb-24 lg:pb-32 [transform:translateX(-16px)]">
           <ProcessTimeline />
         </section>
       </div>

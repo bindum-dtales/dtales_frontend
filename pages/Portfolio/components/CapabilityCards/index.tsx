@@ -7,6 +7,7 @@ import probgImage from "@/src/assets/probg.png";
 import marbgImage from "@/src/assets/marbg.jpeg";
 import salbgImage from "@/src/assets/salbg.jpeg";
 import digbgImage from "@/src/assets/digbg.jpeg";
+import gmtbgImage from "@/src/assets/gmtbg.jpeg";
 
 // These titles otherwise stay on one line at wide desktop widths; capping
 // their width forces the same natural two-line wrap "Technical Documentation"
@@ -59,6 +60,7 @@ export function CapabilityCards() {
           const isProductMarketing = title === "Product Marketing";
           const isSalesEnablement = title === "Sales Enablement";
           const isDigitalExperience = title === "Digital Experience";
+          const isGTMStrategy = title === "GTM Strategy";
           const cardBgImage = isTechnicalDocumentation
             ? tecbgImage
             : isProductExperience
@@ -69,7 +71,9 @@ export function CapabilityCards() {
                   ? salbgImage
                   : isDigitalExperience
                     ? digbgImage
-                    : undefined;
+                    : isGTMStrategy
+                      ? gmtbgImage
+                      : undefined;
           return (
           <Link
             key={number}
@@ -93,20 +97,20 @@ export function CapabilityCards() {
                 <span className="relative text-xs font-medium text-neutral-400">
                   {number}
                 </span>
-                <h3
-                  className={`relative mt-4 text-xl font-bold tracking-tight text-neutral-950 ${
-                    TWO_LINE_TITLES.has(title) ? "lg:max-w-[115px]" : ""
-                  }`}
-                >
+                <h3 className="relative mt-4 text-xl font-bold tracking-tight text-neutral-950">
                   {title}
                 </h3>
-                <p className="relative mt-2 text-sm leading-relaxed text-neutral-500">
-                  {description}
-                </p>
+                <ul className="relative mt-4 space-y-2.5">
+                  {bullets.map((bullet) => (
+                    <li key={bullet} className="text-xs text-neutral-500">
+                      • {bullet}
+                    </li>
+                  ))}
+                </ul>
 
                 <span
                   aria-hidden="true"
-                  className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-[#0020BF]"
+                  className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-[#0020BF] bg-[#0020BF] text-white"
                 >
                   <ArrowRight className="h-4 w-4" />
                 </span>
@@ -123,20 +127,20 @@ export function CapabilityCards() {
                 <span className="relative text-xs font-medium text-neutral-400">
                   {number}
                 </span>
-                <h3 className="relative mt-4 text-xl font-bold tracking-tight text-neutral-950">
+                <h3
+                  className={`relative mt-4 text-xl font-bold tracking-tight text-neutral-950 ${
+                    TWO_LINE_TITLES.has(title) ? "lg:max-w-[115px]" : ""
+                  }`}
+                >
                   {title}
                 </h3>
-                <ul className="relative mt-4 space-y-2.5">
-                  {bullets.map((bullet) => (
-                    <li key={bullet} className="text-xs text-neutral-500">
-                      • {bullet}
-                    </li>
-                  ))}
-                </ul>
+                <p className="relative mt-2 text-sm leading-relaxed text-neutral-500">
+                  {description}
+                </p>
 
                 <span
                   aria-hidden="true"
-                  className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-[#0020BF] bg-[#0020BF] text-white"
+                  className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 text-[#0020BF]"
                 >
                   <ArrowRight className="h-4 w-4" />
                 </span>

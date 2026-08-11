@@ -17,7 +17,7 @@ export function FeaturedClients() {
       </p>
 
       {/* Heading */}
-      <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-neutral-950 sm:text-4xl lg:text-[40px]">
+      <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-neutral-950 sm:text-4xl lg:text-[38px]">
         Case studies that show{" "}
         <br className="hidden lg:block" />
         real outcomes
