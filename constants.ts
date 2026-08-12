@@ -4,13 +4,19 @@ import binduImage from './src/assets/bindu.jpeg';
 import sneehaImage from './src/assets/sneeha.jpeg';
 import yashImage from './src/assets/yash.png';
 import agarwalImage from './src/assets/agarwal.png';
+import binduCutout from './src/assets/bindubg.png';
+import sneehaCutout from './src/assets/sneehabg.png';
+import yashCutout from './src/assets/yashbg.png';
+import agarwalCutout from './src/assets/agarwalbg.png';
 
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Bindu Mohan",
     role: "Founder & Principal",
     image: binduImage,
+    cutoutImage: binduCutout,
     bio: "A seasoned technical documentation leader and consultant with almost two decades of experience in building and optimizing content processes and teams. Bindu's expertise spans the entire content lifecycle, from establishing foundational practices to leading complex content migrations and strategies. With a passion for empowering organizations through user-centric documentation and integrated marketing content, Bindu leads her team at DTALES Tech in keeping pace with the evolving landscape of technical communication.",
+    skills: ["Technical Documentation", "Content Strategy", "Team Leadership", "Process Optimization"],
     linkedin: "https://www.linkedin.com/in/bindu-mohan-54201438/",
     email: "contact@dtales.tech"
   },
@@ -18,7 +24,9 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Sneha Peri",
     role: "Content Lead",
     image: sneehaImage,
+    cutoutImage: sneehaCutout,
     bio: "As a Content Lead with a Master's in Language and Literature, Sneha Peri blends analytical rigor with narrative depth to transform complex B2B and tech concepts into compelling stories. She specializes in the intersection of Information Development and Narrative Design, ensuring technical documentation is both precise and strategically aligned with market needs. Leveraging her expertise in market research, Sneha crafts data-driven strategies that bridge the gap between sophisticated technology and impactful communication.",
+    skills: ["Narrative Design", "Information Development", "Market Research", "B2B Content Strategy"],
     linkedin: "https://www.linkedin.com/in/snehaperi/",
     email: "contact@dtales.tech",
     reverse: true
@@ -27,7 +35,9 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Yashas Niranjan",
     role: "Creative Lead",
     image: yashImage,
+    cutoutImage: yashCutout,
     bio: "A creative strategist and graphic designer with an MA from Coventry University, Yashas Niranjana specializes in building modern brands through impactful visuals and clean, minimalist design. He works closely with startups and creators to transform abstract ideas into fresh, authentic digital content and effective brand identities. By combining advanced design theory with a results-driven approach, Yashas is focused on delivering solutions that foster a genuine connection between brands and their audiences.",
+    skills: ["Brand Identity", "Visual Design", "Creative Strategy", "Minimalist Design"],
     linkedin: "https://www.linkedin.com/in/yash017?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
     email: "contact@dtales.tech"
   },
@@ -35,7 +45,9 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Sakshi Agarwal",
     role: "Strategy Lead",
     image: agarwalImage,
+    cutoutImage: agarwalCutout,
     bio: "A marketing generalist with a talent for clear communication and a strong conviction for client brands. With a background spanning education, systems building, and cross-functional operations, Sakshi brings an unusual lens to marketing, one shaped less by ad campaigns and more by the real work of helping people understand things. At DTALES Tech, she supports the complete marketing operations, from content distribution and outreach to pipeline management and audience engagement. Her experience leading multi-team initiatives at Teach For India and building marketing infrastructure from the ground up at Vivitsa World School means she can hold complexity without losing focus, which, in a fully-managed content agency, is exactly the skill that matters.",
+    skills: ["Marketing Operations", "Content Distribution", "Pipeline Management", "Audience Engagement"],
     linkedin: "https://www.linkedin.com/in/sakshi739/",
     email: "sakshia@dtales.tech"
   }
