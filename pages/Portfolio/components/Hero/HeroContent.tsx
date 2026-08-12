@@ -9,7 +9,7 @@ import {
 
 export function HeroContent() {
   return (
-    <div className="max-w-xl [transform:translateX(-16px)]">
+    <div className="max-w-xl">
       {/* Eyebrow */}
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0020BF]">
         {HERO_EYEBROW}
