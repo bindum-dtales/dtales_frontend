@@ -14,9 +14,9 @@ export type PortfolioStat = {
 };
 
 export const PORTFOLIO_STATS: PortfolioStat[] = [
-  { icon: Box, value: "356", label: "Assets Delivered" },
-  { icon: FileText, value: "15", label: "Documentation Systems" },
-  { icon: PenLine, value: "56", label: "Blogs & Articles" },
-  { icon: PlayCircle, value: "54", label: "Videos & Demos" },
-  { icon: Globe, value: "63", label: "Web / Brand Projects" },
+  { icon: Box, value: "356+", label: "Assets Delivered" },
+  { icon: FileText, value: "15+", label: "Documentation Systems" },
+  { icon: PenLine, value: "56+", label: "Blogs & Articles" },
+  { icon: PlayCircle, value: "54+", label: "Videos & Demos" },
+  { icon: Globe, value: "63+", label: "Web / Brand Projects" },
 ];
