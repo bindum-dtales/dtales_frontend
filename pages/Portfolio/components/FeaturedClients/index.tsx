@@ -17,10 +17,10 @@ export function FeaturedClients() {
       </p>
 
       {/* Heading */}
-      <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-neutral-950 sm:text-4xl lg:text-[38px]">
-        Case studies that show{" "}
+      <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-neutral-950 sm:text-4xl lg:text-[33px]">
+        Case studies that {" "}
         <br className="hidden lg:block" />
-        real outcomes
+        show real outcomes
       </h2>
 
       <div className="mt-8 border-t border-neutral-200" />
