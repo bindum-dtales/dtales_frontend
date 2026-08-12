@@ -7,7 +7,7 @@ export function Hero() {
   return (
     <div className="bg-[#FCFCFD]">
       {/* Hero Grid */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[calc(66.6667%+43px)_calc(33.3333%-43px)] lg:gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[calc(66.6667%+144px)_calc(33.3333%-144px)] lg:gap-8">
         {/* Left: Hero Content + Illustration + Stats */}
         <div>
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-9 lg:gap-12">

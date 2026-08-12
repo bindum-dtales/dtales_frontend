@@ -43,7 +43,7 @@ export function ProcessTimeline() {
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
+                transition={{ duration: 0.6, delay: index * 1.2 }}
                 className="flex items-start gap-4 sm:flex-col"
               >
                 <div className="relative flex items-center">
