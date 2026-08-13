@@ -52,7 +52,7 @@ const Team: React.FC = () => {
 
       {/* Team Showcase */}
       <section className="py-24 md:py-32 px-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl xl:max-w-[1600px] mx-auto">
           <TeamShowcase />
         </div>
       </section>

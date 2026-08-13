@@ -3,14 +3,13 @@ import { motion } from 'framer-motion';
 import { TEAM_MEMBERS } from '../../../constants';
 import TeamMemberCard from './TeamMemberCard';
 
-// Editorial mosaic placement — deliberately asymmetric, not a uniform grid.
-// panelSide is the side the profile-info overlay opens toward, based on which
-// side of the mosaic the card sits on (left cards open rightward, and vice versa).
+// Single horizontal row on desktop. panelSide is the side the profile-info
+// overlay opens toward for each member.
 const LAYOUT = [
-  { span: 'md:col-span-7', align: 'md:justify-self-start', size: 'lg' as const, dRotation: -4, offset: 'md:mt-0', panelSide: 'right' as const },
-  { span: 'md:col-span-5', align: 'md:justify-self-end', size: 'md' as const, dRotation: 6, offset: 'md:mt-24', panelSide: 'left' as const },
-  { span: 'md:col-span-5', align: 'md:justify-self-start', size: 'md' as const, dRotation: -6, offset: 'md:mt-8', panelSide: 'right' as const },
-  { span: 'md:col-span-7', align: 'md:justify-self-end', size: 'lg' as const, dRotation: 4, offset: 'md:mt-0', panelSide: 'left' as const },
+  { size: 'md' as const, dRotation: -4, panelSide: 'right' as const },
+  { size: 'md' as const, dRotation: 6, panelSide: 'right' as const },
+  { size: 'md' as const, dRotation: -6, panelSide: 'left' as const },
+  { size: 'md' as const, dRotation: 4, panelSide: 'left' as const },
 ];
 
 const TeamShowcase: React.FC = () => {
@@ -29,7 +28,7 @@ const TeamShowcase: React.FC = () => {
   const focusedIndex = activeIndex ?? hoveredIndex;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-x-10 gap-y-20 md:gap-y-8">
+    <div className="flex flex-col md:flex-row md:flex-nowrap md:items-end md:justify-center gap-y-20 gap-x-6 lg:gap-x-10">
       {TEAM_MEMBERS.map((member, index) => {
         const layout = LAYOUT[index % LAYOUT.length];
         return (
@@ -38,7 +37,7 @@ const TeamShowcase: React.FC = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className={`w-full max-w-md ${layout.span} ${layout.align} ${layout.offset}`}
+            className="w-full max-w-md md:w-1/4 md:max-w-none md:min-w-0"
           >
             <TeamMemberCard
               member={member}

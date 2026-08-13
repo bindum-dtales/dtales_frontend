@@ -97,8 +97,11 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
       style={{ zIndex: isOpen ? 30 : isFocused ? 20 : 'auto' }}
     >
       <motion.div
-        animate={{ opacity: isDimmed ? 0.35 : 1 }}
-        transition={{ duration: 0.6, ease: 'easeInOut' }}
+        animate={{ opacity: isDimmed ? 0.35 : 1, y: isFocused ? -8 : 0 }}
+        transition={{
+          opacity: { duration: 0.6, ease: 'easeInOut' },
+          y: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+        }}
         className={`relative ${heightClass} flex items-end justify-center`}
         style={{ zIndex: isFocused ? 20 : 1 }}
       >
@@ -116,7 +119,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
             scale: isFocused ? 1.08 : 1,
             opacity: isFocused ? 0.9 : 0.65,
           }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           <DShape className="w-full h-full" fill="#0020BF" />
         </motion.div>
@@ -137,7 +140,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
           className="relative w-full h-full flex items-end justify-center"
           style={{ x: portraitX, y: portraitY }}
           animate={{ scale: isFocused ? 1.1 : 1 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.img
             src={portraitSrc}
