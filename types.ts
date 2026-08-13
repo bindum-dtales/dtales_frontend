@@ -2,7 +2,7 @@ export interface TeamMember {
   name: string;
   role: string;
   image: string;
-  cutoutImage?: string;
+  imageBw: string;
   bio: string;
   skills?: string[];
   linkedin?: string;

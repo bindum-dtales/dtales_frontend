@@ -8,7 +8,7 @@ import TeamShowcase from './components/TeamShowcase';
 
 const Team: React.FC = () => {
   return (
-    <div className="pt-24 min-h-screen bg-white overflow-hidden">
+    <div className="pt-20 min-h-screen bg-white overflow-hidden">
       <SEO
         title="Team | DTALES Tech"
         description="Meet the DTALES Tech team leading technical content, product marketing, creative strategy, and operational execution."
@@ -29,7 +29,7 @@ const Team: React.FC = () => {
       </SEO>
 
       {/* Header */}
-      <section className="py-20 md:py-28 text-center px-6 border-b border-gray-100">
+      <section className="pt-3 md:pt-4 pb-4 md:pb-6 text-center px-6 border-b border-gray-100">
         <div className="max-w-4xl mx-auto">
           <motion.h1
             className="text-6xl md:text-8xl font-bold text-black mb-6 tracking-tighter"
@@ -51,7 +51,7 @@ const Team: React.FC = () => {
       </section>
 
       {/* Team Showcase */}
-      <section className="py-24 md:py-32 px-6">
+      <section className="pt-3 md:pt-4 pb-20 md:pb-24 px-6">
         <div className="max-w-7xl xl:max-w-[1600px] mx-auto">
           <TeamShowcase />
         </div>

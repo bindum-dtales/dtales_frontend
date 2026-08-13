@@ -4,12 +4,13 @@ import { TEAM_MEMBERS } from '../../../constants';
 import TeamMemberCard from './TeamMemberCard';
 
 // Single horizontal row on desktop. panelSide is the side the profile-info
-// overlay opens toward for each member.
+// overlay opens toward for each member. Bindu (Founder & Principal) is the
+// featured/large composition; the other three share the compact size.
 const LAYOUT = [
-  { size: 'md' as const, dRotation: -4, panelSide: 'right' as const },
-  { size: 'md' as const, dRotation: 6, panelSide: 'right' as const },
-  { size: 'md' as const, dRotation: -6, panelSide: 'left' as const },
-  { size: 'md' as const, dRotation: 4, panelSide: 'left' as const },
+  { size: 'lg' as const, panelSide: 'right' as const },
+  { size: 'md' as const, panelSide: 'right' as const },
+  { size: 'md' as const, panelSide: 'left' as const },
+  { size: 'md' as const, panelSide: 'left' as const },
 ];
 
 const TeamShowcase: React.FC = () => {
@@ -26,9 +27,11 @@ const TeamShowcase: React.FC = () => {
   }, []);
 
   const focusedIndex = activeIndex ?? hoveredIndex;
+  // On hover-capable devices info opens on hover; touch devices fall back to tap.
+  const openIndex = canHover ? hoveredIndex : activeIndex;
 
   return (
-    <div className="flex flex-col md:flex-row md:flex-nowrap md:items-end md:justify-center gap-y-20 gap-x-6 lg:gap-x-10">
+    <div className="flex flex-col items-start md:flex-row md:flex-nowrap md:items-end md:justify-center gap-y-14 gap-x-8 lg:gap-x-12">
       {TEAM_MEMBERS.map((member, index) => {
         const layout = LAYOUT[index % LAYOUT.length];
         return (
@@ -37,22 +40,24 @@ const TeamShowcase: React.FC = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-md md:w-1/4 md:max-w-none md:min-w-0"
+            className="md:w-auto"
           >
             <TeamMemberCard
               member={member}
               index={index}
               size={layout.size}
-              dRotation={layout.dRotation}
               panelSide={layout.panelSide}
               isFocused={focusedIndex === index}
-              isOpen={activeIndex === index}
+              isOpen={openIndex === index}
               isDimmed={focusedIndex !== null && focusedIndex !== index}
               canHover={canHover}
               onHoverStart={() => setHoveredIndex(index)}
               onHoverEnd={() => setHoveredIndex(null)}
               onToggle={() => setActiveIndex((prev) => (prev === index ? null : index))}
-              onClose={() => setActiveIndex(null)}
+              onClose={() => {
+                setActiveIndex(null);
+                setHoveredIndex(null);
+              }}
             />
           </motion.div>
         );
