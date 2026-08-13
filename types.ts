@@ -3,6 +3,7 @@ export interface TeamMember {
   role: string;
   image: string;
   imageBw: string;
+  personImage: string;
   bio: string;
   skills?: string[];
   linkedin?: string;
