@@ -14,8 +14,15 @@ const LAYOUT = [
 ];
 
 const TeamShowcase: React.FC = () => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  // Each input modality gets its own channel so mouse hover and keyboard
+  // focus never fight over the same state, then they're merged below into
+  // one canonical activeMemberId. Guarding the "clear" setters with a
+  // functional update (only clear if it's still *my* id) means a
+  // late-firing pointerleave/blur from the previously-hovered card can
+  // never stomp on a newer card's already-set active id.
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [keyboardFocusId, setKeyboardFocusId] = useState<string | null>(null);
+  const [tapActiveId, setTapActiveId] = useState<string | null>(null);
   const [canHover, setCanHover] = useState(false);
 
   useEffect(() => {
@@ -26,37 +33,47 @@ const TeamShowcase: React.FC = () => {
     return () => mq.removeEventListener('change', listener);
   }, []);
 
-  const focusedIndex = activeIndex ?? hoveredIndex;
-  // On hover-capable devices info opens on hover; touch devices fall back to tap.
-  const openIndex = canHover ? hoveredIndex : activeIndex;
+  // On hover-capable devices, mouse hover always wins; keyboard focus is the
+  // fallback (tabbing without moving the mouse). Touch devices use tap.
+  const activeMemberId = canHover ? hoveredId ?? keyboardFocusId : tapActiveId;
 
   return (
     <div className="flex flex-col items-start md:flex-row md:flex-nowrap md:items-end md:justify-center gap-y-14 gap-x-8 lg:gap-x-12">
       {TEAM_MEMBERS.map((member, index) => {
         const layout = LAYOUT[index % LAYOUT.length];
+        const isFocused = activeMemberId === member.name;
         return (
           <motion.div
             key={member.name}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="md:w-auto"
+            className="relative md:w-auto"
+            // The open card's panel is wide and can visually overlap a
+            // neighboring card. Dropping the open card BELOW its resting
+            // siblings (instead of raising it above them) guarantees a
+            // neighbor's own card is always the topmost, hit-testable
+            // element over that shared area — so moving straight into it
+            // always reaches its pointer handlers, even mid-transition.
+            style={{ zIndex: isFocused ? 5 : 10 }}
           >
             <TeamMemberCard
               member={member}
-              index={index}
               size={layout.size}
               panelSide={layout.panelSide}
-              isFocused={focusedIndex === index}
-              isOpen={openIndex === index}
-              isDimmed={focusedIndex !== null && focusedIndex !== index}
+              isFocused={isFocused}
+              isOpen={isFocused}
+              isDimmed={activeMemberId !== null && !isFocused}
               canHover={canHover}
-              onHoverStart={() => setHoveredIndex(index)}
-              onHoverEnd={() => setHoveredIndex(null)}
-              onToggle={() => setActiveIndex((prev) => (prev === index ? null : index))}
+              onHoverStart={() => setHoveredId(member.name)}
+              onHoverEnd={() => setHoveredId((prev) => (prev === member.name ? null : prev))}
+              onFocus={() => setKeyboardFocusId(member.name)}
+              onBlur={() => setKeyboardFocusId((prev) => (prev === member.name ? null : prev))}
+              onToggle={() => setTapActiveId((prev) => (prev === member.name ? null : member.name))}
               onClose={() => {
-                setActiveIndex(null);
-                setHoveredIndex(null);
+                setTapActiveId(null);
+                setHoveredId(null);
+                setKeyboardFocusId(null);
               }}
             />
           </motion.div>

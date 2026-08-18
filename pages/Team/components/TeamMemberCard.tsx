@@ -7,7 +7,6 @@ import InfoPanel from './InfoPanel';
 
 interface TeamMemberCardProps {
   member: TeamMember;
-  index: number;
   size: 'lg' | 'md';
   panelSide: 'left' | 'right';
   isFocused: boolean;
@@ -16,6 +15,8 @@ interface TeamMemberCardProps {
   canHover: boolean;
   onHoverStart: () => void;
   onHoverEnd: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
   onToggle: () => void;
   onClose: () => void;
 }
@@ -52,6 +53,8 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
   canHover,
   onHoverStart,
   onHoverEnd,
+  onFocus,
+  onBlur,
   onToggle,
   onClose,
 }) => {
@@ -70,10 +73,10 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
 
   return (
     <div
-      onMouseEnter={canHover ? onHoverStart : undefined}
-      onMouseLeave={canHover ? onHoverEnd : undefined}
-      onFocus={onHoverStart}
-      onBlur={onHoverEnd}
+      onPointerEnter={canHover ? onHoverStart : undefined}
+      onPointerLeave={canHover ? onHoverEnd : undefined}
+      onFocus={onFocus}
+      onBlur={onBlur}
       onClick={canHover ? undefined : onToggle}
       role="button"
       tabIndex={0}
@@ -86,7 +89,6 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
         }
       }}
       className="relative cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0020BF]/40 rounded-3xl"
-      style={{ zIndex: isOpen ? 30 : isFocused ? 20 : 'auto' }}
     >
       <motion.div
         animate={{ opacity: isDimmed ? 0.35 : 1 }}
@@ -96,7 +98,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
         {/* D + person share one transform so the whole composition scales as a
             single object on hover — the D never gets its own independent motion. */}
         <div
-          className="absolute inset-0 transition-transform duration-[450ms] will-change-transform"
+          className="absolute inset-0 transition-transform duration-[320ms] will-change-transform"
           style={{ transform: isFocused ? 'scale(1.05)' : 'scale(1)', transitionTimingFunction: EASE }}
         >
           {/* Blue D — always blue, never grayscaled */}
@@ -135,7 +137,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
               src={member.personImage}
               alt={`${member.name}, ${member.role}`}
               draggable={false}
-              className="absolute object-contain object-bottom select-none pointer-events-none transition-[filter] duration-[450ms]"
+              className="absolute object-contain object-bottom select-none pointer-events-none transition-[filter] duration-[320ms]"
               style={{
                 left: personPos.left,
                 bottom: personPos.bottom,
@@ -149,11 +151,13 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
         </div>
       </motion.div>
 
-      {/* Name plate — always visible, minimal */}
+      {/* Name plate — always visible, minimal. Nudged right so the text
+          block starts under the visible D graphic rather than the block's
+          raw bounding-box edge. */}
       <motion.div
         animate={{ opacity: isDimmed ? 0.35 : 1 }}
         transition={{ duration: 0.6, ease: 'easeInOut' }}
-        className={`mt-4 ${widthClass}`}
+        className={`mt-4 ml-2 md:ml-3 ${widthClass}`}
       >
         <h3 className="text-base md:text-lg font-bold text-black tracking-tight truncate">{member.name}</h3>
         <p className="text-[10px] md:text-xs font-semibold uppercase tracking-widest text-[#0020BF] mt-1">{member.role}</p>
@@ -172,7 +176,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
             initial={{ opacity: 0, scaleX: 0.82, x: panelSide === 'right' ? -16 : 16 }}
             animate={{ opacity: 1, scaleX: 1, x: 0 }}
             exit={{ opacity: 0, scaleX: 0.82, x: panelSide === 'right' ? -16 : 16 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformOrigin: panelSide === 'right' ? 'left center' : 'right center' }}
             className={`absolute top-0 w-[min(820px,calc(100vw_-_536px))] ${
               panelSide === 'right' ? 'left-full ml-8' : 'right-full mr-8'
@@ -187,7 +191,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >

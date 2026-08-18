@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Building2 } from "lucide-react";
 import { getProxiedImageUrl } from "../../../../src/utils/imageProxy";
 import type { PortfolioItem } from "../../../../src/lib/portfolioApi";
@@ -9,9 +9,16 @@ type ProjectCardProps = {
 };
 
 export function ProjectCard({ item }: ProjectCardProps) {
+  const location = useLocation();
   const categoryLabel = formatCategory(item.capability);
   const date = formatDate(item.created_at);
   const imageSrc = getProxiedImageUrl(item.cover_image_url) || item.cover_image_url;
+
+  // Link-based entries open their external URL; document-based entries (no link,
+  // but stored HTML) open the internal portfolio detail view instead.
+  const hasLink = Boolean(item.link);
+  const hasDocument = !hasLink && Boolean(item.content);
+  const isOpenable = hasLink || hasDocument;
 
   const cardBody = (
     <>
@@ -57,10 +64,16 @@ export function ProjectCard({ item }: ProjectCardProps) {
           ) : (
             <span />
           )}
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0020BF]">
-            View Project
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
-          </span>
+          {isOpenable ? (
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0020BF]">
+              View Project
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+            </span>
+          ) : (
+            <span className="text-sm font-medium text-neutral-400">
+              Project details coming soon
+            </span>
+          )}
         </div>
       </div>
     </>
@@ -69,10 +82,10 @@ export function ProjectCard({ item }: ProjectCardProps) {
   const className =
     "group flex flex-col overflow-hidden rounded-3xl border border-neutral-200 bg-white p-2 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-xl";
 
-  if (item.link) {
+  if (hasLink) {
     return (
       <a
-        href={item.link}
+        href={item.link ?? undefined}
         target="_blank"
         rel="noopener noreferrer"
         className={className}
@@ -82,9 +95,13 @@ export function ProjectCard({ item }: ProjectCardProps) {
     );
   }
 
-  if (item.content) {
+  if (hasDocument) {
     return (
-      <Link to={`/portfolio/${item.id}`} className={className}>
+      <Link
+        to={`/portfolio/${item.id}`}
+        state={{ from: location.pathname }}
+        className={className}
+      >
         {cardBody}
       </Link>
     );

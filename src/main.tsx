@@ -5,6 +5,7 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "../App";
 import "./index.css";
 import "./styles/globals.css";
+import "./styles/documentContent.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

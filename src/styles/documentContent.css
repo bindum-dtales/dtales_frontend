@@ -1,0 +1,212 @@
+/**
+ * Styles for HTML that was converted from an uploaded document.
+ *
+ * Tailwind's preflight strips the default styling from headings, lists and
+ * tables, so document HTML needs these rules to keep its original structure
+ * readable. Scoped to `.document-content` so nothing else is affected.
+ */
+
+.document-content {
+  color: #374151;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  overflow-wrap: break-word;
+}
+
+.document-content > *:first-child {
+  margin-top: 0;
+}
+
+.document-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.document-content h1,
+.document-content h2,
+.document-content h3,
+.document-content h4,
+.document-content h5,
+.document-content h6 {
+  color: #000000;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-top: 2.25rem;
+  margin-bottom: 0.875rem;
+}
+
+.document-content h1 {
+  font-size: 2rem;
+}
+
+.document-content h2 {
+  font-size: 1.625rem;
+}
+
+.document-content h3 {
+  font-size: 1.3125rem;
+}
+
+.document-content h4 {
+  font-size: 1.125rem;
+}
+
+.document-content h5,
+.document-content h6 {
+  font-size: 1rem;
+}
+
+.document-content p {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+.document-content strong,
+.document-content b {
+  color: #000000;
+  font-weight: 700;
+}
+
+.document-content em,
+.document-content i {
+  font-style: italic;
+}
+
+.document-content a {
+  color: #0020bf;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.document-content a:hover {
+  color: #000f55;
+}
+
+.document-content ul,
+.document-content ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.document-content ul {
+  list-style: disc;
+}
+
+.document-content ol {
+  list-style: decimal;
+}
+
+.document-content li {
+  margin-bottom: 0.5rem;
+}
+
+.document-content li > ul,
+.document-content li > ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.document-content blockquote {
+  border-left: 3px solid #0020bf;
+  color: #4b5563;
+  font-style: italic;
+  margin: 0 0 1.25rem;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+}
+
+.document-content hr {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 2.5rem 0;
+}
+
+.document-content img {
+  border-radius: 1rem;
+  display: block;
+  height: auto;
+  margin: 1.75rem 0;
+  max-width: 100%;
+}
+
+.document-content figure {
+  margin: 1.75rem 0;
+}
+
+.document-content figcaption {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.document-content code {
+  background-color: #eff6ff;
+  border-radius: 0.375rem;
+  color: #1d4ed8;
+  font-size: 0.9em;
+  padding: 0.125rem 0.375rem;
+}
+
+.document-content pre {
+  background-color: #111827;
+  border-radius: 1rem;
+  color: #f3f4f6;
+  margin: 0 0 1.5rem;
+  overflow-x: auto;
+  padding: 1.25rem;
+}
+
+.document-content pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+/* Wide tables scroll horizontally instead of breaking the page layout. */
+.document-content table {
+  border-collapse: collapse;
+  display: block;
+  margin: 0 0 1.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  font-size: 0.9375rem;
+}
+
+.document-content th,
+.document-content td {
+  border: 1px solid #e5e7eb;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.document-content th {
+  background-color: #f9fafb;
+  color: #000000;
+  font-weight: 600;
+}
+
+.document-content caption {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+@media (max-width: 640px) {
+  .document-content {
+    font-size: 1rem;
+  }
+
+  .document-content h1 {
+    font-size: 1.625rem;
+  }
+
+  .document-content h2 {
+    font-size: 1.375rem;
+  }
+
+  .document-content h3 {
+    font-size: 1.1875rem;
+  }
+}

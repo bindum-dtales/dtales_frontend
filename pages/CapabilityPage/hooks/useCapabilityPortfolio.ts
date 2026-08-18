@@ -16,7 +16,11 @@ export function useCapabilityPortfolio(capability: string) {
       setItems(
         data
           .filter((item) => item.capability === capability)
-          .map((item) => ({ ...item, link: item.link ?? undefined }))
+          .map((item) => ({
+            ...item,
+            link: item.link ?? undefined,
+            content: item.content ?? null,
+          }))
       );
     } catch (err) {
       console.error("Capability portfolio fetch failed:", err);

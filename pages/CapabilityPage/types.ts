@@ -18,5 +18,8 @@ export type ContentCardItem = {
   subcategory?: string;
   company_name?: string;
   cover_image_url: string;
+  /** External project URL. Absent for document-based portfolio entries. */
   link?: string;
+  /** HTML converted from an uploaded document. Absent for link-based entries. */
+  content?: string | null;
 };
