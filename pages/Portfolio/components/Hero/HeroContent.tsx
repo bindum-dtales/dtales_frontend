@@ -16,7 +16,7 @@ export function HeroContent() {
       </p>
 
       {/* Heading */}
-      <h1 className="mt-4 text-5xl font-bold leading-[1.1] tracking-tight text-neutral-950 sm:text-6xl">
+      <h1 className="mt-4 text-[2.5rem] font-bold leading-[1.1] tracking-tight text-neutral-950 min-[360px]:text-5xl sm:text-6xl">
         {HERO_HEADING.line1}
         <br />
         <span className="text-[#0020BF]">{HERO_HEADING.highlight}</span>{" "}

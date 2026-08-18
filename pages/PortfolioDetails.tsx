@@ -64,7 +64,7 @@ const PortfolioDetails: React.FC = () => {
   const backLink = (
     <Link
       to={backPath}
-      className="group inline-flex items-center gap-2 font-semibold text-dtales-navy transition-colors hover:text-[#0020BF]"
+      className="group inline-flex min-h-[44px] items-center gap-2 font-semibold text-dtales-navy transition-colors hover:text-[#0020BF] sm:min-h-0"
     >
       <ArrowLeft
         size={20}
@@ -75,7 +75,7 @@ const PortfolioDetails: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] pt-28 pb-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#F5F5F7] px-4 pb-16 pt-10 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8">
       <div className="max-w-5xl mx-auto">
         {item ? (
           <SEO
@@ -112,7 +112,7 @@ const PortfolioDetails: React.FC = () => {
           />
         )}
 
-        <div className="mb-8">{backLink}</div>
+        <div className="mb-6 sm:mb-8">{backLink}</div>
 
         {loading && (
           <div className="rounded-[2.5rem] border border-neutral-200 bg-white p-8 sm:p-12">
@@ -148,7 +148,7 @@ const PortfolioDetails: React.FC = () => {
 
         {!loading && !error && item && (
           <motion.article
-            className="bg-white rounded-[2.5rem] shadow-sm p-6 sm:p-10 lg:p-12"
+            className="rounded-3xl bg-white p-5 shadow-sm sm:rounded-[2.5rem] sm:p-10 lg:p-12"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -168,14 +168,14 @@ const PortfolioDetails: React.FC = () => {
                 </div>
               )}
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black leading-tight tracking-tight">
+              <h1 className="break-words text-[28px] font-bold leading-tight tracking-tight text-black sm:text-4xl md:text-5xl">
                 {item.title}
               </h1>
 
               {item.company_name && (
-                <div className="mt-5 flex items-center gap-2 text-gray-500">
-                  <Building2 size={18} />
-                  <span className="text-base">{item.company_name}</span>
+                <div className="mt-5 flex items-start gap-2 text-gray-500">
+                  <Building2 size={18} className="mt-0.5 shrink-0" />
+                  <span className="break-words text-base">{item.company_name}</span>
                 </div>
               )}
             </header>
@@ -185,7 +185,7 @@ const PortfolioDetails: React.FC = () => {
 
             {/* Description */}
             {item.description && (
-              <p className="mb-8 text-lg leading-relaxed text-gray-700">
+              <p className="mb-8 break-words text-base leading-relaxed text-gray-700 sm:text-lg">
                 {item.description}
               </p>
             )}
@@ -201,7 +201,7 @@ const PortfolioDetails: React.FC = () => {
                 href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0020BF] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#000F55]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0020BF] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#000F55]"
               >
                 Open project
                 <ExternalLink className="h-4 w-4" />

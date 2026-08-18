@@ -14,7 +14,7 @@ export function Hero() {
             role="img"
             aria-label=""
             style={{ backgroundImage: `url(${portBg})` }}
-            className="relative overflow-hidden rounded-3xl bg-cover bg-[position:right_center] [transform:translateX(-16px)]"
+            className="relative overflow-hidden rounded-3xl bg-cover bg-[position:right_center] p-6 sm:p-8 lg:p-0 lg:[transform:translateX(-16px)]"
           >
             {/* Soft readability wash — fades out toward the artwork on the right */}
             <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/55 to-white/0" />
@@ -33,7 +33,7 @@ export function Hero() {
           </div>
 
           {/* Stats Bar */}
-          <div className="mt-10 w-full [transform:translateX(-16px)]">
+          <div className="mt-10 w-full lg:[transform:translateX(-16px)]">
             <Stats />
           </div>
         </div>

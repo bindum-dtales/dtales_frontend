@@ -26,6 +26,16 @@ const Navbar: React.FC = () => {
     };
   }, [isMobileOpen]);
 
+  // Let keyboard users dismiss the mobile menu.
+  useEffect(() => {
+    if (!isMobileOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isMobileOpen]);
+
   return (
     <motion.nav
       style={{
@@ -63,28 +73,28 @@ const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center space-x-8">
           <Link
             to="/"
-            className="text-sm font-medium text-white hover:opacity-70 transition"
+            className="text-sm font-medium text-white hover:opacity-70 transition max-lg:flex max-lg:min-h-[44px] max-lg:items-center"
           >
             Home
           </Link>
 
           <Link
             to="/services"
-            className="text-sm font-medium text-white hover:opacity-70 transition"
+            className="text-sm font-medium text-white hover:opacity-70 transition max-lg:flex max-lg:min-h-[44px] max-lg:items-center"
           >
             Services
           </Link>
 
           <Link
             to="/portfolio"
-            className="text-sm font-medium text-white hover:opacity-70 transition"
+            className="text-sm font-medium text-white hover:opacity-70 transition max-lg:flex max-lg:min-h-[44px] max-lg:items-center"
           >
             Portfolio
           </Link>
 
           <Link
             to="/team"
-            className="text-sm font-medium text-white hover:opacity-70 transition"
+            className="text-sm font-medium text-white hover:opacity-70 transition max-lg:flex max-lg:min-h-[44px] max-lg:items-center"
           >
             Our Team
           </Link>
@@ -136,7 +146,7 @@ const Navbar: React.FC = () => {
 
           <button 
             onClick={() => navigate('/contact')}
-            className="bg-[#0020BF] text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wide hover:bg-[#0A2CFF] hover:scale-105 transition-all shadow-lg"
+            className="bg-[#0020BF] text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wide hover:bg-[#0A2CFF] hover:scale-105 transition-all shadow-lg max-lg:min-h-[44px]"
           >
             Get Started
           </button>
@@ -144,7 +154,11 @@ const Navbar: React.FC = () => {
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden z-50 p-2"
+          type="button"
+          className="md:hidden z-50 flex h-11 w-11 items-center justify-center p-2"
+          aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMobileOpen}
+          aria-controls="mobile-navigation"
           onClick={() => setIsMobileOpen(!isMobileOpen)}
         >
           {isMobileOpen ? <X size={24} className="text-white" /> : <Menu size={24} className="text-white" />}
@@ -155,7 +169,8 @@ const Navbar: React.FC = () => {
       <AnimatePresence>
         {isMobileOpen && (
           <motion.div
-            className="absolute left-0 top-full w-full bg-[#0b0f1a] border-t border-white/10 shadow-2xl md:hidden z-40"
+            id="mobile-navigation"
+            className="absolute left-0 top-full max-h-[calc(100vh-5rem)] w-full overflow-y-auto overscroll-contain bg-[#0b0f1a] border-t border-white/10 shadow-2xl md:hidden z-40"
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -164,28 +179,28 @@ const Navbar: React.FC = () => {
             <div className="px-6 py-4 flex flex-col divide-y divide-white/10">
               <Link
                 to="/"
-                className="py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
+                className="flex min-h-[48px] items-center py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
                 onClick={() => setIsMobileOpen(false)}
               >
                 Home
               </Link>
               <Link
                 to="/services"
-                className="py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
+                className="flex min-h-[48px] items-center py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
                 onClick={() => setIsMobileOpen(false)}
               >
                 Services
               </Link>
               <Link
                 to="/portfolio"
-                className="py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
+                className="flex min-h-[48px] items-center py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
                 onClick={() => setIsMobileOpen(false)}
               >
                 Portfolio
               </Link>
               <Link
                 to="/team"
-                className="py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
+                className="flex min-h-[48px] items-center py-3 text-base font-medium text-white transition-colors duration-200 hover:text-white/80"
                 onClick={() => setIsMobileOpen(false)}
               >
                 Our Team

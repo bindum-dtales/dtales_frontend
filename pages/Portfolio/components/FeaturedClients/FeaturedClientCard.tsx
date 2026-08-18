@@ -32,7 +32,7 @@ export function FeaturedClientCard({ caseStudy }: FeaturedClientCardProps) {
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         {caseStudy.company_name ? (
-          <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-neutral-400">
+          <span className="truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-neutral-400">
             {caseStudy.company_name}
           </span>
         ) : null}
@@ -41,9 +41,12 @@ export function FeaturedClientCard({ caseStudy }: FeaturedClientCardProps) {
           {caseStudy.title}
         </h3>
 
-        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0020BF] transition-all duration-150 group-hover:gap-1.5">
+        {/* Wrapping keeps the arrow inside the narrow sidebar column at ~1024px
+            instead of pushing it past the viewport edge; at wider widths the
+            label fits on one line and nothing changes. */}
+        <span className="inline-flex min-w-0 flex-wrap items-center gap-1 text-xs font-semibold text-[#0020BF] transition-all duration-150 group-hover:gap-1.5">
           View Case Study
-          <ArrowRight className="h-3 w-3" />
+          <ArrowRight className="h-3 w-3 shrink-0" />
         </span>
       </div>
     </Link>

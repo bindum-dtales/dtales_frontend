@@ -10,7 +10,9 @@
   color: #374151;
   font-size: 1.0625rem;
   line-height: 1.75;
-  overflow-wrap: break-word;
+  /* Long words and bare URLs must wrap rather than widen the page on phones. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .document-content > *:first-child {
@@ -148,6 +150,7 @@
 }
 
 .document-content pre {
+  -webkit-overflow-scrolling: touch;
   background-color: #111827;
   border-radius: 1rem;
   color: #f3f4f6;
@@ -164,6 +167,7 @@
 
 /* Wide tables scroll horizontally instead of breaking the page layout. */
 .document-content table {
+  -webkit-overflow-scrolling: touch;
   border-collapse: collapse;
   display: block;
   margin: 0 0 1.5rem;
@@ -196,17 +200,67 @@
 @media (max-width: 640px) {
   .document-content {
     font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .document-content h1,
+  .document-content h2,
+  .document-content h3,
+  .document-content h4,
+  .document-content h5,
+  .document-content h6 {
+    margin-top: 1.75rem;
+    margin-bottom: 0.75rem;
   }
 
   .document-content h1 {
-    font-size: 1.625rem;
+    font-size: 1.5rem;
   }
 
   .document-content h2 {
-    font-size: 1.375rem;
+    font-size: 1.3125rem;
   }
 
   .document-content h3 {
-    font-size: 1.1875rem;
+    font-size: 1.125rem;
+  }
+
+  .document-content p {
+    margin-bottom: 1rem;
+  }
+
+  .document-content ul,
+  .document-content ol {
+    padding-left: 1.25rem;
+  }
+
+  .document-content blockquote {
+    padding-left: 1rem;
+  }
+
+  .document-content img {
+    border-radius: 0.75rem;
+    margin: 1.25rem 0;
+  }
+
+  .document-content pre {
+    border-radius: 0.75rem;
+    padding: 1rem;
+  }
+
+  .document-content table {
+    font-size: 0.875rem;
+  }
+
+  /* Keep columns readable and let the table scroll, rather than crushing
+     five columns into a phone-width viewport. */
+  .document-content th,
+  .document-content td {
+    min-width: 7.5rem;
+    padding: 0.5rem 0.625rem;
+  }
+
+  .document-content hr {
+    margin: 1.75rem 0;
   }
 }

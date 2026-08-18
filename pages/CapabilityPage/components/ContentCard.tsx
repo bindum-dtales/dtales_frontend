@@ -34,7 +34,7 @@ export function ContentCard({ item }: ContentCardProps) {
           <div className="h-full w-full bg-gradient-to-br from-slate-900 to-blue-900" />
         )}
         {item.subcategory && (
-          <span className="absolute left-3 top-3 rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-medium text-neutral-800 backdrop-blur">
+          <span className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-medium text-neutral-800 backdrop-blur">
             {item.subcategory}
           </span>
         )}
@@ -42,17 +42,17 @@ export function ContentCard({ item }: ContentCardProps) {
 
       <div className="flex flex-1 flex-col gap-3 p-5">
         {item.company_name ? (
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600">
-            <Building2 className="h-3.5 w-3.5" />
+          <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-neutral-600">
+            <Building2 className="h-3.5 w-3.5 shrink-0" />
             {item.company_name}
           </span>
         ) : null}
 
-        <h3 className="text-base font-bold leading-snug text-neutral-950">
+        <h3 className="break-words text-base font-bold leading-snug text-neutral-950">
           {item.title}
         </h3>
 
-        <p className="line-clamp-2 text-sm leading-relaxed text-neutral-500">
+        <p className="line-clamp-2 break-words text-sm leading-relaxed text-neutral-500">
           {item.description}
         </p>
 

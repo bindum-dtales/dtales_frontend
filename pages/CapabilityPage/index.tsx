@@ -4,6 +4,7 @@ import { Sidebar } from "./components/Sidebar";
 import { SearchBar } from "./components/SearchBar";
 import { ContentCard } from "./components/ContentCard";
 import { ContentCardSkeleton } from "./components/ContentCardSkeleton";
+import { SidebarCta } from "./components/SidebarCta";
 import { Pagination } from "./components/Pagination";
 import { useCapabilityPortfolio } from "./hooks/useCapabilityPortfolio";
 import { useCapabilityBlogs } from "./hooks/useCapabilityBlogs";
@@ -75,7 +76,7 @@ export function CapabilityPageTemplate({
         />
 
         <div className="min-w-0 flex-1 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto">
-          <main className="mx-auto w-full max-w-[1400px] px-6 py-12 sm:px-8 lg:px-12">
+          <main className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-8 sm:py-12 lg:px-12">
             <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
             {loading && (
@@ -141,6 +142,11 @@ export function CapabilityPageTemplate({
                 </div>
               </>
             )}
+
+            {/* On mobile the sidebar CTA is relocated here, below the results. */}
+            <div className="mt-14 border-t border-neutral-200 pt-10 lg:hidden">
+              <SidebarCta cta={cta} />
+            </div>
           </main>
         </div>
       </div>
