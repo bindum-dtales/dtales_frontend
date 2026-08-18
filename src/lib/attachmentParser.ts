@@ -8,6 +8,7 @@
 
 import { marked } from "marked";
 import { parseDocxToHtml } from "./docxParser";
+import { uploadPdf } from "./uploads";
 
 export type AttachmentType =
   | "document"
@@ -24,6 +25,12 @@ export interface AttachmentPreview {
   previewType: PreviewType;
   previewContent: string | null;
   fileName: string;
+  /** Stored file URL, returned by server-side uploads (PDF). */
+  url?: string;
+  /** Upload timestamp, returned by server-side uploads (PDF). */
+  attachmentTime?: string;
+  /** Original file name, returned by server-side uploads (PDF). */
+  attachmentName?: string;
 }
 
 const EXTENSIONS: Record<AttachmentType, string[]> = {
@@ -126,11 +133,18 @@ export async function buildAttachmentPreview(
     }
 
     case "pdf": {
+      // PDFs are extracted server-side (POST /api/uploads/pdf) rather than in
+      // the browser. The result is stored in the same shape the DOCX flow
+      // produces, so the rest of the attachment workflow is unchanged.
+      const uploaded = await uploadPdf(file);
       return {
         attachmentType,
-        previewType: "file",
-        previewContent: `${humanLabel(attachmentType)}:\n${file.name}`,
-        fileName: file.name,
+        previewType: "html",
+        previewContent: uploaded.content,
+        fileName: uploaded.attachmentName || file.name,
+        url: uploaded.url,
+        attachmentTime: uploaded.attachmentTime,
+        attachmentName: uploaded.attachmentName,
       };
     }
 
