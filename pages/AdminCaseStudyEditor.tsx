@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Upload, X } from "lucide-react";
 import { apiFetch } from "../src/lib/api";
 import { uploadImage } from "../src/lib/uploads";
-import { parseDocxToHtml } from "../src/lib/docxParser";
+import { DOCUMENT_ACCEPT, parseDocumentToHtml } from "../src/lib/documentContent";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
 import SEO from '../components/seo/SEO';
 
@@ -50,7 +50,7 @@ const AdminCaseStudyEditor: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(isEdit);
   const coverInputRef = useRef<HTMLInputElement>(null);
-  const docxInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -105,19 +105,19 @@ const AdminCaseStudyEditor: React.FC = () => {
     }
   };
 
-  const handleDocxFileChange = async (file: File | null) => {
+  const handleDocumentFileChange = async (file: File | null) => {
     if (!file) return;
     setError(null);
 
     try {
-      const html = await parseDocxToHtml(file);
+      const html = await parseDocumentToHtml(file);
       if (html && html.trim()) {
         setHtmlContent(html);
       } else {
-        setError("Failed to parse .docx file: no content extracted");
+        setError("No content could be extracted from that document.");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to parse .docx file");
+      setError(err?.message || "Failed to read the document. Please try again.");
     }
   };
 
@@ -138,7 +138,7 @@ const AdminCaseStudyEditor: React.FC = () => {
       }
 
       if (!isEdit && !htmlContent) {
-        setError("Please upload a .docx file with your content");
+        setError("Please upload a DOCX or PDF file with your content");
         setSaving(false);
         return;
       }
@@ -191,7 +191,7 @@ const AdminCaseStudyEditor: React.FC = () => {
       }
 
       if (!isEdit && !htmlContent) {
-        setError("Please upload a .docx file with your content");
+        setError("Please upload a DOCX or PDF file with your content");
         setSaving(false);
         return;
       }
@@ -306,19 +306,19 @@ const AdminCaseStudyEditor: React.FC = () => {
               />
             </div>
 
-            {/* Content File Upload (.docx) */}
+            {/* Content File Upload (DOCX / PDF) */}
             <div className="md:col-span-2">
               <label className="block text-sm text-gray-700 mb-2">
-                Upload Content (.docx from Google Docs)
+                Upload Content
               </label>
               <div className="flex gap-3 items-center">
                 <button
                   type="button"
-                  onClick={() => docxInputRef.current?.click()}
+                  onClick={() => documentInputRef.current?.click()}
                   className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-3 rounded-lg font-semibold border border-gray-200"
                 >
                   <Upload size={18} />
-                  Choose .docx File
+                  Choose Document
                 </button>
                 {htmlContent && (
                   <div className="flex-1 flex items-center gap-3">
@@ -334,12 +334,15 @@ const AdminCaseStudyEditor: React.FC = () => {
                 )}
               </div>
               <input
-                ref={docxInputRef}
+                ref={documentInputRef}
                 type="file"
-                accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                onChange={(e) => handleDocxFileChange(e.target.files?.[0] || null)}
+                accept={DOCUMENT_ACCEPT}
+                onChange={(e) => handleDocumentFileChange(e.target.files?.[0] || null)}
                 className="hidden"
               />
+              <p className="text-xs text-gray-500 mt-2">
+                Supported formats: DOCX, PDF
+              </p>
               {isEdit && !htmlContent && (
                 <p className="text-xs text-gray-500 mt-2">
                   Leave empty to keep existing content

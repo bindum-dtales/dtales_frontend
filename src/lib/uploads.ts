@@ -145,3 +145,63 @@ export async function uploadPdf(file: File): Promise<PdfUploadResult> {
     attachmentName: data.attachmentName || file.name,
   };
 }
+
+/**
+ * Upload a PDF article body through the shared document endpoint.
+ *
+ * The backend detects the `.pdf` extension on `POST /api/uploads/docx` and
+ * delegates to its PDF rendering/storage pipeline, returning the same
+ * `content` HTML the DOCX path produces. That is the endpoint the Blog and
+ * Case Study editors use; Portfolio attachments keep using `uploadPdf` and
+ * `POST /api/uploads/pdf`, which is a separate flow and is not touched here.
+ *
+ * @param file - PDF file to upload and extract
+ * @returns The extracted HTML for the `content` field; never empty
+ * @throws Error with a user-facing message on auth, extraction or network failure
+ */
+export async function uploadDocumentPdf(file: File): Promise<string> {
+  if (!file) {
+    throw new Error("No file provided");
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  let data: Partial<PdfUploadResult> | null;
+  try {
+    data = await apiFetch<Partial<PdfUploadResult>>("/api/uploads/docx", {
+      // Empty headers so the browser sets the multipart boundary itself; the
+      // Authorization header is still attached by the shared fetch wrapper.
+      method: "POST",
+      headers: {},
+      body: formData,
+    });
+  } catch (err) {
+    if (err instanceof ApiError) {
+      if (err.code === "PDF_EXTRACTION_FAILED") {
+        throw new Error(PDF_EXTRACTION_MESSAGE);
+      }
+      if (err.code === "UNAUTHORIZED" || err.code === "FORBIDDEN") {
+        throw new Error("Your session has expired. Please sign in again to upload files.");
+      }
+      throw new Error(err.message || "PDF upload failed");
+    }
+
+    const message = err instanceof Error ? err.message : "";
+    if (/\b401\b|unauthor/i.test(message)) {
+      throw new Error("Your session has expired. Please sign in again to upload files.");
+    }
+    if (/\b422\b/.test(message)) {
+      throw new Error(PDF_EXTRACTION_MESSAGE);
+    }
+    throw err;
+  }
+
+  // Only `content` is required: it is what gets stored. The stored file URL is
+  // not part of the Blog / Case Study payload, so its absence is not an error.
+  if (!data?.content?.trim()) {
+    throw new Error(PDF_EXTRACTION_MESSAGE);
+  }
+
+  return data.content;
+}
