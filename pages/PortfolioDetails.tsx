@@ -157,7 +157,7 @@ const PortfolioDetails: React.FC = () => {
             >
               {/* Header */}
               <header className="mb-8">
-                {tags.length > 0 && (
+                {(tags.length > 0 || item.featured) && (
                   <div className="mb-5 flex flex-wrap gap-2">
                     {tags.map((tag) => (
                       <span
@@ -167,6 +167,11 @@ const PortfolioDetails: React.FC = () => {
                         {tag}
                       </span>
                     ))}
+                    {item.featured && (
+                      <span className="rounded-full bg-neutral-900/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-700">
+                        Featured
+                      </span>
+                    )}
                   </div>
                 )}
 
@@ -211,10 +216,11 @@ const PortfolioDetails: React.FC = () => {
               ) : (
                 <div className="rounded-3xl border border-neutral-200 bg-neutral-50 px-6 py-10 text-center">
                   <p className="text-sm font-semibold text-neutral-700">
-                    This project has no content to display yet.
+                    Project content is being prepared.
                   </p>
                   <p className="mt-2 text-sm text-neutral-500">
-                    Please check back soon, or browse the rest of our work.
+                    The details above are everything published for this project
+                    so far. Please check back soon, or browse the rest of our work.
                   </p>
                   <div className="mt-6 flex justify-center">{backLink}</div>
                 </div>

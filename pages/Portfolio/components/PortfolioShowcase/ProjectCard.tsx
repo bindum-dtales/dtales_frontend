@@ -70,7 +70,7 @@ export function ProjectCard({ item }: ProjectCardProps) {
             </span>
           ) : (
             <span className="text-sm font-medium text-neutral-400">
-              Project details coming soon
+              Details unavailable
             </span>
           )}
         </div>

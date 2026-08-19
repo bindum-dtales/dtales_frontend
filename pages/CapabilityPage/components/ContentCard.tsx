@@ -62,7 +62,7 @@ export function ContentCard({ item }: ContentCardProps) {
           </span>
         ) : (
           <span className="mt-auto inline-flex items-center pt-2 text-sm font-medium text-neutral-400">
-            Project details coming soon
+            Details unavailable
           </span>
         )}
       </div>
