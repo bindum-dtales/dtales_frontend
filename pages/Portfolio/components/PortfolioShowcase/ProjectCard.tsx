@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Building2 } from "lucide-react";
 import { getProxiedImageUrl } from "../../../../src/utils/imageProxy";
 import type { PortfolioItem } from "../../../../src/lib/portfolioApi";
+import { resolvePortfolioTarget } from "../../../../src/lib/portfolioLinks";
 import { formatCategory, formatDate } from "./constants";
 
 type ProjectCardProps = {
@@ -14,11 +15,9 @@ export function ProjectCard({ item }: ProjectCardProps) {
   const date = formatDate(item.created_at);
   const imageSrc = getProxiedImageUrl(item.cover_image_url) || item.cover_image_url;
 
-  // Link-based entries open their external URL; document-based entries (no link,
-  // but stored HTML) open the internal portfolio detail view instead.
-  const hasLink = Boolean(item.link);
-  const hasDocument = !hasLink && Boolean(item.content);
-  const isOpenable = hasLink || hasDocument;
+  // External links, uploaded attachments and "nothing yet" are resolved in one
+  // shared place so every portfolio surface behaves the same way.
+  const target = resolvePortfolioTarget(item);
 
   const cardBody = (
     <>
@@ -64,9 +63,9 @@ export function ProjectCard({ item }: ProjectCardProps) {
           ) : (
             <span />
           )}
-          {isOpenable ? (
+          {target.kind !== "none" ? (
             <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0020BF]">
-              View Project
+              {target.label}
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
             </span>
           ) : (
@@ -82,10 +81,10 @@ export function ProjectCard({ item }: ProjectCardProps) {
   const className =
     "group flex flex-col overflow-hidden rounded-3xl border border-neutral-200 bg-white p-2 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-neutral-300 hover:shadow-xl";
 
-  if (hasLink) {
+  if (target.kind === "external") {
     return (
       <a
-        href={item.link ?? undefined}
+        href={target.href}
         target="_blank"
         rel="noopener noreferrer"
         className={className}
@@ -95,10 +94,10 @@ export function ProjectCard({ item }: ProjectCardProps) {
     );
   }
 
-  if (hasDocument) {
+  if (target.kind === "internal") {
     return (
       <Link
-        to={`/portfolio/${item.id}`}
+        to={target.to}
         state={{ from: location.pathname }}
         className={className}
       >

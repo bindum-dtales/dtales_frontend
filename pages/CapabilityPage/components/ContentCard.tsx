@@ -1,6 +1,7 @@
 import { ArrowRight, Building2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { getProxiedImageUrl } from "../../../src/utils/imageProxy";
+import { resolvePortfolioTarget } from "../../../src/lib/portfolioLinks";
 import type { ContentCardItem } from "../types";
 
 type ContentCardProps = {
@@ -14,11 +15,9 @@ export function ContentCard({ item }: ContentCardProps) {
   const location = useLocation();
   const imageSrc = getProxiedImageUrl(item.cover_image_url) || item.cover_image_url;
 
-  // Link-based entries open their external URL; document-based entries (no link,
-  // but stored HTML) open the internal portfolio detail view instead.
-  const hasLink = Boolean(item.link);
-  const hasDocument = !hasLink && Boolean(item.content);
-  const isOpenable = hasLink || hasDocument;
+  // External links, uploaded attachments and "nothing yet" are resolved in one
+  // shared place so every portfolio surface behaves the same way.
+  const target = resolvePortfolioTarget(item);
 
   const cardBody = (
     <>
@@ -56,9 +55,9 @@ export function ContentCard({ item }: ContentCardProps) {
           {item.description}
         </p>
 
-        {isOpenable ? (
+        {target.kind !== "none" ? (
           <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold text-[#0020BF]">
-            View Project
+            {target.label}
             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
           </span>
         ) : (
@@ -70,18 +69,18 @@ export function ContentCard({ item }: ContentCardProps) {
     </>
   );
 
-  if (hasLink) {
+  if (target.kind === "external") {
     return (
-      <a href={item.link} target="_blank" rel="noopener noreferrer" className={CARD_CLASS_NAME}>
+      <a href={target.href} target="_blank" rel="noopener noreferrer" className={CARD_CLASS_NAME}>
         {cardBody}
       </a>
     );
   }
 
-  if (hasDocument) {
+  if (target.kind === "internal") {
     return (
       <Link
-        to={`/portfolio/${item.id}`}
+        to={target.to}
         state={{ from: location.pathname }}
         className={CARD_CLASS_NAME}
       >

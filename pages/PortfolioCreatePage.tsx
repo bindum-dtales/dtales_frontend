@@ -10,6 +10,7 @@ import {
 } from "../src/lib/portfolioApi";
 import {
   buildAttachmentPreview,
+  buildImageAttachmentHtml,
   AttachmentPreview,
 } from "../src/lib/attachmentParser";
 import SEO from '../components/seo/SEO';
@@ -80,12 +81,13 @@ export default function PortfolioCreatePage() {
         }
       : null
   );
+  // The selected file is kept alongside its preview because image attachments
+  // are only uploaded on submit (the preview itself is a local blob URL).
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [attachmentProcessing, setAttachmentProcessing] = useState(false);
 
   const hasProjectLink = formData.projectLink.trim().length > 0;
   const hasDocument = !!attachment;
-  const documentHtml =
-    attachment?.previewType === "html" ? attachment.previewContent : null;
 
   const handleCapabilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCapability(e.target.value);
@@ -161,6 +163,7 @@ export default function PortfolioCreatePage() {
         setError("Failed to parse file: no content extracted");
       } else {
         setAttachment(preview);
+        setAttachmentFile(file);
       }
     } catch (err: any) {
       setError(err.message || "Failed to parse file");
@@ -177,6 +180,7 @@ export default function PortfolioCreatePage() {
       URL.revokeObjectURL(attachment.previewContent);
     }
     setAttachment(null);
+    setAttachmentFile(null);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -191,6 +195,15 @@ export default function PortfolioCreatePage() {
 
     if (!formData.projectLink.trim() && !hasDocument) {
       setError("Provide a Project Link or upload a document");
+      return;
+    }
+
+    // Formats with no conversion path cannot be published: saving them would
+    // store an entry with neither a link nor any attachment content.
+    if (attachment && attachment.previewType === "file") {
+      setError(
+        "This attachment format can't be published yet. Upload a PDF, DOCX, TXT, Markdown or image file, or provide a Project Link."
+      );
       return;
     }
 
@@ -218,6 +231,37 @@ export default function PortfolioCreatePage() {
       // Upload image only if a new file was selected
       if (formData.coverImage) {
         imageUrl = await uploadPortfolioImage(formData.coverImage);
+      }
+
+      // Resolve the attachment into the `content` field, the only
+      // attachment-bearing field the portfolio API stores. Converted documents
+      // (PDF/DOCX/TXT/Markdown) already carry their HTML; image attachments are
+      // uploaded here and wrapped in the same markup.
+      let documentHtml: string | null = null;
+      if (attachment) {
+        if (attachment.previewType === "html") {
+          documentHtml = attachment.previewContent;
+        } else if (attachmentFile) {
+          const attachmentUrl = await uploadPortfolioImage(attachmentFile);
+          documentHtml = buildImageAttachmentHtml(attachmentUrl, attachment.fileName);
+        } else {
+          // Editing an existing entry without touching its attachment.
+          documentHtml = editingItem?.content ?? null;
+        }
+
+        // Hard stop: an entry must never be saved with an attachment selected
+        // but nothing persisted, and a browser-only blob URL must never reach
+        // the database (it dies with the tab that created it).
+        if (!documentHtml?.trim()) {
+          throw new Error(
+            "The attachment could not be prepared for publishing. Re-select the file and try again."
+          );
+        }
+        if (/\bblob:/i.test(documentHtml)) {
+          throw new Error(
+            "The attachment was not uploaded correctly. Re-select the file and try again."
+          );
+        }
       }
 
       const portfolioData = {

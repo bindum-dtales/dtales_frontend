@@ -200,3 +200,17 @@ export async function buildAttachmentPreview(
     }
   }
 }
+
+/**
+ * Wrap an already-uploaded image URL in the same markup the PDF flow stores,
+ * so an image attachment is rendered by the portfolio detail view exactly like
+ * a converted document page.
+ *
+ * @param url Public URL of the uploaded image.
+ * @param fileName Original file name, used as the alt text.
+ */
+export function buildImageAttachmentHtml(url: string, fileName: string): string {
+  return `<div class="pdf-portfolio">\n  <img src="${escapeHtml(url)}" alt="${escapeHtml(
+    fileName
+  )}" loading="lazy" />\n</div>`;
+}
