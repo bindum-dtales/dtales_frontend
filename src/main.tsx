@@ -6,6 +6,7 @@ import App from "../App";
 import "./index.css";
 import "./styles/globals.css";
 import "./styles/documentContent.css";
+import "./styles/protectedViewer.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

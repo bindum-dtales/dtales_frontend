@@ -6,6 +6,7 @@ import { apiFetch } from "../src/lib/api";
 import type { PortfolioItem } from "../src/lib/portfolioApi";
 import { sanitizeHtml } from "../src/utils/sanitizeHtml";
 import CoverImage from "../components/CoverImage";
+import ProtectedViewer from "../components/ProtectedViewer";
 import SEO from '../components/seo/SEO';
 import ArticleSchema from '../components/seo/ArticleSchema';
 import { buildRouteUrl } from '../src/config/site';
@@ -147,77 +148,79 @@ const PortfolioDetails: React.FC = () => {
         )}
 
         {!loading && !error && item && (
-          <motion.article
-            className="rounded-3xl bg-white p-5 shadow-sm sm:rounded-[2.5rem] sm:p-10 lg:p-12"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {/* Header */}
-            <header className="mb-8">
-              {tags.length > 0 && (
-                <div className="mb-5 flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-[#0020BF]/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#0020BF]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+          <ProtectedViewer>
+            <motion.article
+              className="rounded-3xl bg-white p-5 shadow-sm sm:rounded-[2.5rem] sm:p-10 lg:p-12"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Header */}
+              <header className="mb-8">
+                {tags.length > 0 && (
+                  <div className="mb-5 flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-[#0020BF]/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#0020BF]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <h1 className="break-words text-[28px] font-bold leading-tight tracking-tight text-black sm:text-4xl md:text-5xl">
+                  {item.title}
+                </h1>
+
+                {item.company_name && (
+                  <div className="mt-5 flex items-start gap-2 text-gray-500">
+                    <Building2 size={18} className="mt-0.5 shrink-0" />
+                    <span className="break-words text-base">{item.company_name}</span>
+                  </div>
+                )}
+              </header>
+
+              {/* Cover Image */}
+              <CoverImage src={item.cover_image_url} alt={item.title} />
+
+              {/* Description */}
+              {item.description && (
+                <p className="mb-8 break-words text-base leading-relaxed text-gray-700 sm:text-lg">
+                  {item.description}
+                </p>
               )}
 
-              <h1 className="break-words text-[28px] font-bold leading-tight tracking-tight text-black sm:text-4xl md:text-5xl">
-                {item.title}
-              </h1>
-
-              {item.company_name && (
-                <div className="mt-5 flex items-start gap-2 text-gray-500">
-                  <Building2 size={18} className="mt-0.5 shrink-0" />
-                  <span className="break-words text-base">{item.company_name}</span>
+              {/* Converted document content */}
+              {safeContent ? (
+                <div
+                  className="document-content"
+                  dangerouslySetInnerHTML={{ __html: safeContent }}
+                />
+              ) : item.link ? (
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0020BF] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#000F55]"
+                >
+                  Open project
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              ) : (
+                <div className="rounded-3xl border border-neutral-200 bg-neutral-50 px-6 py-10 text-center">
+                  <p className="text-sm font-semibold text-neutral-700">
+                    This project has no content to display yet.
+                  </p>
+                  <p className="mt-2 text-sm text-neutral-500">
+                    Please check back soon, or browse the rest of our work.
+                  </p>
+                  <div className="mt-6 flex justify-center">{backLink}</div>
                 </div>
               )}
-            </header>
-
-            {/* Cover Image */}
-            <CoverImage src={item.cover_image_url} alt={item.title} />
-
-            {/* Description */}
-            {item.description && (
-              <p className="mb-8 break-words text-base leading-relaxed text-gray-700 sm:text-lg">
-                {item.description}
-              </p>
-            )}
-
-            {/* Converted document content */}
-            {safeContent ? (
-              <div
-                className="document-content"
-                dangerouslySetInnerHTML={{ __html: safeContent }}
-              />
-            ) : item.link ? (
-              <a
-                href={item.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#0020BF] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#000F55]"
-              >
-                Open project
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            ) : (
-              <div className="rounded-3xl border border-neutral-200 bg-neutral-50 px-6 py-10 text-center">
-                <p className="text-sm font-semibold text-neutral-700">
-                  This project has no content to display yet.
-                </p>
-                <p className="mt-2 text-sm text-neutral-500">
-                  Please check back soon, or browse the rest of our work.
-                </p>
-                <div className="mt-6 flex justify-center">{backLink}</div>
-              </div>
-            )}
-          </motion.article>
+            </motion.article>
+          </ProtectedViewer>
         )}
       </div>
     </div>

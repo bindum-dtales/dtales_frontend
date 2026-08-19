@@ -1,0 +1,39 @@
+/**
+ * Protected Viewer
+ *
+ * Content-protection styles for the portfolio document viewer. Everything is
+ * scoped to `.protected-viewer`, so no other page, component or image on the
+ * site changes behaviour.
+ *
+ * Screen rendering is untouched: images keep their size, position and pointer
+ * events, so scrolling, zooming and links inside the document all still work.
+ */
+
+.protected-viewer img {
+  /* Blocks the native drag-image-to-desktop gesture. */
+  -webkit-user-drag: none;
+  /* Blocks the iOS/Safari long-press "Save Image" callout. */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Screen-hidden notice that replaces the document in printed output. */
+.protected-viewer-print-notice {
+  display: none;
+}
+
+/*
+ * Ctrl/Cmd+P is intercepted in ProtectedViewer, but print can also be started
+ * from the browser menu (including "Save as PDF"), so the document is removed
+ * from printed output as well.
+ */
+@media print {
+  .protected-viewer > *:not(.protected-viewer-print-notice) {
+    display: none !important;
+  }
+
+  .protected-viewer-print-notice {
+    display: block;
+  }
+}
