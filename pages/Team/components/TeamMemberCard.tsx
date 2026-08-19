@@ -34,10 +34,10 @@ const BLOCK_SIZE = {
 // block's edges without ever spilling outside the D. Tune per person if a
 // composition looks off; these don't affect the source images.
 const PERSON_POSITION: Record<string, { left: string; bottom: string; width: string; height: string }> = {
-  'Bindu Mohan': { left: '-8%', bottom: '5%', width: '107%', height: '270%' },
-  'Sneha Peri': { left: '2%', bottom: '1%', width: '85%', height: '122%' },
-  'Yashas Niranjan': { left: '5%', bottom: '1%', width: '100%', height: '140%' },
-  'Sakshi Agarwal': { left: '-8%', bottom: '5%', width: '120%', height: '200%' },
+  'Bindu Mohan': { left: '-2%', bottom: '5%', width: '91%', height: '270%' },
+  'Sneha Peri': { left: '-7%', bottom: '1%', width: '99%', height: '122%' },
+  'Yashas Niranjan': { left: '-1%', bottom: '1%', width: '100%', height: '140%' },
+  'Sakshi Agarwal': { left: '5%', bottom: '5%', width: '78%', height: '200%' },
 };
 const DEFAULT_PERSON_POSITION = { left: '9%', bottom: '-6%', width: '84%', height: '126%' };
 

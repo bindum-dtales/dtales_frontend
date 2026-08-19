@@ -2,7 +2,6 @@ export interface TeamMember {
   name: string;
   role: string;
   image: string;
-  imageBw: string;
   personImage: string;
   bio: string;
   skills?: string[];
