@@ -17,6 +17,10 @@ const AdminBlogsManage: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // True once a GET has actually succeeded. "No blogs found." is gated on this
+  // so it can only ever mean "the server really returned an empty list", never
+  // "the request failed and we blanked the table".
+  const [loadedOnce, setLoadedOnce] = useState(false);
 
   const fetchBlogs = async () => {
     setError(null);
@@ -24,10 +28,18 @@ const AdminBlogsManage: React.FC = () => {
       console.log("Admin: Fetching blogs...");
       const data = await apiFetch<Blog[]>("/api/blogs");
       console.log("Admin: Blogs API response:", data);
-      setBlogs(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) {
+        // A non-array body is an anomaly, not an empty collection. Coercing it
+        // to [] here would render as "No blogs found." and hide the fault.
+        throw new Error("Unexpected response shape from /api/blogs");
+      }
+      setBlogs(data);
+      setLoadedOnce(true);
     } catch (e: any) {
       console.error("Admin: Failed to load blogs:", e);
       setError(e.message || "Failed to load blogs");
+      // Deliberately leaves `blogs` untouched so a failed refresh keeps
+      // showing the last known good list instead of emptying the page.
     } finally {
       setLoading(false);
     }
@@ -39,7 +51,9 @@ const AdminBlogsManage: React.FC = () => {
       console.log("Admin: Deleting blog:", id);
       await apiFetch<unknown>(`/api/blogs/${id}`, { method: "DELETE" });
       console.log("Admin: Blog deleted successfully");
-      fetchBlogs();
+      // Server-confirmed refresh rather than an optimistic local splice: the
+      // list is only ever what the API reports.
+      await fetchBlogs();
     } catch (e: any) {
       console.error("Admin: Failed to delete blog:", e);
       setError(e.message || "Failed to delete blog");
@@ -66,52 +80,60 @@ const AdminBlogsManage: React.FC = () => {
 
         {loading ? (
           <p className="text-gray-600">Loading...</p>
-        ) : error ? (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
-            {error}
-          </div>
-        ) : blogs.length === 0 ? (
-          <p className="text-gray-600">No blogs found.</p>
         ) : (
-          <div className="space-y-3">
-            {blogs.map((blog) => (
-              <div
-                key={blog.id}
-                className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm"
-              >
-                <div>
-                  <p className="text-gray-900 font-medium">{blog.title}</p>
-                  <p className="text-gray-500 text-sm">{blog.slug}</p>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      blog.published
-                        ? "bg-green-50 text-green-700 border border-green-200"
-                        : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                    }`}
-                  >
-                    {blog.published ? "Published" : "Draft"}
-                  </span>
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() =>
-                      navigate(`/admin/blogs/edit/${blog.id}`)
-                    }
-                    className="text-[#0020BF] hover:text-[#0b2be0]"
-                  >
-                    <Pencil size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(blog.id)}
-                    className="text-red-500 hover:text-red-600"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+          <>
+            {/* The error banner now sits above the list instead of replacing
+                it, so a failed refresh reports the failure without wiping the
+                blogs that are still on screen. */}
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+                {error}
               </div>
-            ))}
-          </div>
+            )}
+            {blogs.length === 0 && loadedOnce && !error ? (
+              <p className="text-gray-600">No blogs found.</p>
+            ) : blogs.length > 0 ? (
+              <div className="space-y-3">
+                {blogs.map((blog) => (
+                  <div
+                    key={blog.id}
+                    className="flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm"
+                  >
+                    <div>
+                      <p className="text-gray-900 font-medium">{blog.title}</p>
+                      <p className="text-gray-500 text-sm">{blog.slug}</p>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          blog.published
+                            ? "bg-green-50 text-green-700 border border-green-200"
+                            : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                        }`}
+                      >
+                        {blog.published ? "Published" : "Draft"}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/blogs/edit/${blog.id}`)
+                        }
+                        className="text-[#0020BF] hover:text-[#0b2be0]"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(blog.id)}
+                        className="text-red-500 hover:text-red-600"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </>
         )}
       </div>
     </div>
