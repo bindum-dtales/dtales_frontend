@@ -34,10 +34,10 @@ const BLOCK_SIZE = {
 // block's edges without ever spilling outside the D. Tune per person if a
 // composition looks off; these don't affect the source images.
 const PERSON_POSITION: Record<string, { left: string; bottom: string; width: string; height: string }> = {
-  'Bindu Mohan': { left: '-11%', bottom: '5%', width: '100%', height: '270%' },
-  'Sneha Peri': { left: '-7%', bottom: '5%', width: '80%', height: '122%' },
-  'Yashas Niranjan': { left: '5%', bottom: '3%', width: '100%', height: '140%' },
-  'Sakshi Agarwal': { left: '-15%', bottom: '5%', width: '100%', height: '132%' },
+  'Bindu Mohan': { left: '-8%', bottom: '5%', width: '107%', height: '270%' },
+  'Sneha Peri': { left: '2%', bottom: '1%', width: '85%', height: '122%' },
+  'Yashas Niranjan': { left: '5%', bottom: '1%', width: '100%', height: '140%' },
+  'Sakshi Agarwal': { left: '-8%', bottom: '5%', width: '120%', height: '200%' },
 };
 const DEFAULT_PERSON_POSITION = { left: '9%', bottom: '-6%', width: '84%', height: '126%' };
 
@@ -137,7 +137,14 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
               src={member.personImage}
               alt={`${member.name}, ${member.role}`}
               draggable={false}
-              className="absolute object-contain object-bottom select-none pointer-events-none transition-[filter] duration-[320ms]"
+              // max-w-none is load-bearing. Tailwind's preflight sets
+              // `img,video { max-width: 100% }`, which resolves against this
+              // image's containing block (the mask layer, i.e. the D block).
+              // There is no inline max-width to beat it, so any
+              // PERSON_POSITION width above 100% was silently clamped back
+              // down to 100% and widening a person did nothing on screen.
+              // Members at or below 100% were never affected either way.
+              className="absolute max-w-none object-contain object-bottom select-none pointer-events-none transition-[filter] duration-[320ms]"
               style={{
                 left: personPos.left,
                 bottom: personPos.bottom,
@@ -178,8 +185,14 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({
             exit={{ opacity: 0, scaleX: 0.82, x: panelSide === 'right' ? -16 : 16 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformOrigin: panelSide === 'right' ? 'left center' : 'right center' }}
-            className={`absolute top-0 w-[min(820px,calc(100vw_-_536px))] ${
-              panelSide === 'right' ? 'left-full ml-8' : 'right-full mr-8'
+            // z-50 keeps the panel above the card's own artwork, and the
+            // ::before strip bridges the 32px gap between card and panel.
+            // Without that bridge the gap belongs to the flex container, not
+            // to the card, so crossing it fired pointerleave on the card and
+            // closed the panel — then re-entering reopened it, which is what
+            // produced the flicker loop.
+            className={`absolute top-0 z-50 w-[min(820px,calc(100vw_-_536px))] before:absolute before:inset-y-0 before:w-8 before:content-[''] ${
+              panelSide === 'right' ? 'left-full ml-8 before:-left-8' : 'right-full mr-8 before:-right-8'
             }`}
             onClick={(e) => e.stopPropagation()}
           >

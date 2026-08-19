@@ -8,10 +8,14 @@ interface InfoPanelProps {
   onClose: () => void;
 }
 
+// The container only drives the child stagger; it deliberately animates no
+// opacity of its own. The wrapper in TeamMemberCard already owns the panel's
+// fade, and a second opacity animation stacked on top of it left the white
+// surface translucent for the whole entry, letting the cards behind show
+// through. Children still fade and rise in individually.
 const container = {
-  hidden: { opacity: 0 },
+  hidden: {},
   show: {
-    opacity: 1,
     transition: { staggerChildren: 0.08, delayChildren: 0.1 },
   },
 };
@@ -28,6 +32,9 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ member, onClose }) => {
       initial="hidden"
       animate="show"
       exit="hidden"
+      // Explicitly opaque: the panel is a solid modal surface over the cards,
+      // so it must never inherit or animate a partial opacity.
+      style={{ backgroundColor: '#ffffff', opacity: 1 }}
       className="relative bg-white rounded-2xl md:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,32,191,0.25)] border border-[#0020BF]/10 p-6 md:p-7 text-left"
     >
       <button

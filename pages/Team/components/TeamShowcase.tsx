@@ -49,13 +49,13 @@ const TeamShowcase: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
             className="relative md:w-auto"
-            // The open card's panel is wide and can visually overlap a
-            // neighboring card. Dropping the open card BELOW its resting
-            // siblings (instead of raising it above them) guarantees a
-            // neighbor's own card is always the topmost, hit-testable
-            // element over that shared area — so moving straight into it
-            // always reaches its pointer handlers, even mid-transition.
-            style={{ zIndex: isFocused ? 5 : 10 }}
+            // The open card's panel is wide and overlaps its neighbours, so
+            // the open card is raised ABOVE its resting siblings. That makes
+            // the panel both the topmost painted layer (neighbours can never
+            // show through it) and the topmost hit-testable one, so moving
+            // the cursor across the panel can never reach a neighbour's
+            // pointer handlers and switch the active member mid-move.
+            style={{ zIndex: isFocused ? 50 : 10 }}
           >
             <TeamMemberCard
               member={member}
