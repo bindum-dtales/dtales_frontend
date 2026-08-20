@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, ExternalLink } from "lucide-react";
 import { apiFetch } from "../src/lib/api";
 import CoverImage from "../components/CoverImage";
 import SEO from '../components/seo/SEO';
@@ -13,6 +13,8 @@ type Blog = {
   title: string;
   cover_image_url?: string | null;
   content?: string;
+  /** External project URL; set instead of `content` for link-based records. */
+  link?: string | null;
   created_at?: string;
 };
 
@@ -130,8 +132,20 @@ const BlogDetails: React.FC = () => {
             {/* Cover Image */}
             <CoverImage src={blog.cover_image_url} alt={blog.title} />
 
-            {/* Content */}
-            {blog.content ? (
+            {/* Content: an external project link, or the document-derived HTML */}
+            {blog.link?.trim() ? (
+              <div className="py-8 text-center">
+                <a
+                  href={blog.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#0020BF] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#0b2be0]"
+                >
+                  View Project
+                  <ExternalLink size={18} />
+                </a>
+              </div>
+            ) : blog.content ? (
               <div
                 className="prose prose-lg max-w-none
                   prose-headings:font-bold prose-headings:text-black prose-headings:tracking-tight

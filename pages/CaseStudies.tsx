@@ -14,6 +14,7 @@ type CaseStudy = {
 	cover_image_url?: string | null;
 	excerpt: string;
 	content?: string;
+	link?: string | null;
 	published: boolean;
 	created_at: string;
 };
@@ -163,6 +164,7 @@ const CaseStudies: React.FC = () => {
                         date={caseStudy.created_at}
                         category="Case Study"
                         href={`/case-studies/${caseStudy.id}`}
+                        link={caseStudy.link}
                     />
                 ))}
             </div>

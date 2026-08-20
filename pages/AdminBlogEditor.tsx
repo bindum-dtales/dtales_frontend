@@ -5,6 +5,7 @@ import { Upload, X } from "lucide-react";
 import { uploadImage } from "../src/lib/uploads";
 import { apiFetch } from "../src/lib/api";
 import { DOCUMENT_ACCEPT, parseDocumentToHtml } from "../src/lib/documentContent";
+import { MISSING_SOURCE_MESSAGE, useLinkOrDocument } from "../src/hooks/useLinkOrDocument";
 import { getProxiedImageUrl } from "../src/utils/imageProxy";
 import SEO from '../components/seo/SEO';
 
@@ -44,7 +45,20 @@ export default function AdminBlogEditor() {
   const [title, setTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
-  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+
+  // A blog carries its body either as an external link or as an uploaded
+  // document; the hook owns that mutually exclusive choice.
+  const {
+    link,
+    setLink,
+    hasLink,
+    hasDocument,
+    hasNewDocument,
+    setDocumentHtml,
+    clearDocument,
+    loadRecord,
+    toPayloadFields,
+  } = useLinkOrDocument();
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,10 +67,10 @@ export default function AdminBlogEditor() {
   const documentInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (coverImageUrl || htmlContent) {
+    if (coverImageUrl || hasDocument || hasLink) {
       setError(null);
     }
-  }, [coverImageUrl, htmlContent]);
+  }, [coverImageUrl, hasDocument, hasLink]);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -67,10 +81,13 @@ export default function AdminBlogEditor() {
           title: string;
           cover_image_url?: string | null;
           company_name?: string | null;
+          link?: string | null;
+          content?: string | null;
         }>(`/api/blogs/${id}`);
         setTitle(data.title || "");
         setCoverImageUrl(data.cover_image_url || null);
         setCompanyName(data.company_name || "");
+        loadRecord(data);
       } catch (err: any) {
         setError(err.message || "Failed to load blog");
       } finally {
@@ -79,7 +96,7 @@ export default function AdminBlogEditor() {
     };
 
     loadBlog();
-  }, [id, isEdit]);
+  }, [id, isEdit, loadRecord]);
 
   // ---------------- IMAGE UPLOAD ----------------
   async function handleImageUpload(file: File) {
@@ -107,7 +124,7 @@ export default function AdminBlogEditor() {
         setError("No content could be extracted from that document.");
         return;
       }
-      setHtmlContent(html);
+      setDocumentHtml(html);
     } catch (err: any) {
       setError(err?.message || "Failed to read the document. Please try again.");
     } finally {
@@ -129,8 +146,8 @@ export default function AdminBlogEditor() {
       return;
     }
 
-    if (!isEdit && (!htmlContent || !htmlContent.trim())) {
-      setError("Please upload a DOCX or PDF file with your content");
+    if (!hasLink && !hasDocument) {
+      setError(MISSING_SOURCE_MESSAGE);
       return;
     }
 
@@ -143,17 +160,15 @@ export default function AdminBlogEditor() {
       setLoading(true);
 
       // Payload matches Supabase schema exactly: cover_image_url (text), content (text/HTML)
+      // `link` and `content` come from the hook, which sends one or the other
+      // and never both.
       const payload: any = {
         title: title.trim(),
         company_name: companyName.trim(),
         cover_image_url: coverImageUrl,  // Supabase column name
         published: true,
+        ...toPayloadFields(),
       };
-
-      // Only include content if it's being updated
-      if (htmlContent) {
-        payload.content = htmlContent;   // Plain HTML string
-      }
 
       console.log("Publishing blog with payload:", JSON.stringify(payload, null, 2));
 
@@ -248,6 +263,24 @@ export default function AdminBlogEditor() {
               />
             </div>
 
+            {/* Project Link */}
+            <div className="md:col-span-2">
+              <label className="block text-sm text-gray-700 mb-2">Project Link</label>
+              <input
+                type="url"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0020BF] focus:border-[#0020BF] disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+                placeholder="https://example.com"
+                value={link}
+                disabled={hasDocument}
+                onChange={(e) => setLink(e.target.value)}
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                {hasDocument
+                  ? "Remove the document to use an external project link."
+                  : "Provide a project link instead of uploading a document."}
+              </p>
+            </div>
+
             {/* Content File Upload (DOCX / PDF) */}
             <div className="md:col-span-2">
               <label className="block text-sm text-gray-700 mb-2">
@@ -257,17 +290,22 @@ export default function AdminBlogEditor() {
                 <button
                   type="button"
                   onClick={() => documentInputRef.current?.click()}
-                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-3 rounded-lg font-semibold border border-gray-200"
+                  disabled={hasLink}
+                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-3 rounded-lg font-semibold border border-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <Upload size={18} />
                   Choose Document
                 </button>
-                {htmlContent && (
+                {hasDocument && (
                   <div className="flex-1 flex items-center gap-3">
-                    <span className="text-green-600">Content parsed successfully</span>
+                    <span className="text-green-600">
+                      {hasNewDocument
+                        ? "Content parsed successfully"
+                        : "Existing document in use"}
+                    </span>
                     <button
                       type="button"
-                      onClick={() => setHtmlContent(null)}
+                      onClick={clearDocument}
                       className="text-red-500 hover:text-red-600"
                     >
                       <X size={18} />
@@ -279,13 +317,21 @@ export default function AdminBlogEditor() {
                 ref={documentInputRef}
                 type="file"
                 accept={DOCUMENT_ACCEPT}
-                onChange={(e) => e.target.files && handleDocumentUpload(e.target.files[0])}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  // Reset so re-picking the same file after switching modes
+                  // still fires a change event.
+                  e.target.value = "";
+                  if (file) handleDocumentUpload(file);
+                }}
                 className="hidden"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Supported formats: DOCX, PDF
+                {hasLink
+                  ? "Clear the project link to upload a document."
+                  : "Supported formats: DOCX, PDF"}
               </p>
-              {isEdit && !htmlContent && (
+              {isEdit && !hasNewDocument && hasDocument && (
                 <p className="text-xs text-gray-500 mt-2">
                   Leave empty to keep existing content
                 </p>

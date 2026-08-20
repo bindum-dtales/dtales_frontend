@@ -8,6 +8,8 @@ type Blog = {
   cover_image_url?: string | null;
   excerpt?: string;
   content?: string;
+  /** External project URL; set instead of `content` for link-based blogs. */
+  link?: string | null;
   published: boolean;
 };
 
@@ -24,7 +26,9 @@ function mapBlogToContentItem(blog: Blog): ContentCardItem {
     description: blog.excerpt || getExcerpt(blog.content),
     subcategory: "Blogs",
     cover_image_url: blog.cover_image_url || "",
-    link: `/#/blogs/${blog.id}`,
+    // A link-based blog opens its external URL; everything else opens the
+    // in-app blog page.
+    link: blog.link?.trim() || `/#/blogs/${blog.id}`,
   };
 }
 

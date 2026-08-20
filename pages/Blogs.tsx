@@ -15,6 +15,7 @@ type Blog = {
 	cover_image_url?: string | null;
 	excerpt: string;
 	content?: string;
+	link?: string | null;
 	published: boolean;
 	created_at: string;
 };
@@ -165,6 +166,7 @@ const Blogs: React.FC = () => {
                         date={blog.created_at}
                         category="Blog"
                         href={`/blogs/${blog.id}`}
+                        link={blog.link}
                     />
                 ))}
             </div>
